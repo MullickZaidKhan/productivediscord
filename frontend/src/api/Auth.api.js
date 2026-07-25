@@ -14,3 +14,7 @@ export const refreshToken = () =>
 
 export const accesstoken = () =>
     api.get("auth/accesstoken");
+
+export const refreshtoken = () =>
+    api.get("auth/refresh");
+
