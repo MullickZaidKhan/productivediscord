@@ -10,6 +10,7 @@ export const verifyJwt = async function (req, res, next) {
         message: "Unauthorized user.",
       });
     }
+
     const payload = verifyAccessToken(token);
     req.user = { id: payload._id };
 
@@ -33,12 +34,13 @@ export const accessTokenverifyJwt = async function (req, res) {
         message: "Unauthorized user.",
       });
     }
+
     const payload = verifyAccessToken(token);
     const User =  payload;
     
     res.status(201).json({
       success:true,
-      payloadtofontend:User,
+      payloadtofrontend:User,
     })
   } catch (error) {
     console.log(error);

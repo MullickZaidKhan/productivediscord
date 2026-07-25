@@ -7,7 +7,6 @@ import config from "../config/config.js"; // Aapki config file
 import { signAccessToken, signRefreshToken, hashToken, verifyRefreshToken } from "../lib/jwt.js";
 import { clearAuthCookies, setAuthCookies } from "../lib/cookies.js";
 
-
 export const register = async (req, res) => {
   const { username, email, password } = req.body;
 
@@ -114,7 +113,6 @@ export const login = async (req, res) => {
       id: existUser._id,
       name: existUser.username,
       email: existUser.email,
-
     };
 
     const refreshToken = signRefreshToken(payload);
@@ -223,5 +221,62 @@ export const refresh = async (req, res) => {
       message: "internal server error",
     });
   }
-
 };
+
+// GET /api/auth/check-username/:username
+// Returns { available: boolean, message: string }
+const checkUsername = async (req, res) => {
+  try {
+    const { username } = req.params;
+    if(!username){
+       return res.status(400).json({
+        success:false
+       })
+    }
+
+    if(username<5){
+       return res.status(400).json({
+        message: "Username must be at least 5 characters",
+        success:false,
+       })
+    }
+
+    if(username>18){
+       return res.status(400).json({
+        message: "Username cannot exceed 18 characters",
+        success:false,
+       })
+    }
+
+     // Only allow letters, numbers, dots and underscores (Instagram-style)
+    const validPattern = /^[a-zA-Z0-9._]+$/;
+    if (!validPattern.test(username)) {
+      return res.status(200).json({
+        available: false,
+        message: "Only letters, numbers, '.' and '_' are allowed",
+      });
+    }
+
+      const existingUser = await User.findOne({
+      username: { $regex: `^${username}$`, $options: "i" },
+    }).select("_id");
+
+    if(existingUser){
+       return res.status(400).json({
+        message: "This username has already been taken",
+        success:false,
+       })
+    }
+
+      return res.status(200).json({
+      available: true,
+      message: "Username is available",
+    });
+  } catch (error) {
+     console.error("checkUsername error:", error);
+    return res.status(500).json({
+      available: false,
+      message: "Something went wrong while checking username",
+    });
+  }
+}

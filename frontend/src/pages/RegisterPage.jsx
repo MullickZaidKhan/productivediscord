@@ -1,8 +1,7 @@
 import { useState, useContext } from "react";
 import { useForm } from "react-hook-form";
-import { Eye, EyeOff, AlertCircle } from "lucide-react";
-import { useRegister } from "../hooks/useAuth.js";
-
+import { Eye, EyeOff, AlertCircle, Check, X, Loader2 } from "lucide-react";
+import { useRegister, checkUsernameEX } from "../hooks/useAuth.js";
 
 // Calculates a simple password strength score based on length and character variety
 const getPasswordStrength = (password) => {
@@ -41,11 +40,14 @@ const RegisterPage = () => {
 
   const registerMutation = useRegister();
 
-
   const [showPassword, setShowPassword] = useState(false);
 
   const passwordValue = watch("password", "");
+  const usernameValue = watch("username", "");
   const strength = getPasswordStrength(passwordValue);
+
+  // Live availability check — debounced inside the hook itself
+  const { status: usernameStatus, message: usernameMessage } = checkUsernameEX(usernameValue);
 
   // Pull a human-readable message out of whatever shape the backend error takes
   const getErrorMessage = (error) => {
@@ -55,13 +57,18 @@ const RegisterPage = () => {
     if (status === 401 || status === 403) {
       return "Wrong credentials. Please double-check your details and try again.";
     }
+
     if (status === 409) {
       return serverMessage || "That username or email is already taken.";
     }
+
     return serverMessage || "Registration failed. Please try again.";
   };
 
   const onSubmit = (data) => {
+    // Guard against submitting a username we already know is taken/invalid
+    if (usernameStatus === "taken" || usernameStatus === "invalid") return;
+
     registerMutation.mutate(data, {
       onSuccess: ({ data }) => {
         reset();
@@ -94,24 +101,62 @@ const RegisterPage = () => {
           {/* Username */}
           <div>
             <label className="block text-gray-300 text-sm mb-2">Username</label>
-            <input
-              {...register("username", {
-                required: "Username is required",
-                maxLength: { value: 20, message: "Username cannot exceed 20 characters" },
-              })}
-              type="text"
-              placeholder="johndoe"
-              aria-invalid={errors.username ? "true" : "false"}
-              className={`w-full rounded-full px-5 py-3 bg-[#0b1327ad] text-white placeholder-gray-500 border outline-none transition ${
-                errors.username
-                  ? "border-red-500"
-                  : "border-blue-500/30 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20"
-              }`}
-            />
-            {errors.username && (
+            <div className="relative">
+              <span className="absolute inset-y-0 left-0 flex items-center pl-5 text-gray-500 pointer-events-none">
+                @
+              </span>
+              <input
+                id="username"
+                {...register("username", {
+                  required: "Username is required",
+                  maxLength: { value: 20, message: "Username cannot exceed 20 characters" },
+                })}
+                type="text"
+                placeholder="johndoe"
+                autoComplete="off"
+                aria-invalid={errors.username ? "true" : "false"}
+                className={`w-full rounded-full pl-9 pr-11 py-3 bg-[#0b1327ad] text-white placeholder-gray-500 border outline-none transition ${
+                  errors.username || usernameStatus === "taken"
+                    ? "border-red-500"
+                    : usernameStatus === "available"
+                    ? "border-green-500"
+                    : "border-blue-500/30 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20"
+                }`}
+              />
+
+              {/* Right-side status icon — spinner / check / x, just like Instagram's signup form */}
+              <span className="absolute inset-y-0 right-0 flex items-center pr-4">
+                {usernameStatus === "checking" && (
+                  <Loader2 className="h-4 w-4 text-gray-400 animate-spin" />
+                )}
+                {usernameStatus === "available" && (
+                  <Check className="h-4.5 w-4.5 text-green-500" />
+                )}
+                {(usernameStatus === "taken" || usernameStatus === "invalid") && (
+                  <X className="h-4.5 w-4.5 text-red-500" />
+                )}
+              </span>
+            </div>
+
+            {/* Form-level required/maxLength error takes priority over the live-check message */}
+            {errors.username ? (
               <p className="text-red-400 text-xs mt-2 flex items-center gap-1">
                 <AlertCircle className="h-3.5 w-3.5" /> {errors.username.message}
               </p>
+            ) : (
+              usernameMessage && (
+                <p
+                  className={`text-xs mt-2 ${
+                    usernameStatus === "available"
+                      ? "text-green-400"
+                      : usernameStatus === "error"
+                      ? "text-gray-400"
+                      : "text-red-400"
+                  }`}
+                >
+                  {usernameMessage}
+                </p>
+              )
             )}
           </div>
 
@@ -218,7 +263,7 @@ const RegisterPage = () => {
           {/* Submit */}
           <button
             type="submit"
-            disabled={registerMutation.isPending}
+            disabled={registerMutation.isPending || usernameStatus === "taken" || usernameStatus === "invalid"}
             className="w-full rounded-full bg-gradient-to-r from-blue-600 to-indigo-500 py-3.5 font-semibold text-white transition hover:shadow-[0_0_30px_rgba(59,130,246,.5)] hover:scale-[1.02] active:scale-95 disabled:opacity-60"
           >
             {registerMutation.isPending ? (

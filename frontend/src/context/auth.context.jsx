@@ -1,10 +1,6 @@
-import {
-    useState,
-    createContext,
-    useEffect,
-    useMemo,
-} from "react";
+import { useState, createContext, useMemo } from "react";
 
+import { useAccessToken } from "../hooks/useAuth";
 export const AuthContext = createContext();
 
 

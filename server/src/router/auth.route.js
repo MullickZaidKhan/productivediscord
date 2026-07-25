@@ -1,13 +1,27 @@
 import { Router } from "express";
-import { register, login ,logout,refresh} from "../controller/auth.controller.js";
-import { verifyJwt,accessTokenverifyJwt } from "../middleware/auth.middleware.js";
+import {
+  register,
+  login,
+  logout,
+  refresh,
+  checkUsername,
+} from "../controller/auth.controller.js";
+import {
+  verifyJwt,
+  accessTokenverifyJwt,
+} from "../middleware/auth.middleware.js";
 
-const  authRoute = Router();
+const authRoute = Router();
 
-authRoute.post('/register', register)
-authRoute.post('/login', login)
-authRoute.post('/logout', verifyJwt, logout)
-authRoute.get('/refresh', refresh)
-authRoute.get('/accesstoken', accessTokenverifyJwt);
+//All the post
+authRoute.post("/register", register);
+authRoute.post("/login", login);
+authRoute.post("/logout", verifyJwt, logout);
 
-export default authRoute
+//All the get
+authRoute.get("/refresh", refresh);
+authRoute.get("/accesstoken", accessTokenverifyJwt);
+authRoute.get("/checkUsername/:username",checkUsername);
+
+//export
+export default authRoute;
