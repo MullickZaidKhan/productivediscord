@@ -4,7 +4,7 @@ import {
   login,
   logout,
   refresh,
-  checkUsername,
+
 } from "../controller/auth.controller.js";
 import {
   verifyJwt,
@@ -21,7 +21,7 @@ authRoute.post("/logout", verifyJwt, logout);
 //All the get
 authRoute.get("/refresh", refresh);
 authRoute.get("/accesstoken", accessTokenverifyJwt);
-authRoute.get("/checkUsername/:username",checkUsername);
+// authRoute.get("/checkUsername/:username",checkUsername);
 
 //export
 export default authRoute;

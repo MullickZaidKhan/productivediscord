@@ -225,58 +225,58 @@ export const refresh = async (req, res) => {
 
 // GET /api/auth/check-username/:username
 // Returns { available: boolean, message: string }
-const checkUsername = async (req, res) => {
-  try {
-    const { username } = req.params;
-    if(!username){
-       return res.status(400).json({
-        success:false
-       })
-    }
+// const checkUsername = async (req, res) => {
+//   try {
+//     const { username } = req.params;
+//     if(!username){
+//        return res.status(400).json({
+//         success:false
+//        })
+//     }
 
-    if(username<5){
-       return res.status(400).json({
-        message: "Username must be at least 5 characters",
-        success:false,
-       })
-    }
+//     if(username<5){
+//        return res.status(400).json({
+//         message: "Username must be at least 5 characters",
+//         success:false,
+//        })
+//     }
 
-    if(username>18){
-       return res.status(400).json({
-        message: "Username cannot exceed 18 characters",
-        success:false,
-       })
-    }
+//     if(username>18){
+//        return res.status(400).json({
+//         message: "Username cannot exceed 18 characters",
+//         success:false,
+//        })
+//     }
 
-     // Only allow letters, numbers, dots and underscores (Instagram-style)
-    const validPattern = /^[a-zA-Z0-9._]+$/;
-    if (!validPattern.test(username)) {
-      return res.status(200).json({
-        available: false,
-        message: "Only letters, numbers, '.' and '_' are allowed",
-      });
-    }
+//      // Only allow letters, numbers, dots and underscores (Instagram-style)
+//     const validPattern = /^[a-zA-Z0-9._]+$/;
+//     if (!validPattern.test(username)) {
+//       return res.status(200).json({
+//         available: false,
+//         message: "Only letters, numbers, '.' and '_' are allowed",
+//       });
+//     }
 
-      const existingUser = await User.findOne({
-      username: { $regex: `^${username}$`, $options: "i" },
-    }).select("_id");
+//       const existingUser = await User.findOne({
+//       username: { $regex: `^${username}$`, $options: "i" },
+//     }).select("_id");
 
-    if(existingUser){
-       return res.status(400).json({
-        message: "This username has already been taken",
-        success:false,
-       })
-    }
+//     if(existingUser){
+//        return res.status(400).json({
+//         message: "This username has already been taken",
+//         success:false,
+//        })
+//     }
 
-      return res.status(200).json({
-      available: true,
-      message: "Username is available",
-    });
-  } catch (error) {
-     console.error("checkUsername error:", error);
-    return res.status(500).json({
-      available: false,
-      message: "Something went wrong while checking username",
-    });
-  }
-}
+//       return res.status(200).json({
+//       available: true,
+//       message: "Username is available",
+//     });
+//   } catch (error) {
+//      console.error("checkUsername error:", error);
+//     return res.status(500).json({
+//       available: false,
+//       message: "Something went wrong while checking username",
+//     });
+//   }
+// }

@@ -3,35 +3,39 @@ import React, { useEffect, useContext, useRef } from 'react';
 import { AuthContext } from '../context/auth.context.jsx';
 import { Navigate } from 'react-router-dom';
 import { useAccessToken } from '../hooks/useAuth.js';
-
+import { useSelector, useDispatch } from 'react-redux'
+import { setLogin, setUser } from '../redux/authSlice.js'
 function ProtectedRoute({ children }) {
-  const { User, setUser } = useContext(AuthContext);
 
+  const dispatch = useDispatch();
   // 1. Call custom hook at top level
 
 
-  
-      const { data, isLoading, isError, error } = useAccessToken();
-      
-      console.log("Query State ->", { data, isLoading, isError, error });
 
-   
+  const { data, isLoading, isError, error } = useAccessToken();
+
+  console.log("Query State ->", { data, isLoading, isError, error });
+
+  const login = useSelector((state) => state.authinfoSlice.login);
+  const userinfo = useSelector((state) => state.authinfoSlice.userinfo);
 
   // 2. Sync fetched data into AuthContext safely AFTER render
   useEffect(() => {
-    if (data && !User && setUser) {
-      setUser(data);
+    if (data && !isError) {
+      dispatch(setLogin(true));
+      dispatch(setUser(data));
+
     }
-  }, [data, User, setUser]);
+  }, [data, isError,dispatch]);
 
 
   // 2. Show a loading state while fetching the token/user state
-  if (isLoading) {
+  if (!login) {
     return <div>Loading...</div>; // Or return a spinner
   }
 
   // 3. Check for authentication once loading is complete
-  if (!User && !data) {
+  if (!login && !userinfo) {
     console.log("User is not authenticated. Redirecting to login page.");
     return <Navigate to="/login" replace />;
   }

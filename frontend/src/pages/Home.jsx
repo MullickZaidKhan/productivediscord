@@ -1,16 +1,32 @@
-
-import React from 'react'
-import { useContext } from 'react'
-import { AuthContext} from '../context/auth.context.jsx'
+import React from "react";
+import Sidebar from "../components/layout/Sidebar";
+import UserPanel from "../components/layout/UserPanel";
+import { useSelector } from "react-redux";
 
 function Home() {
-  const { User } = useContext(AuthContext);
-  console.log("User in Home component:", User);
+  const userinfo = useSelector(
+    (state) => state.authinfoSlice.userinfo
+  );
+
   return (
-    <div>
-      <h1>Welcome, {User?.name}!</h1>
+    <div className="flex h-screen bg-[#313338]">
+      {/* Left Side */}
+      <Sidebar />
+
+      {/* Right Side */}
+      <div className="flex flex-col flex-1">
+        {/* Main Content */}
+        <div className="flex-1 p-6">
+          <h1 className="text-white text-3xl font-bold">
+            Welcome!
+          </h1>
+        </div>
+
+        {/* Bottom User Panel */}
+        <UserPanel userinfo={userinfo} />
+      </div>
     </div>
-  )
+  );
 }
 
-export default Home
+export default Home;

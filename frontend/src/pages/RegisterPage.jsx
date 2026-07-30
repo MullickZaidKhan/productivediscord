@@ -1,7 +1,7 @@
 import { useState, useContext } from "react";
 import { useForm } from "react-hook-form";
 import { Eye, EyeOff, AlertCircle, Check, X, Loader2 } from "lucide-react";
-import { useRegister, checkUsernameEX } from "../hooks/useAuth.js";
+import { useRegister} from "../hooks/useAuth.js";
 
 // Calculates a simple password strength score based on length and character variety
 const getPasswordStrength = (password) => {
@@ -47,7 +47,7 @@ const RegisterPage = () => {
   const strength = getPasswordStrength(passwordValue);
 
   // Live availability check — debounced inside the hook itself
-  const { status: usernameStatus, message: usernameMessage } = checkUsernameEX(usernameValue);
+  // const { status: usernameStatus, message: usernameMessage } = checkUsernameEX(usernameValue);
 
   // Pull a human-readable message out of whatever shape the backend error takes
   const getErrorMessage = (error) => {
