@@ -6,7 +6,7 @@ const FriendsList = () => {
   const tabs = ['Friends', 'Online', 'All', 'Add Friend'];
 
   return (
-    <div className="flex-1 min-h-screen bg-[#3133388e] flex flex-col">
+    <div className="flex-1 min-h-screen bg-[#0000008e] flex flex-col">
       {/* Header */}
       <div className="h-12 px-4 mt-3 flex items-center gap-4 border-b border-[#232428] shadow-sm">
         <div className="flex items-center gap-2 text-[#f2f3f5]">

@@ -14,7 +14,7 @@ export default function UserPanel(props) {
   <div
  onClick={() => setIsOpen(prev => !prev)}
   // onClick={setIsOpen(true)}
-  className="cursor-pointer w-[340px] h-16 bg-[#232428] rounded-xl flex items-center justify-between px-3 shadow-lg"
+  className="cursor-pointer w-[340px] h-16 bg-[#1d1d1d] hover:bg-[#181b24] rounded-xl flex items-center justify-between px-3 shadow-lg"
 >
       {/* Left */}
       <div className="flex items-center gap-3">

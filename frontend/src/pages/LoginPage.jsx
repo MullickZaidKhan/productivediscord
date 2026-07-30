@@ -4,6 +4,7 @@ import { useContext, useState } from "react";
 import { AuthContext } from "../context/auth.context.jsx";
 import { FaUserCircle } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { useAccessToken } from "../hooks/useAuth.js";
 const LoginPage = () => {
   const {
     register,

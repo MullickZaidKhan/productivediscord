@@ -17,12 +17,16 @@ function Home() {
       <div className="flex flex-col flex-1  min-h-screen ">
         {/* Main Content */}
         <div className="flex-1  min-h-screen   ">
-       <div
-  className="rounded-2xl bg-[#313338] bg-cover bg-center bg-no-repeat"
-  style={{ backgroundImage: "url('/images/image.png')" }}
->
-  <Chat />
-</div>
+          <div
+            className="rounded-2xl bg-[#313338] bg-cover bg-center bg-no-repeat"
+            // style={{ backgroundImage: "url('/images/image.png')" }}
+            style={{
+              backgroundImage:
+                "url('https://i.pinimg.com/1200x/81/c1/79/81c1798f090c8090aefca4886ea768d2.jpg')",
+            }}
+          >
+            <Chat />
+          </div>
         </div>
 
         {/* Bottom User Panel */}

@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { HiChevronDown, HiCog6Tooth } from "react-icons/hi2";
 import { BsMicMuteFill, BsHeadphones } from "react-icons/bs";
 import { Pencil, ChevronRight, User } from "lucide-react";
+
 // UserPanel.jsx
 // export default function UserPanel({ userinfo = {}, isOpen, onToggle }) {
 export default function UserPanel(userinfo) {
@@ -26,7 +27,7 @@ export default function UserPanel(userinfo) {
             <div className="relative w-[72px] h-[72px]">
               {/* Animated Frame */}
               <img
-                src="https://cdn.discordapp.com/media/v1/collectibles-shop/1256321669467865088/animated"
+                src="https://cdn.discordapp.com/media/v1/collectibles-shop/1252404745977462836/animated"
                 alt=""
                 className="absolute -inset-3 top-[-17px] left-[-6px] w-[96px] h-[96px] object-contain pointer-events-none z-20"
               />
