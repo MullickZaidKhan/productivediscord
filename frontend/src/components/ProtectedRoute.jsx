@@ -5,6 +5,7 @@ import { Navigate } from 'react-router-dom';
 import { useAccessToken } from '../hooks/useAuth.js';
 import { useSelector, useDispatch } from 'react-redux'
 import { setLogin, setUser } from '../redux/authSlice.js'
+import AppSkeleton from './ui/AppSkeleton.jsx'
 function ProtectedRoute({ children }) {
 
   const dispatch = useDispatch();
@@ -31,7 +32,7 @@ function ProtectedRoute({ children }) {
 
   // 2. Show a loading state while fetching the token/user state
   if (!login) {
-    return <div>Loading...</div>; // Or return a spinner
+    return <AppSkeleton />;
   }
 
   // 3. Check for authentication once loading is complete

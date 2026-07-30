@@ -2,6 +2,8 @@ import { useState, useContext } from "react";
 import { useForm } from "react-hook-form";
 import { Eye, EyeOff, AlertCircle, Check, X, Loader2 } from "lucide-react";
 import { useRegister} from "../hooks/useAuth.js";
+import { motion } from "framer-motion";
+import { staggerContainer, fadeInUp } from "../components/ui/motion.js";
 
 // Calculates a simple password strength score based on length and character variety
 const getPasswordStrength = (password) => {
@@ -48,6 +50,8 @@ const RegisterPage = () => {
 
   // Live availability check — debounced inside the hook itself
   // const { status: usernameStatus, message: usernameMessage } = checkUsernameEX(usernameValue);
+  const usernameStatus = undefined;
+  const usernameMessage = "";
 
   // Pull a human-readable message out of whatever shape the backend error takes
   const getErrorMessage = (error) => {
@@ -88,18 +92,23 @@ const RegisterPage = () => {
       <div className="absolute inset-0 bg-[#040817]/70 backdrop-blur-[2px]" />
 
       {/* Register Card */}
-      <div className="relative z-10 w-full max-w-md rounded-[30px] p-6">
+      <motion.div
+        initial="hidden"
+        animate="show"
+        variants={staggerContainer(0.06)}
+        className="relative z-10 w-full max-w-md rounded-[30px] p-4 sm:p-6"
+      >
         {/* Heading */}
-        <div className="text-center mb-8">
-          <h2 className="text-4xl font-bold text-white">Create Account</h2>
-          <p className="text-gray-400 mt-2 text-lg">
+        <motion.div variants={fadeInUp} className="text-center mb-8">
+          <h2 className="text-3xl sm:text-4xl font-bold text-white">Create Account</h2>
+          <p className="text-gray-400 mt-2 text-base sm:text-lg">
             Join us today — it only takes a minute
           </p>
-        </div>
+        </motion.div>
 
         <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-5">
           {/* Username */}
-          <div>
+          <motion.div variants={fadeInUp}>
             <label className="block text-gray-300 text-sm mb-2">Username</label>
             <div className="relative">
               <span className="absolute inset-y-0 left-0 flex items-center pl-5 text-gray-500 pointer-events-none">
@@ -158,10 +167,10 @@ const RegisterPage = () => {
                 </p>
               )
             )}
-          </div>
+          </motion.div>
 
           {/* Email */}
-          <div>
+          <motion.div variants={fadeInUp}>
             <label className="block text-gray-300 text-sm mb-2">Email Address</label>
             <input
               {...register("email", {
@@ -185,10 +194,10 @@ const RegisterPage = () => {
                 <AlertCircle className="h-3.5 w-3.5" /> {errors.email.message}
               </p>
             )}
-          </div>
+          </motion.div>
 
           {/* Password with show/hide toggle */}
-          <div>
+          <motion.div variants={fadeInUp}>
             <label className="block text-gray-300 text-sm mb-2">Password</label>
             <div className="relative">
               <input
@@ -250,21 +259,28 @@ const RegisterPage = () => {
                 </p>
               </div>
             )}
-          </div>
+          </motion.div>
 
           {/* Backend / credentials error */}
           {registerMutation.isError && (
-            <div className="rounded-lg border border-red-500/40 bg-red-500/10 px-4 py-2.5 flex items-start gap-2">
+            <motion.div
+              initial={{ opacity: 0, y: -6 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="rounded-lg border border-red-500/40 bg-red-500/10 px-4 py-2.5 flex items-start gap-2"
+            >
               <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0 text-red-400" />
               <span className="text-red-400 text-sm">{getErrorMessage(registerMutation.error)}</span>
-            </div>
+            </motion.div>
           )}
 
           {/* Submit */}
-          <button
+          <motion.button
+            variants={fadeInUp}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.96 }}
             type="submit"
             disabled={registerMutation.isPending || usernameStatus === "taken" || usernameStatus === "invalid"}
-            className="w-full rounded-full bg-gradient-to-r from-blue-600 to-indigo-500 py-3.5 font-semibold text-white transition hover:shadow-[0_0_30px_rgba(59,130,246,.5)] hover:scale-[1.02] active:scale-95 disabled:opacity-60"
+            className="w-full rounded-full bg-gradient-to-r from-blue-600 to-indigo-500 py-3.5 font-semibold text-white transition-shadow hover:shadow-[0_0_30px_rgba(59,130,246,.5)] disabled:opacity-60"
           >
             {registerMutation.isPending ? (
               <span className="flex items-center justify-center gap-2">
@@ -277,17 +293,17 @@ const RegisterPage = () => {
             ) : (
               "Sign up"
             )}
-          </button>
+          </motion.button>
         </form>
 
         {/* Bottom */}
-        <div className="mt-8 text-center text-sm text-gray-400">
+        <motion.div variants={fadeInUp} className="mt-8 text-center text-sm text-gray-400">
           Already have an account?{" "}
-          <a href="/login" className="text-blue-400 hover:text-blue-300">
+          <a href="/login" className="text-blue-400 hover:text-blue-300 transition-colors">
             Sign In
           </a>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
     </div>
   );
 };

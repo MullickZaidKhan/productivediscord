@@ -5,6 +5,8 @@ import { AuthContext } from "../context/auth.context.jsx";
 import { FaUserCircle } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { useAccessToken } from "../hooks/useAuth.js";
+import { motion } from "framer-motion";
+import { staggerContainer, fadeInUp } from "../components/ui/motion.js";
 const LoginPage = () => {
   const {
     register,
@@ -46,19 +48,24 @@ const navigate = useNavigate();
       <div className="absolute inset-0 bg-[#040817]/70 backdrop-blur-[2px]" />
 
       {/* Login Card */}
-      <div className="relative z-10 w-full max-w-md rounded-[30px]  p-6">
+      <motion.div
+        initial="hidden"
+        animate="show"
+        variants={staggerContainer(0.06)}
+        className="relative z-10 w-full max-w-md rounded-[30px] p-4 sm:p-6"
+      >
         {/* Heading */}
-        <div className="text-center mb-8">
-          <h2 className="text-4xl font-bold text-white">Welcome Back</h2>
+        <motion.div variants={fadeInUp} className="text-center mb-8">
+          <h2 className="text-3xl sm:text-4xl font-bold text-white">Welcome Back</h2>
 
-          <p className="text-gray-400 mt-2 text-lg">
+          <p className="text-gray-400 mt-2 text-base sm:text-lg">
             Please enter your details to sign in
           </p>
-        </div>
+        </motion.div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
           {/* Email */}
-          <div>
+          <motion.div variants={fadeInUp}>
             <label className="block text-gray-300 text-sm mb-2">
               Email Address
             </label>
@@ -85,10 +92,10 @@ const navigate = useNavigate();
                 ⚠️ {errors.email.message}
               </p>
             )}
-          </div>
+          </motion.div>
 
           {/* Password */}
-          <div>
+          <motion.div variants={fadeInUp}>
             <label className="block text-gray-300 text-sm mb-2">
               Password
             </label>
@@ -115,42 +122,49 @@ const navigate = useNavigate();
                 ⚠️ {errors.password.message}
               </p>
             )}
-          </div>
+          </motion.div>
 
           {/* Forgot Password */}
-          <div className="flex justify-end">
-            <a href="/forgot-password" className="text-sm text-gray-400 hover:text-blue-400">
+          <motion.div variants={fadeInUp} className="flex justify-end">
+            <a href="/forgot-password" className="text-sm text-gray-400 hover:text-blue-400 transition-colors">
               Forgot password?
             </a>
-          </div>
+          </motion.div>
 
           {/* Login (server) error */}
           {loginError && (
-            <div className="rounded-lg border border-red-500/40 bg-red-500/10 px-4 py-2.5">
+            <motion.div
+              initial={{ opacity: 0, y: -6 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="rounded-lg border border-red-500/40 bg-red-500/10 px-4 py-2.5"
+            >
               <p className="text-red-400 text-sm text-center">
                 ⚠️ {loginError}
               </p>
-            </div>
+            </motion.div>
           )}
 
           {/* Button */}
-          <button
+          <motion.button
+            variants={fadeInUp}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.96 }}
             type="submit"
             disabled={isSubmitting}
-            className="w-full rounded-full bg-gradient-to-r from-blue-600 to-indigo-500 py-3.5 font-semibold text-white transition hover:shadow-[0_0_30px_rgba(59,130,246,.5)] hover:scale-[1.02] active:scale-95 disabled:opacity-60"
+            className="w-full rounded-full bg-gradient-to-r from-blue-600 to-indigo-500 py-3.5 font-semibold text-white transition-shadow hover:shadow-[0_0_30px_rgba(59,130,246,.5)] disabled:opacity-60"
           >
             {isSubmitting ? "Logging in..." : "Sign In"}
-          </button>
+          </motion.button>
         </form>
 
         {/* Bottom */}
-        <div className="mt-8 text-center text-sm text-gray-400">
+        <motion.div variants={fadeInUp} className="mt-8 text-center text-sm text-gray-400">
           Don't have an account?{" "}
-          <a href="/register" className="text-blue-400 hover:text-blue-300">
+          <a href="/register" className="text-blue-400 hover:text-blue-300 transition-colors">
             Sign Up
           </a>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
     </div>
   );
 };

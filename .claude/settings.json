@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx playwright *)",
+      "Bash(curl -s http://localhost:5173)",
+      "Bash(netstat -ano)",
+      "Bash(awk '{print $5}')",
+      "Bash(powershell -NoProfile -Command \"Stop-Process -Id 22740 -Force\")",
+      "Bash(curl -sf http://localhost:5174)",
+      "Bash(sed -i 's/5174/5173/g' pw.js pw2.js)",
+      "Bash(node pw2.js)"
+    ]
+  }
+}

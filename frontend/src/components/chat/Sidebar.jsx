@@ -1,23 +1,45 @@
 import React from 'react';
-import { MessageCirclePlus ,UsersRound  } from "lucide-react";
-const Sidebar = () => {
+import { MessageCirclePlus ,UsersRound, X } from "lucide-react";
+import { motion } from 'framer-motion';
+import { staggerContainer, fadeInUp } from '../ui/motion.js';
+
+const Sidebar = ({ onClose }) => {
   return (
-    <div className="w-[240px] min-h-screen p-1 bg-[#03030373] flex flex-col rounded-2x text-[#949ba4] select-none">
+    <motion.div
+      initial="hidden"
+      animate="show"
+      variants={staggerContainer(0.04)}
+      className="w-[82vw] max-w-[280px] md:w-[240px] md:max-w-none h-full md:h-screen p-1 bg-[#1e1f22] md:bg-[#03030373] flex flex-col rounded-2x text-[#949ba4] select-none overflow-y-auto"
+    >
+      {/* Mobile drawer header */}
+      {onClose && (
+        <div className="flex items-center justify-between px-3 pt-3 md:hidden">
+          <span className="text-sm font-semibold text-white">Menu</span>
+          <button
+            onClick={onClose}
+            className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-[#3e3f45] transition-colors active:scale-95"
+            aria-label="Close menu"
+          >
+            <X size={18} />
+          </button>
+        </div>
+      )}
+
       {/* Search Button */}
-      <div className="p-3">
-        <div className="bg-[#1e1f22] hover:bg-[#393c43] cursor-pointer rounded-md py-1.5 px-3 text-sm shadow-sm border border-[#232428]">
+      <motion.div variants={fadeInUp} className="p-3">
+        <div className="bg-[#1e1f22] hover:bg-[#393c43] cursor-pointer rounded-md py-1.5 px-3 text-sm shadow-sm border border-[#232428] transition-colors">
           Find or start a conversation
         </div>
-      </div>
+      </motion.div>
 
       {/* Nav Items */}
       <div className="px-2 space-y-0.5">
-        <div className="flex items-center gap-3 px-2 py-2 rounded-md bg-[#3e3f45] text-white cursor-pointer">
+        <motion.div variants={fadeInUp} className="flex items-center gap-3 px-2 py-2 rounded-md bg-[#3e3f45] text-white cursor-pointer">
           <UsersRound size={18}/>
           <span className="text-sm font-medium">Friends</span>
-        </div>
+        </motion.div>
 
-        <div className="flex items-center gap-3 px-2 py-2 rounded-md hover:bg-[#3e3f45] hover:text-[#dbdee1] cursor-pointer transition-colors">
+        <motion.div variants={fadeInUp} className="flex items-center gap-3 px-2 py-2 rounded-md hover:bg-[#3e3f45] hover:text-[#dbdee1] cursor-pointer transition-colors">
           <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
             <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
           </svg>
@@ -25,16 +47,16 @@ const Sidebar = () => {
           <span className="ml-auto text-[10px] font-bold bg-[#232428] text-white px-1.5 py-0.5 rounded-full border border-[#3e3f45]">
             1 MONTH FREE
           </span>
-        </div>
+        </motion.div>
 
-        <div className="flex items-center gap-3 px-2 py-2 rounded-md hover:bg-[#3e3f45] hover:text-[#dbdee1] cursor-pointer transition-colors">
+        <motion.div variants={fadeInUp} className="flex items-center gap-3 px-2 py-2 rounded-md hover:bg-[#3e3f45] hover:text-[#dbdee1] cursor-pointer transition-colors">
           <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
             <path d="M19 6h-2c0-2.76-2.24-5-5-5S7 3.24 7 6H5c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-7-3c1.66 0 3 1.34 3 3H9c0-1.66 1.34-3 3-3zm7 17H5V8h14v12zm-7-8c-1.66 0-3-1.34-3-3H7c0 2.76 2.24 5 5 5s5-2.24 5-5h-2c0 1.66-1.34 3-3 3z"/>
           </svg>
           <span className="text-sm font-medium">Shop</span>
-        </div>
+        </motion.div>
 
-        <div className="flex items-center gap-3 px-2 py-2 rounded-md hover:bg-[#3e3f45] hover:text-[#dbdee1] cursor-pointer transition-colors">
+        <motion.div variants={fadeInUp} className="flex items-center gap-3 px-2 py-2 rounded-md hover:bg-[#3e3f45] hover:text-[#dbdee1] cursor-pointer transition-colors">
           <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
             <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
           </svg>
@@ -42,7 +64,7 @@ const Sidebar = () => {
           <span className="ml-auto text-[10px] font-bold bg-[#5865f2] text-white px-2 py-0.5 rounded-md">
             NEW
           </span>
-        </div>
+        </motion.div>
       </div>
 
       {/* Direct Messages Header */}
@@ -56,8 +78,8 @@ const Sidebar = () => {
       </div>
 
       {/* DM List */}
-      <div className="mt-1 px-2">
-        <div className="flex items-center gap-3 px-2 py-1 rounded-[12px] bg-[#3e3f45] text-white cursor-pointer">
+      <motion.div variants={fadeInUp} className="mt-1 px-2">
+        <div className="flex items-center gap-3 px-2 py-1 rounded-[12px] bg-[#3e3f45] text-white cursor-pointer hover:bg-[#43444b] transition-colors">
           <div className="relative">
             <img 
               src="https://cdn.discordapp.com/embed/avatars/0.png" 
@@ -81,8 +103,8 @@ const Sidebar = () => {
             </div>
           </div>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 };
 

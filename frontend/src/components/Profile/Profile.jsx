@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { HiChevronDown, HiCog6Tooth } from "react-icons/hi2";
 import { BsMicMuteFill, BsHeadphones } from "react-icons/bs";
 import { Pencil, ChevronRight, User } from "lucide-react";
+import { motion } from "framer-motion";
 
 // UserPanel.jsx
 // export default function UserPanel({ userinfo = {}, isOpen, onToggle }) {
@@ -20,7 +21,7 @@ export default function UserPanel(userinfo) {
     <div className="relative inline-block" ref={containerRef}>
       {/* Profile Popup */}
 
-      <div className="absolute bottom-[72px] left-0 w-[300px] bg-[#111214] rounded-xl overflow-hidden shadow-2xl z-50 animate-in fade-in slide-in-from-bottom-2 duration-200">
+      <div className="absolute bottom-[72px] left-0 w-[85vw] max-w-[300px] bg-[#111214] rounded-xl overflow-hidden shadow-2xl z-50">
         {/* Banner */}
         <div className="h-[100px] bg-[#00709c] relative">
           <div className="absolute -bottom-7 left-4">
@@ -50,30 +51,30 @@ export default function UserPanel(userinfo) {
 
         {/* Body */}
         <div className="pt-10 px-4 pb-4">
-          <h2 className="text-white font-bold text-xl">{displayName}</h2>
-          <p className="text-[#b5bac1] text-sm">{handle}</p>
+          <h2 className="text-white font-bold text-xl truncate">{displayName}</h2>
+          <p className="text-[#b5bac1] text-sm truncate">{handle}</p>
 
           <div className="mt-4 space-y-0.5">
-            <button className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#232428] text-[#b5bac1] hover:text-white transition-colors text-sm">
+            <motion.button whileHover={{ x: 2 }} whileTap={{ scale: 0.98 }} className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#232428] text-[#b5bac1] hover:text-white transition-colors text-sm">
               <Pencil size={16} />
               <span>Edit Profile</span>
-            </button>
+            </motion.button>
 
-            <button className="w-full flex items-center justify-between px-3 py-2 rounded-lg hover:bg-[#232428] text-[#b5bac1] hover:text-white transition-colors text-sm">
+            <motion.button whileHover={{ x: 2 }} whileTap={{ scale: 0.98 }} className="w-full flex items-center justify-between px-3 py-2 rounded-lg hover:bg-[#232428] text-[#b5bac1] hover:text-white transition-colors text-sm">
               <div className="flex items-center gap-3">
                 <div className="w-3.5 h-3.5 rounded-full bg-[#23a55a]" />
                 <span>Online</span>
               </div>
               <ChevronRight size={16} />
-            </button>
+            </motion.button>
 
-            <button className="w-full flex items-center justify-between px-3 py-2 rounded-lg hover:bg-[#232428] text-[#b5bac1] hover:text-white transition-colors text-sm">
+            <motion.button whileHover={{ x: 2 }} whileTap={{ scale: 0.98 }} className="w-full flex items-center justify-between px-3 py-2 rounded-lg hover:bg-[#232428] text-[#b5bac1] hover:text-white transition-colors text-sm">
               <div className="flex items-center gap-3">
                 <User size={16} />
                 <span>Switch Accounts</span>
               </div>
               <ChevronRight size={16} />
-            </button>
+            </motion.button>
           </div>
         </div>
       </div>
