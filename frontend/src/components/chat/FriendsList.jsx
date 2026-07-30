@@ -1,18 +1,19 @@
 import React, { useState } from 'react';
-import { MessageCirclePlus  } from "lucide-react";
+import { MessageCirclePlus ,UsersRound  } from "lucide-react";
 const FriendsList = () => {
   const [activeTab, setActiveTab] = useState('Online');
 
   const tabs = ['Friends', 'Online', 'All', 'Add Friend'];
 
   return (
-    <div className="flex-1 min-h-screen bg-[#313338] flex flex-col">
+    <div className="flex-1 min-h-screen bg-[#3133388e] flex flex-col">
       {/* Header */}
       <div className="h-12 px-4 mt-3 flex items-center gap-4 border-b border-[#232428] shadow-sm">
         <div className="flex items-center gap-2 text-[#f2f3f5]">
-          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+          {/* <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
             <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
-          </svg>
+          </svg> */}
+        <UsersRound size={18}/>
           <span className="text-sm font-semibold">Friends</span>
           <svg className="w-3 h-3 text-[#949ba4]" fill="currentColor" viewBox="0 0 24 24">
             <path d="M7 10l5 5 5-5z"/>

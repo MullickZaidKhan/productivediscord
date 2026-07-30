@@ -5,7 +5,7 @@ import ActiveNow from './ActiveNow';
 
 function Chat() {
   return (
-   <div className="flex min-h-screen rounded-2xl bg-[#313338] font-sans">
+   <div className="flex min-h-screen rounded-2xl bg-[#313338bb] font-sans">
 
       {/* Left Sidebar */}
       <Sidebar />

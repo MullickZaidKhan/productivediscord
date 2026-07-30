@@ -1,8 +1,8 @@
 import React from 'react';
-
+import { MessageCirclePlus ,UsersRound  } from "lucide-react";
 const Sidebar = () => {
   return (
-    <div className="w-[240px] min-h-screen p-1 bg-[#181717] flex flex-col rounded-2x text-[#949ba4] select-none">
+    <div className="w-[240px] min-h-screen p-1 bg-[#03030373] flex flex-col rounded-2x text-[#949ba4] select-none">
       {/* Search Button */}
       <div className="p-3">
         <div className="bg-[#1e1f22] hover:bg-[#393c43] cursor-pointer rounded-md py-1.5 px-3 text-sm shadow-sm border border-[#232428]">
@@ -13,9 +13,7 @@ const Sidebar = () => {
       {/* Nav Items */}
       <div className="px-2 space-y-0.5">
         <div className="flex items-center gap-3 px-2 py-2 rounded-md bg-[#3e3f45] text-white cursor-pointer">
-          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
-          </svg>
+          <UsersRound size={18}/>
           <span className="text-sm font-medium">Friends</span>
         </div>
 

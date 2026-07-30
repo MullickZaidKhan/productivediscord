@@ -2,7 +2,7 @@ import React from 'react';
 
 const ActiveNow = () => {
   return (
-    <div className="w-[360px] min-h-screen bg-[#2b2d31] rounded-2x p-4 hidden lg:block">
+    <div className="w-[360px] min-h-screen bg-[#1a1b1f93] rounded-2x p-4 hidden lg:block">
       <h2 className="text-lg font-semibold text-white mb-4">Active Now</h2>
       
       <div className="space-y-3">
