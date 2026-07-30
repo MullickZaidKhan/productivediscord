@@ -27,7 +27,7 @@ export default function AppSkeleton() {
       {/* Main area */}
       <div className="flex-1 flex flex-col p-4 gap-4">
         <Skeleton className="h-10 w-1/3 rounded-md" />
-        <div className="flex-1 rounded-2xl bg-[#313338]/60 p-4">
+        <div className="flex-1 rounded-2xl bg-[#27282a]/60 p-4">
           <SkeletonList rows={6} />
         </div>
       </div>

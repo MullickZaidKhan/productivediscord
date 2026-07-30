@@ -14,7 +14,7 @@ export default function UserPanel(props) {
   <motion.div
  onClick={() => setIsOpen(prev => !prev)}
   whileTap={tapScale}
-  className="cursor-pointer w-full max-w-[440px] h-16 bg-[#1d1d1d] hover:bg-[#181b24] rounded-xl flex items-center justify-between px-2 sm:px-3 shadow-lg transition-colors gap-14"
+  className="cursor-pointer w-full max-w-[440px] h-16 bg-[#0f0f0f] hover:bg-[#181b24] rounded-xl flex items-center justify-between px-2 sm:px-3 shadow-lg transition-colors gap-14"
 >
       {/* Left */}
       <div className="flex items-center gap-2 sm:gap-3 min-w-0">

@@ -17,11 +17,11 @@ function Home() {
       <Sidebar />
 
       {/* Right Side */}
-      <div className="flex flex-col flex-1 min-w-0 min-h-0">
+      <div className="flex flex-col flex-1 min-w-0 min-h-0 ">
         {/* Main Content */}
         <div className="flex-1 min-h-0 p-0 sm:p-1.5">
           <div
-            className="h-full w-full overflow-hidden rounded-none sm:rounded-2xl bg-[#313338] bg-cover bg-center bg-no-repeat"
+            className="h-full w-full overflow-hidden rounded-none sm:rounded-[15px] bg-[#313338] bg-cover bg-center bg-no-repeat"
             style={{
               backgroundImage:
                 "url('https://i.pinimg.com/1200x/81/c1/79/81c1798f090c8090aefca4886ea768d2.jpg')",
@@ -34,7 +34,7 @@ function Home() {
         {/* Bottom User Panel */}
         <div className="shrink-0 px-2 py-2 sm:px-3 absolute bottom-5 left-3 ">
           <UserPanel userinfo={userinfo} setIsOpen={setIsOpen} />
-          <AnimatePresence>
+          <AnimatePresence className ="absolute ">
             {isOpen && (
               <motion.div
                 variants={scaleIn}
@@ -43,7 +43,7 @@ function Home() {
                 exit="hidden"
                 style={{ transformOrigin: "bottom left" }}
               >
-                <Profile userinfo={userinfo} />
+                <Profile className="absolute" userinfo={userinfo} />
               </motion.div>
             )}
           </AnimatePresence>
