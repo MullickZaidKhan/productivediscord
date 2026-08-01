@@ -1,6 +1,6 @@
 import { api } from "../api/axios.js";
 import { useMutation } from "@tanstack/react-query";
-import { login, register, accesstoken, refreshtoken } from "../api/Auth.api.js";
+import { login, register, accesstoken, refreshtoken, checkUsername } from "../api/Auth.api.js";
 import { AuthContext } from "../context/auth.context.jsx";
 import { useQuery } from '@tanstack/react-query'
 // export const useAuth = () => {
@@ -48,7 +48,7 @@ export function useRegister() {
         onSuccess: (data) => {
 
             // Handle successful login, e.g., update context or local storage
-            // console.log("Login successful:", data);
+            console.log("Register: ", data);
 
 
             // console.log("User set in context:", userData);
@@ -83,3 +83,24 @@ export function useAccessToken() {
     });
 }
 
+// export function checkUsernamehook() {
+//     return useQuery({
+//         queryKey: ["checkUsernamev",username],
+//         queryFn: async () => {
+//             const response = await checkUsername();
+//             const payload = response
+//             console.log(payload)
+//         }
+//     })
+// }
+
+export const checkUsernamehook = (username) => {
+  return useQuery({
+    queryKey: ["checkUsername", username],
+    queryFn: async () => {
+      const response = await checkUsername(username);
+      return response.data;
+    },
+    enabled: username.length >= 5, // Only run when username has 5+ characters
+  });
+};

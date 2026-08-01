@@ -10,6 +10,7 @@ const AVATAR_DECORATION_URL =
 
 export default function UserPanel(props) {
   const { userinfo,setIsOpen } = props;
+  console.log(userinfo)
   return (
   <motion.div
  onClick={() => setIsOpen(prev => !prev)}

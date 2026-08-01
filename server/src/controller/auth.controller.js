@@ -8,11 +8,11 @@ import { signAccessToken, signRefreshToken, hashToken, verifyRefreshToken } from
 import { clearAuthCookies, setAuthCookies } from "../lib/cookies.js";
 
 export const register = async (req, res) => {
-  const { username, email, password } = req.body;
+  const { username, name, email, password } = req.body;
 
   try {
     // * check all field
-    if (!username || !email || !password) {
+    if (!username || !email || !name || !password) {
       return res.status(400).json({
         success: false,
         message: "all Field is required",
@@ -23,6 +23,8 @@ export const register = async (req, res) => {
     const existUser = await User.findOne({
       email,
     });
+    console.log("Email:", email);
+console.log("Exist User:", existUser);
 
     // * if user exists
     if (existUser) {
@@ -38,15 +40,16 @@ export const register = async (req, res) => {
     const user = await User.create({
       username,
       email,
+      name,
       password: hashPass,
     });
 
     const payload = {
       id: user._id,
-      name: user.username,
+      username: user.username,
+      name: user.name,
       email: user.email,
     };
-
     // refreshToken generated
     const refreshToken = signRefreshToken(payload);
 
@@ -99,7 +102,7 @@ export const login = async (req, res) => {
         message: "Something went wrong",
       });
     }
-
+    console.log(existUser)
     const isRightPassword = await bcrypt.compare(password, existUser.password);
 
     if (!isRightPassword) {
@@ -111,7 +114,8 @@ export const login = async (req, res) => {
 
     const payload = {
       id: existUser._id,
-      name: existUser.username,
+      username: existUser.username,
+      name: existUser.name,
       email: existUser.email,
     };
 
@@ -130,7 +134,7 @@ export const login = async (req, res) => {
     const accessToken = signAccessToken(payload);
 
     setAuthCookies(res, accessToken, refreshToken);
-    
+
     return res.status(200).json({
       success: true,
       message: "User Logged In",
@@ -225,58 +229,59 @@ export const refresh = async (req, res) => {
 
 // GET /api/auth/check-username/:username
 // Returns { available: boolean, message: string }
-// const checkUsername = async (req, res) => {
-//   try {
-//     const { username } = req.params;
-//     if(!username){
-//        return res.status(400).json({
-//         success:false
-//        })
-//     }
+export const checkUsername = async (req, res) => {
+  try {
+    const { username } = req.params;
 
-//     if(username<5){
-//        return res.status(400).json({
-//         message: "Username must be at least 5 characters",
-//         success:false,
-//        })
-//     }
+    if (!username.length) {
+      return res.status(400).json({
+        success: false
+      })
+    }
 
-//     if(username>18){
-//        return res.status(400).json({
-//         message: "Username cannot exceed 18 characters",
-//         success:false,
-//        })
-//     }
+    if (username.length <= 5) {
+      return res.status(400).json({
+        message: "Username must contain at least 5 and no more than 18 characters",
+        success: false,
+      })
+    }
 
-//      // Only allow letters, numbers, dots and underscores (Instagram-style)
-//     const validPattern = /^[a-zA-Z0-9._]+$/;
-//     if (!validPattern.test(username)) {
-//       return res.status(200).json({
-//         available: false,
-//         message: "Only letters, numbers, '.' and '_' are allowed",
-//       });
-//     }
+    if (username.length > 18) {
+      return res.status(400).json({
+        message: "Username must contain at least 5 and no more than 18 characters",
+        success: false,
+      })
+    }
 
-//       const existingUser = await User.findOne({
-//       username: { $regex: `^${username}$`, $options: "i" },
-//     }).select("_id");
+    // Only allow letters, numbers, dots and underscores (Instagram-style)
+    const validPattern = /^[a-zA-Z0-9._]+$/;
+    if (!validPattern.test(username)) {
+      return res.status(200).json({
+        available: false,
+        message: "Only letters, numbers, '.' and '_' are allowed",
+      });
+    }
 
-//     if(existingUser){
-//        return res.status(400).json({
-//         message: "This username has already been taken",
-//         success:false,
-//        })
-//     }
+    const existingUser = await User.findOne({
+      username: { $regex: `^${username}$`, $options: "i" },
+    }).select("_id");
 
-//       return res.status(200).json({
-//       available: true,
-//       message: "Username is available",
-//     });
-//   } catch (error) {
-//      console.error("checkUsername error:", error);
-//     return res.status(500).json({
-//       available: false,
-//       message: "Something went wrong while checking username",
-//     });
-//   }
-// }
+    if (existingUser) {
+      return res.status(400).json({
+        message: "This username has already been taken",
+        success: false,
+      })
+    }
+
+    return res.status(200).json({
+      available: true,
+      message: "Username is available",
+    });
+  } catch (error) {
+    console.error("checkUsername error:", error);
+    return res.status(500).json({
+      available: false,
+      message: "Something went wrong while checking username",
+    });
+  }
+}

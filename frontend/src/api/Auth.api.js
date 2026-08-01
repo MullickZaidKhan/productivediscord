@@ -20,3 +20,5 @@ export const accesstoken = () =>
 export const refreshtoken = () =>
     api.get("auth/refresh");
 
+export const checkUsername = (username) =>
+    api.get(`auth/checkUsername/${username}`);

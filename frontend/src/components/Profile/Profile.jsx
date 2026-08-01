@@ -8,14 +8,14 @@ import { motion } from "framer-motion";
 // export default function UserPanel({ userinfo = {}, isOpen, onToggle }) {
 export default function UserPanel(userinfo) {
   const containerRef = useRef(null);
-  console.log(userinfo)
-  const user ="Zaid khan";
-  const profileImg ="https://i.pinimg.com/originals/f6/5d/f3/f65df37ea7c3cc3f65f8c29906a81eef.gif";
-  const displayName =userinfo.userinfo.name||"User";
-  const handle =  "zaidk0064_98925";
+  console.log(userinfo, "op")
+  const user = "Zaid khan";
+  const profileImg = "https://i.pinimg.com/originals/f6/5d/f3/f65df37ea7c3cc3f65f8c29906a81eef.gif";
+  const displayName = userinfo.userinfo.name || "User";
+  const handle = userinfo.userinfo.username || "User";
   const statusText = "hi";
 
-//   if (!isOpen) return null; // or keep the trigger button always visible and only guard the popup
+  //   if (!isOpen) return null; // or keep the trigger button always visible and only guard the popup
 
   return (
     <div className="relative inline-block" ref={containerRef}>
