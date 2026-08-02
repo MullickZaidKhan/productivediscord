@@ -2,7 +2,7 @@ import { api } from "../api/axios.js";
 import { useMutation } from "@tanstack/react-query";
 import { login, register, accesstoken, refreshtoken, checkUsername } from "../api/Auth.api.js";
 import { AuthContext } from "../context/auth.context.jsx";
-import { useQuery } from '@tanstack/react-query'
+import { useQuery,useQueryClient } from '@tanstack/react-query'
 import { useEffect, useState } from "react";
 // export const useAuth = () => {
 //     const { user, setUser } = useContext(AuthContext);
@@ -21,7 +21,7 @@ import { useEffect, useState } from "react";
 
 
 export function useLogin() {
-
+    const queryClient = useQueryClient();
 
     return useMutation({
         mutationFn: login,
@@ -29,8 +29,8 @@ export function useLogin() {
 
             // Handle successful login, e.g., update context or local storage
             // console.log("Login successful:", data);
-
-
+            queryClient.invalidateQueries({ queryKey: ["authUser"] });
+    
             // console.log("User set in context:", userData);
             // console.log("User set in context:", User);
         },
@@ -107,24 +107,24 @@ export function useAccessToken() {
 // };
 
 export const checkUsernamehook = (username) => {
-  const [debouncedUsername, setDebouncedUsername] = useState(username);
+    const [debouncedUsername, setDebouncedUsername] = useState(username);
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedUsername(username);
-    }, 500); // 500ms debounce
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setDebouncedUsername(username);
+        }, 500); // 500ms debounce
 
-    return () => clearTimeout(timer);
-  }, [username]);
+        return () => clearTimeout(timer);
+    }, [username]);
 
-  return useQuery({
-    queryKey: ["checkUsername", debouncedUsername],
-    queryFn: async () => {
-      const response = await checkUsername(debouncedUsername);
-      return response.data;
-      console.log(response)
-    },
-    enabled: debouncedUsername?.length >= 5,
-    retry: false,
-  });
+    return useQuery({
+        queryKey: ["checkUsername", debouncedUsername],
+        queryFn: async () => {
+            const response = await checkUsername(debouncedUsername);
+            return response.data;
+            console.log(response)
+        },
+        enabled: debouncedUsername?.length >= 5,
+        retry: false,
+    });
 };
