@@ -12,7 +12,7 @@ function Home() {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-[#070707]">
+    <div className="flex h-screen w-screen overflow-hidden bg-[#07070700]">
       {/* Left Side */}
       <Sidebar />
 
@@ -21,7 +21,7 @@ function Home() {
         {/* Main Content */}
         <div className="flex-1 min-h-0 p-0 sm:p-1.5">
           <div
-            className="h-full w-full overflow-hidden rounded-none sm:rounded-[15px] bg-[#313338] bg-cover bg-center bg-no-repeat"
+            className="h-full w-full overflow-hidden rounded-none sm:rounded-[15px] bg-[#31333815] bg-cover bg-center bg-no-repeat"
             style={{
               backgroundImage:
                 "url('https://i.pinimg.com/1200x/81/c1/79/81c1798f090c8090aefca4886ea768d2.jpg')",

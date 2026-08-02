@@ -3,6 +3,7 @@ import { useMutation } from "@tanstack/react-query";
 import { login, register, accesstoken, refreshtoken, checkUsername } from "../api/Auth.api.js";
 import { AuthContext } from "../context/auth.context.jsx";
 import { useQuery } from '@tanstack/react-query'
+import { useEffect, useState } from "react";
 // export const useAuth = () => {
 //     const { user, setUser } = useContext(AuthContext);
 //     const handleLogin = async (username, password) => {
@@ -94,13 +95,36 @@ export function useAccessToken() {
 //     })
 // }
 
+// export const checkUsernamehook = (username) => {
+//   return useQuery({
+//     queryKey: ["checkUsername", username],
+//     queryFn: async () => {
+//       const response = await checkUsername(username);
+//       return response.data;
+//     },
+//     enabled: username.length >= 5, // Only run when username has 5+ characters
+//   });
+// };
+
 export const checkUsernamehook = (username) => {
+  const [debouncedUsername, setDebouncedUsername] = useState(username);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedUsername(username);
+    }, 500); // 500ms debounce
+
+    return () => clearTimeout(timer);
+  }, [username]);
+
   return useQuery({
-    queryKey: ["checkUsername", username],
+    queryKey: ["checkUsername", debouncedUsername],
     queryFn: async () => {
-      const response = await checkUsername(username);
+      const response = await checkUsername(debouncedUsername);
       return response.data;
+      console.log(response)
     },
-    enabled: username.length >= 5, // Only run when username has 5+ characters
+    enabled: debouncedUsername?.length >= 5,
+    retry: false,
   });
 };

@@ -60,10 +60,10 @@ const navigate = useNavigate();
   useEffect(() => {
     if (
       usernameChecked.length > 0 &&
-      (usernameChecked.length < 5 || usernameChecked.length > 18)
+      (usernameChecked.length < 6 || usernameChecked.length > 18)
     ) {
       seterrorusernameChecked(
-        "Username must be between 5 and 18 characters long."
+        "Username must be between 6 and 18 characters long."
       );
     } else {
       seterrorusernameChecked("");

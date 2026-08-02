@@ -24,7 +24,7 @@ export const register = async (req, res) => {
       email,
     });
     console.log("Email:", email);
-console.log("Exist User:", existUser);
+    console.log("Exist User:", existUser);
 
     // * if user exists
     if (existUser) {
