@@ -109,7 +109,7 @@ export default function SentRequests() {
           return (
             <div
               key={request._id ?? request.id}
-              className="flex items-center px-1 py-2.5 rounded-lg hover:bg-[#3a3c41] group"
+              className="flex items-center px-4 py-2.5 rounded-lg hover:bg-[#3a3c419f] group"
             >
               <div className="relative w-8 h-8 mr-3 shrink-0">
                 <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#ff5fa2] to-[#d61f69] flex items-center justify-center text-white text-sm font-semibold">
@@ -133,7 +133,7 @@ export default function SentRequests() {
                     type="button"
                     aria-label="Accept request"
                     onClick={() => handleAccept(request)}
-                    className="w-8 h-8 rounded-full flex items-center justify-center text-[#23a55a] bg-[#23a55a1a] hover:bg-[#23a55a] hover:text-white transition-colors"
+                    className="w-8 h-8 rounded-[5px] flex items-center justify-center text-[#23a55a] bg-[#23a55a1a] hover:bg-[#23a55a] hover:text-white transition-colors"
                   >
                     <Check size={16} />
                   </button>
@@ -141,7 +141,7 @@ export default function SentRequests() {
                     type="button"
                     aria-label="Reject request"
                     onClick={() => handleReject(request)}
-                    className="w-8 h-8 rounded-full flex items-center justify-center text-[#f23f42] bg-[#f23f421a] hover:bg-[#f23f42] hover:text-white transition-colors"
+                    className="w-8 h-8 rounded-[5px] flex items-center justify-center text-[#f23f42] bg-[#f23f421a] hover:bg-[#f23f42] hover:text-white transition-colors"
                   >
                     <X size={16} />
                   </button>
