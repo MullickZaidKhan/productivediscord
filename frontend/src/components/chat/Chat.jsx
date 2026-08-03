@@ -4,10 +4,10 @@ import Sidebar from './Sidebar';
 import FriendsList from './FriendsList';
 import ActiveNow from './ActiveNow';
 import { EASE } from '../ui/motion.js';
-
+import ChatPage from './Chatpage.jsx';
 function Chat() {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
-
+  const [Chatopen, setChatopen] = useState(false);
   return (
     <div className="flex h-full min-h-0 bg-[#313338bb] font-sans relative overflow-hidden">
 
@@ -47,7 +47,9 @@ function Chat() {
       <div className="w-px bg-[#232428] hidden md:block"></div>
 
       {/* Main Friends Area */}
-      <FriendsList onOpenMenu={() => setMobileNavOpen(true)} />
+
+      {!Chatopen && (<FriendsList onOpenMenu={() => setMobileNavOpen(true)}  setChatopen={setChatopen} />)}
+      {Chatopen && (<ChatPage setChatopen={setChatopen} />)}
 
       {/* Vertical Divider */}
       <div className="w-px bg-[#232428] hidden lg:block"></div>

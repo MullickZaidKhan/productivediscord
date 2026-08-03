@@ -2,11 +2,14 @@ import mongoose from "mongoose";
 import { User } from "../model/auth.model.js";
 import { FriendRequest } from "../model/friendRequest.model.js";
 
+// Friend controller: handles sending, accepting, rejecting, listing, and removing friends.
+
 export const sendFriendRequest = async (req, res) => {
   try {
     const senderId = req.user.id;
     const { receiverId } = req.body; // username or ObjectId
 
+    // Commit details: validate input, prevent self-request, check friendship status, and create pending request
     if (!receiverId) {
       return res.status(400).json({
         success: false,
@@ -14,7 +17,7 @@ export const sendFriendRequest = async (req, res) => {
       });
     }
 
-    // Find sender
+    // Find sender by current authenticated user
     const sender = await User.findById(senderId);
 
     if (!sender) {
@@ -44,7 +47,7 @@ export const sendFriendRequest = async (req, res) => {
       });
     }
 
-    // Can't send request to yourself
+    // Prevent sending a request to yourself
     if (sender._id.toString() === receiver._id.toString()) {
       return res.status(400).json({
         success: false,
@@ -52,7 +55,7 @@ export const sendFriendRequest = async (req, res) => {
       });
     }
 
-    // Already friends
+    // Prevent duplicate friend relationships
     const isFriend = sender.friends.some(
       (friendId) => friendId.toString() === receiver._id.toString()
     );
@@ -64,7 +67,7 @@ export const sendFriendRequest = async (req, res) => {
       });
     }
 
-    // Check if request already exists (either direction)
+    // Prevent duplicate pending requests in either direction
     const existingRequest = await FriendRequest.findOne({
       $or: [
         {
@@ -112,6 +115,7 @@ export const acceptFriendRequest = async (req, res) => {
     const receiverId = req.user.id;
     const { requestId } = req.params;
 
+    // Commit details: verify request exists, authorize receiver, mark accepted, update friend lists
     const request = await FriendRequest.findById(requestId);
 
     if (!request) {
@@ -162,6 +166,7 @@ export const rejectFriendRequest = async (req, res) => {
     const receiverId = req.user.id;
     const { requestId } = req.params;
 
+    // Commit details: verify request, authorize receiver, and mark it rejected
     const request = await FriendRequest.findById(requestId);
 
     if (!request) {
@@ -179,7 +184,6 @@ export const rejectFriendRequest = async (req, res) => {
     }
 
     request.status = "rejected";
-
     await request.save();
 
     return res.status(200).json({
@@ -198,13 +202,15 @@ export const rejectFriendRequest = async (req, res) => {
 
 export const getFriendRequests = async (req, res) => {
   try {
+    // Commit details: return all pending friend requests received by current user
     const requests = await FriendRequest.find({
       receiver: req.user.id,
       status: "pending",
     }).populate("sender", "username name email");
 
     return res.status(200).json({
-      success: true,      count: requests.length,
+      success: true,
+      count: requests.length,
       payload: requests,
     });
   } catch (error) {
@@ -221,6 +227,7 @@ export const getSentFriendRequests = async (req, res) => {
   try {
     const userId = req.user.id;
 
+    // Commit details: return pending friend requests sent by current user
     const requests = await FriendRequest.find({
       sender: userId,
       status: "pending",
@@ -230,7 +237,8 @@ export const getSentFriendRequests = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      count: requests.length,      payload: requests,
+      count: requests.length,
+      payload: requests,
     });
   } catch (err) {
     console.log(err);
@@ -244,6 +252,7 @@ export const getSentFriendRequests = async (req, res) => {
 
 export const getFriends = async (req, res) => {
   try {
+    // Commit details: return user friends list with selected profile fields
     const user = await User.findById(req.user.id).populate(
       "friends",
       "username name email",
@@ -268,6 +277,7 @@ export const removeFriend = async (req, res) => {
     const myId = req.user.id;
     const { friendId } = req.params;
 
+    // Commit details: remove friend references from both users
     await User.findByIdAndUpdate(myId, {
       $pull: {
         friends: friendId,
@@ -299,6 +309,7 @@ export const getPendingFriendRequests = async (req, res) => {
   try {
     const userId = req.user.id;
 
+    // Commit details: return pending friend requests for receiver sorted by newest first
     const requests = await FriendRequest.find({
       receiver: userId,
       status: "pending",

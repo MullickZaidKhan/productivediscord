@@ -83,7 +83,7 @@ import Onlinepage from '../common/Onlinepage.jsx';
 import AddFriendpage from '../common/AddFriendpage.jsx';
 import { AllList } from '../common/AllList.jsx';
 import SentRequests from '../common/SentRequests.jsx';
-const FriendsList = ({ onOpenMenu }) => {
+const FriendsList = ({ onOpenMenu ,setChatopen}) => {
   const [activeTab, setActiveTab] = useState('Online');
 
   const tabs = ['Friends', 'Online', 'All', 'Add Friend', 'Pending'];
@@ -183,7 +183,7 @@ const FriendsList = ({ onOpenMenu }) => {
               transition={{ duration: 0.18, ease: 'easeOut' }}
               className="h-full"
             >
-              <AllList />
+              <AllList setChatopen={setChatopen} />
             </motion.div>
           )}
           {activeTab === 'Pending' && (

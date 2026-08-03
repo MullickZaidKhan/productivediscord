@@ -3,40 +3,95 @@ import { Search, X, Check, Inbox, Send } from "lucide-react";
 import {
   usePendingFriendRequests,
   useSentFriendRequests,
+  useAcceptFriendRequest,
+  useRejectFriendRequest,
 } from "../../hooks/useFriend.js";
 
 export default function SentRequests() {
   const [activeSection, setActiveSection] = useState("received");
+  // Tracks per-request UI state: "accepting" | "accepted" | "rejecting" | "rejected"
+  const [actionStatus, setActionStatus] = useState({});
+  // Requests that have finished their exit animation and should be removed from view
+  const [dismissedIds, setDismissedIds] = useState(new Set());
+
   const {
     data: receivedRequests = [],
     isLoading: isReceivedLoading,
     isError: isReceivedError,
+    refetch: refetchReceived,
   } = usePendingFriendRequests();
   const {
     data: sentRequests = [],
     isLoading: isSentLoading,
     isError: isSentError,
+    refetch: refetchSent,
   } = useSentFriendRequests();
+  const { mutate: acceptRequest } = useAcceptFriendRequest();
+  const { mutate: rejectRequest } = useRejectFriendRequest();
 
   const requests = activeSection === "received" ? receivedRequests : sentRequests;
   const isLoading = activeSection === "received" ? isReceivedLoading : isSentLoading;
   const isError = activeSection === "received" ? isReceivedError : isSentError;
-  const pendingCount = requests?.length ?? 0;
+
+  const visibleRequests = requests.filter((r) => !dismissedIds.has(r._id ?? r.id));
+  const pendingCount = visibleRequests.length;
   const sectionLabel = activeSection === "received" ? "Requests I Get" : "Requests I Send";
 
+  const EXIT_ANIMATION_MS = 900;
+
+  const finishAndRemove = (id, refetch) => {
+    setTimeout(() => {
+      setDismissedIds((prev) => new Set(prev).add(id));
+      setActionStatus((prev) => {
+        const next = { ...prev };
+        delete next[id];
+        return next;
+      });
+      // Re-pull the source of truth from the server now that the row is gone visually
+      refetch?.();
+    }, EXIT_ANIMATION_MS);
+  };
+
   const handleAccept = (request) => {
-    // hook up to your accept-friend-request mutation here
-    console.log("accept", request._id ?? request.id);
+    const id = request._id ?? request.id;
+    setActionStatus((prev) => ({ ...prev, [id]: "accepting" }));
+    acceptRequest(id, {
+      onSuccess: () => {
+        setActionStatus((prev) => ({ ...prev, [id]: "accepted" }));
+        finishAndRemove(id, refetchReceived);
+      },
+      onError: () => {
+        setActionStatus((prev) => {
+          const next = { ...prev };
+          delete next[id];
+          return next;
+        });
+      },
+    });
   };
 
   const handleReject = (request) => {
-    // hook up to your reject-friend-request mutation here
-    console.log("reject", request._id ?? request.id);
+    const id = request._id ?? request.id;
+    setActionStatus((prev) => ({ ...prev, [id]: "rejecting" }));
+    rejectRequest(id, {
+      onSuccess: () => {
+        setActionStatus((prev) => ({ ...prev, [id]: "rejected" }));
+        finishAndRemove(id, refetchReceived);
+      },
+      onError: () => {
+        setActionStatus((prev) => {
+          const next = { ...prev };
+          delete next[id];
+          return next;
+        });
+      },
+    });
   };
 
   const handleCancel = (request) => {
-    // hook up to your cancel-sent-request mutation here
-    console.log("cancel", request._id ?? request.id);
+    const id = request._id ?? request.id;
+    // Cancel request is not implemented yet; add a cancel mutation if needed.
+    console.log("cancel", id);
   };
 
   return (
@@ -100,65 +155,91 @@ export default function SentRequests() {
           <div className="text-sm text-[#cbd5e1] py-6">No pending friend requests.</div>
         )}
 
-        {!isLoading && !isError && requests.map((request) => {
-          const profile = activeSection === "received" ? request.sender ?? {} : request.receiver ?? {};
-          const displayName = profile.name || profile.username || "Unknown user";
-          const username = profile.username ? `@${profile.username}` : "";
-          const initials = (profile.name || profile.username || "?").charAt(0).toUpperCase();
+        {!isLoading &&
+          !isError &&
+          visibleRequests.map((request) => {
+            const id = request._id ?? request.id;
+            const profile = activeSection === "received" ? request.sender ?? {} : request.receiver ?? {};
+            const displayName = profile.name || profile.username || "Unknown user";
+            const username = profile.username ? `@${profile.username}` : "";
+            const initials = (profile.name || profile.username || "?").charAt(0).toUpperCase();
 
-          return (
-            <div
-              key={request._id ?? request.id}
-              className="flex items-center px-4 py-2.5 rounded-lg hover:bg-[#3a3c419f] group"
-            >
-              <div className="relative w-8 h-8 mr-3 shrink-0">
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#ff5fa2] to-[#d61f69] flex items-center justify-center text-white text-sm font-semibold">
-                  {initials}
-                </div>
-                <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-[#23a55a] border-[3px] border-[#313338]" />
-              </div>
+            const status = actionStatus[id];
+            const isSettled = status === "accepted" || status === "rejected";
+            const isBusy = status === "accepting" || status === "rejecting";
 
-              <div className="flex-1 min-w-0 flex flex-col justify-center">
-                <div className="text-[15px] font-semibold text-[#f2f3f5] leading-tight truncate">
-                  {displayName}
+            return (
+              <div
+                key={id}
+                className={`flex items-center px-4 py-2.5 rounded-lg hover:bg-[#3a3c419f] group transition-all duration-700 ease-in-out overflow-hidden ${
+                  isSettled
+                    ? "opacity-0 -translate-x-3 max-h-0 py-0 my-0 scale-95"
+                    : "opacity-100 translate-x-0 max-h-20"
+                }`}
+              >
+                <div className="relative w-8 h-8 mr-3 shrink-0">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#ff5fa2] to-[#d61f69] flex items-center justify-center text-white text-sm font-semibold">
+                    {initials}
+                  </div>
+                  <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-[#23a55a] border-[3px] border-[#313338]" />
                 </div>
-                <div className="text-[13px] text-[#949ba4] leading-tight truncate">
-                  {username}
-                </div>
-              </div>
 
-              {activeSection === "received" ? (
-                <div className="flex items-center gap-2 shrink-0">
+                <div className="flex-1 min-w-0 flex flex-col justify-center">
+                  <div className="text-[15px] font-semibold text-[#f2f3f5] leading-tight truncate">
+                    {displayName}
+                  </div>
+                  <div className="text-[13px] text-[#949ba4] leading-tight truncate">
+                    {username}
+                  </div>
+                </div>
+
+                {status === "accepted" && (
+                  <span className="flex items-center gap-1 text-[13px] font-medium text-[#23a55a] px-2 py-1 rounded-full bg-[#23a55a1a] animate-[fadeIn_0.2s_ease-out] shrink-0">
+                    <Check size={14} /> Accepted
+                  </span>
+                )}
+                {status === "rejected" && (
+                  <span className="flex items-center gap-1 text-[13px] font-medium text-[#f23f42] px-2 py-1 rounded-full bg-[#f23f421a] animate-[fadeIn_0.2s_ease-out] shrink-0">
+                    <X size={14} /> Rejected
+                  </span>
+                )}
+
+                {!isSettled && activeSection === "received" && (
+                  <div className="flex items-center gap-2 shrink-0">
+                    <button
+                      type="button"
+                      aria-label="Accept request"
+                      disabled={isBusy}
+                      onClick={() => handleAccept(request)}
+                      className="w-8 h-8 rounded-[5px] flex items-center justify-center text-[#23a55a] bg-[#23a55a1a] hover:bg-[#23a55a] hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <Check size={16} className={status === "accepting" ? "animate-pulse" : ""} />
+                    </button>
+                    <button
+                      type="button"
+                      aria-label="Reject request"
+                      disabled={isBusy}
+                      onClick={() => handleReject(request)}
+                      className="w-8 h-8 rounded-[5px] flex items-center justify-center text-[#f23f42] bg-[#f23f421a] hover:bg-[#f23f42] hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <X size={16} className={status === "rejecting" ? "animate-pulse" : ""} />
+                    </button>
+                  </div>
+                )}
+
+                {!isSettled && activeSection !== "received" && (
                   <button
                     type="button"
-                    aria-label="Accept request"
-                    onClick={() => handleAccept(request)}
-                    className="w-8 h-8 rounded-[5px] flex items-center justify-center text-[#23a55a] bg-[#23a55a1a] hover:bg-[#23a55a] hover:text-white transition-colors"
-                  >
-                    <Check size={16} />
-                  </button>
-                  <button
-                    type="button"
-                    aria-label="Reject request"
-                    onClick={() => handleReject(request)}
-                    className="w-8 h-8 rounded-[5px] flex items-center justify-center text-[#f23f42] bg-[#f23f421a] hover:bg-[#f23f42] hover:text-white transition-colors"
+                    aria-label="Cancel request"
+                    onClick={() => handleCancel(request)}
+                    className="w-8 h-8 rounded-full flex items-center justify-center text-[#b5bac1] hover:bg-[#4e5058] hover:text-[#f2f3f5] shrink-0"
                   >
                     <X size={16} />
                   </button>
-                </div>
-              ) : (
-                <button
-                  type="button"
-                  aria-label="Cancel request"
-                  onClick={() => handleCancel(request)}
-                  className="w-8 h-8 rounded-full flex items-center justify-center text-[#b5bac1] hover:bg-[#4e5058] hover:text-[#f2f3f5] shrink-0"
-                >
-                  <X size={16} />
-                </button>
-              )}
-            </div>
-          );
-        })}
+                )}
+              </div>
+            );
+          })}
       </div>
     </div>
   );
