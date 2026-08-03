@@ -8,12 +8,11 @@ export const api = axios.create({
   },
 });
 
-
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
-    console.log("op")
+  
     if (!originalRequest) {
       return Promise.reject(error);
     }

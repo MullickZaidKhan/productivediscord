@@ -1,18 +1,52 @@
 import React, { useState } from 'react';
 import { MessageCirclePlus, UsersRound, Menu, ChevronRight, Search, MessageSquare, MoreVertical, Check } from "lucide-react";
 import { motion, AnimatePresence } from 'framer-motion';
+import { useSelector } from 'react-redux';
+import { useSendFriendRequest } from "../../hooks/useFriend.js";
 
 const AddFriendpage = () => {
     const [sent, setSent] = useState(false);
     const [shake, setShake] = useState(false);
     const [username, setUsername] = useState('');
+    const [successMessage, setSuccessMessage] = useState('');
+    const currentUser = useSelector((state) => state.authinfoSlice.userinfo);
+    const sendFriendRequest = useSendFriendRequest();
+    const currentUserId = currentUser?.id || currentUser?._id;
+    console.log("Current User Info ->", currentUser);
     const handleSend = () => {
         if (!username.trim()) {
             setShake(true);
             setTimeout(() => setShake(false), 400);
             return;
         }
-        setSent(true);
+
+        if (!currentUserId) {
+            setShake(true);
+            setTimeout(() => setShake(false), 400);
+            return;
+        }
+
+        sendFriendRequest.mutate({
+            senderId: currentUserId,
+            receiverId: username,
+        }, {
+            onSuccess: (response) => {
+                setSent(true);
+                setSuccessMessage(response?.data?.message || 'Friend request sent');
+            },
+            onError: () => {
+                setShake(true);
+                setTimeout(() => setShake(false), 400);
+            },
+        });
+    };
+
+    const handleInputChange = (value) => {
+        setUsername(value);
+        if (sent) {
+            setSent(false);
+            setSuccessMessage('');
+        }
     };
     return (
         <div>
@@ -55,12 +89,11 @@ const AddFriendpage = () => {
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.3, delay: 0.2 }}
-                        className={`mt-4 flex items-center gap-3 bg-[#1e1f228e] rounded-2xl px-4 py-1.5 border border border-[#5865f25d]  focus-within:border-[#5865F2] transition-colors ${shake ? "animate-[shake_0.4s_ease-in-out]" : ""
-                            }`}
+                        className={`mt-4 flex items-center gap-3 bg-[#1e1f228e] rounded-2xl px-4 py-1.5 border ${sent ? 'border-[#23a55a]' : 'border-[#5865f25d]'} focus-within:border-[#5865F2] transition-colors ${shake ? "animate-[shake_0.4s_ease-in-out]" : ""}`}
                     >
                         <input
                             value={username}
-                            onChange={(e) => setUsername(e.target.value)}
+                            onChange={(e) => handleInputChange(e.target.value)}
                             onKeyDown={(e) => e.key === "Enter" && handleSend()}
                             placeholder="Enter a username"
                             className="flex-1 bg-transparent text-white placeholder-[#6d6f78] text-sm py-3 outline-none"
@@ -71,7 +104,7 @@ const AddFriendpage = () => {
                             whileTap={{ scale: 0.95 }}
                             animate={sent ? { scale: [1, 1.06, 1] } : { scale: 1 }}
                             transition={{ duration: 0.3 }}
-                            className={`shrink-0 text-white text-sm font-medium px-4 py-2 rounded-[6px] transition-colors duration-150 flex items-center gap-1.5 ${sent
+                            className={`shrink-0 text-white text-sm font-medium px-4 py-2 rounded-md transition-colors duration-150 flex items-center gap-1.5 ${sent
                                 ? "bg-[#23a55a]"
                                 : "bg-[#5865F2] hover:bg-[#4752c4]"
                                 }`}

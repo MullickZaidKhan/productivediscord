@@ -12,7 +12,8 @@ export const verifyJwt = async function (req, res, next) {
     }
 
     const payload = verifyAccessToken(token);
-    req.user = { id: payload._id };
+    const userId = payload.id || payload._id;
+    req.user = { id: userId };
 
     next();
   } catch (error) {

@@ -10,10 +10,6 @@
 
 //   const tabs = ['Friends', 'Online', 'All', 'Add Friend'];
 
-
-
-
-
 //   return (
 //     <div className="flex-1 min-w-0 min-h-0 h-full bg-[#0000008e] flex flex-col">
 //       {/* Header */}
@@ -86,11 +82,11 @@ import { staggerContainer, fadeInUp } from '../ui/motion.js';
 import Onlinepage from '../common/Onlinepage.jsx';
 import AddFriendpage from '../common/AddFriendpage.jsx';
 import { AllList } from '../common/AllList.jsx';
-
+import SentRequests from '../common/SentRequests.jsx';
 const FriendsList = ({ onOpenMenu }) => {
   const [activeTab, setActiveTab] = useState('Online');
 
-  const tabs = ['Friends', 'Online', 'All', 'Add Friend'];
+  const tabs = ['Friends', 'Online', 'All', 'Add Friend', 'Pending'];
 
   return (
     <div className="flex-1 min-w-0 min-h-0 h-full bg-[#0000008e] flex flex-col">
@@ -188,6 +184,18 @@ const FriendsList = ({ onOpenMenu }) => {
               className="h-full"
             >
               <AllList />
+            </motion.div>
+          )}
+          {activeTab === 'Pending' && (
+            <motion.div
+              key="pending"
+              initial={{ opacity: 0, x: 12 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -12 }}
+              transition={{ duration: 0.18, ease: 'easeOut' }}
+              className="h-full"
+            >
+              <SentRequests />
             </motion.div>
           )}
         </AnimatePresence>

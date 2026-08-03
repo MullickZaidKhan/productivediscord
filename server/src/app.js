@@ -1,6 +1,7 @@
 import express from "express"
 import morgan from "morgan";
 import authRoute from "./router/auth.route.js";
+import friendRoute from "./router/Friend.route.js";
 import cookieParser from "cookie-parser"
 import cors from 'cors'
 
@@ -16,7 +17,8 @@ app.use(cors({
 
 app.set('trust proxy', 1)
 app.use('/api/v1/auth',authRoute)
-    
+app.use('/api/v1/friends',friendRoute)
+
 app.get("/", (req, res) => {
   res.send("Hello, World!")
 })

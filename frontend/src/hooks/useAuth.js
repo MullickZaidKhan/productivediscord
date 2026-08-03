@@ -2,8 +2,9 @@ import { api } from "../api/axios.js";
 import { useMutation } from "@tanstack/react-query";
 import { login, register, accesstoken, refreshtoken, checkUsername } from "../api/Auth.api.js";
 import { AuthContext } from "../context/auth.context.jsx";
-import { useQuery,useQueryClient } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useEffect, useState } from "react";
+
 // export const useAuth = () => {
 //     const { user, setUser } = useContext(AuthContext);
 //     const handleLogin = async (username, password) => {
@@ -19,14 +20,12 @@ import { useEffect, useState } from "react";
 
 // return { user, handleLogin };
 
-
 export function useLogin() {
     const queryClient = useQueryClient();
 
     return useMutation({
         mutationFn: login,
         onSuccess: (data) => {
-
             // Handle successful login, e.g., update context or local storage
             // console.log("Login successful:", data);
             queryClient.invalidateQueries({ queryKey: ["authUser"] });
@@ -42,15 +41,11 @@ export function useLogin() {
 }
 
 export function useRegister() {
-
-
     return useMutation({
         mutationFn: register,
         onSuccess: (data) => {
-
             // Handle successful login, e.g., update context or local storage
             console.log("Register: ", data);
-
 
             // console.log("User set in context:", userData);
             // console.log("User set in context:", User);
@@ -60,9 +55,7 @@ export function useRegister() {
             console.error("Login failed:", error);
         }
     })
-
 }
-
 
 export function useAccessToken() {
     return useQuery({
@@ -120,9 +113,21 @@ export const checkUsernamehook = (username) => {
     return useQuery({
         queryKey: ["checkUsername", debouncedUsername],
         queryFn: async () => {
-            const response = await checkUsername(debouncedUsername);
-            return response.data;
-            console.log(response)
+            try {
+                const response = await checkUsername(debouncedUsername);
+                return response.data;
+            } catch (error) {
+                const response = error?.response;
+                if (response?.status === 400) {
+                    return {
+                        available: false,
+                        message: response.data?.message || "Username is unavailable",
+                        success: response.data?.success ?? false,
+                    };
+                }
+
+                throw error;
+            }
         },
         enabled: debouncedUsername?.length >= 5,
         retry: false,
