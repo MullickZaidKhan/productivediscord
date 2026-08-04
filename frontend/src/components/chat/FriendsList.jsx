@@ -83,10 +83,12 @@ import Onlinepage from '../common/Onlinepage.jsx';
 import AddFriendpage from '../common/AddFriendpage.jsx';
 import { AllList } from '../common/AllList.jsx';
 import SentRequests from '../common/SentRequests.jsx';
+
+
 const FriendsList = ({ onOpenMenu ,setChatopen}) => {
   const [activeTab, setActiveTab] = useState('Online');
 
-  const tabs = ['Friends', 'Online', 'All', 'Add Friend', 'Pending'];
+  const tabs = ['Online', 'All', 'Add Friend', 'Pending'];
 
   return (
     <div className="flex-1 min-w-0 min-h-0 h-full bg-[#0000008e] flex flex-col">
@@ -110,7 +112,7 @@ const FriendsList = ({ onOpenMenu ,setChatopen}) => {
         <div className="w-px h-6 bg-[#3e3f45] mx-1 shrink-0"></div>
 
         <div className="relative flex items-center gap-5 shrink-0">
-          {tabs.slice(1).map((tab) => (
+          {tabs.map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -118,7 +120,7 @@ const FriendsList = ({ onOpenMenu ,setChatopen}) => {
                 tab === 'Add Friend'
                   ? 'bg-[#5865f2] text-white hover:bg-[#4752c4]'
                   : activeTab === tab
-                    ? 'text-white'
+                    ? 'text-white bg-[#3e3f458c]'
                     : 'text-[#949ba4] hover:text-[#dbdee1] hover:bg-[#3e3f45]'
               }`}
             >

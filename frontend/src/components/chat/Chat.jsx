@@ -5,9 +5,18 @@ import FriendsList from './FriendsList';
 import ActiveNow from './ActiveNow';
 import { EASE } from '../ui/motion.js';
 import ChatPage from './Chatpage.jsx';
+import { useSelector, useDispatch } from 'react-redux'
+import { openChat, closeChat } from '../../redux/chat/Chatslice.js'
+
 function Chat() {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
-  const [Chatopen, setChatopen] = useState(false);
+  const dispatch = useDispatch();
+  const Chatopen = useSelector((state) => state.chat?.chatopen ?? false);
+  const setChatopen = (value) => {
+    if (value) dispatch(openChat());
+    else dispatch(closeChat());
+  };
+
   return (
     <div className="flex h-full min-h-0 bg-[#313338bb] font-sans relative overflow-hidden">
 
@@ -48,7 +57,7 @@ function Chat() {
 
       {/* Main Friends Area */}
 
-      {!Chatopen && (<FriendsList onOpenMenu={() => setMobileNavOpen(true)}  setChatopen={setChatopen} />)}
+      {!Chatopen && (<FriendsList onOpenMenu={() => setMobileNavOpen(true)} setChatopen={setChatopen} />)}
       {Chatopen && (<ChatPage setChatopen={setChatopen} />)}
 
       {/* Vertical Divider */}
