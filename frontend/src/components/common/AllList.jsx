@@ -22,7 +22,6 @@ export const AllList = ({ setChatopen }) => {
     friends.length > 0
       ? friends
       : [
-          
         ];
 
   const friendsCount = FRIENDS.length;
@@ -34,7 +33,7 @@ export const AllList = ({ setChatopen }) => {
 
   return (
     <div>
-      <div className=" w-full bg-[#31333813] flex items-start justify-center px-5 pt-5">
+      <div className=" w-full bg-[#31333800] flex items-start justify-center px-5 pt-5">
         <div className="w-full bg-[#31333800] flex justify-center">
           <div className="w-full ">
             {/* Search */}

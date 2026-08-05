@@ -6,11 +6,15 @@ import { useSelector } from "react-redux";
 import Chat from "../components/chat/Chat";
 import Profile from "../components/Profile/Profile.jsx";
 import { scaleIn } from "../components/ui/motion.js";
-
+import { useGetUserBackground } from "../hooks/background.hook.js";
 function Home() {
   const userinfo = useSelector((state) => state.authinfoSlice.userinfo);
   const [isOpen, setIsOpen] = useState(false);
+const { data, isLoading } = useGetUserBackground();
 
+const backgrounds = data?.data || [];
+const bgimg= backgrounds.imageUrl ? backgrounds.imageUrl : "https://i.pinimg.com/1200x/81/c1/79/81c1798f090c8090aefca4886ea768d2.jpg";
+console.log("Backgrounds:", backgrounds);
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-[#07070700]">
       {/* Left Side */}
@@ -24,7 +28,7 @@ function Home() {
             className="h-full w-full overflow-hidden rounded-none sm:rounded-[15px] bg-[#31333815] bg-cover bg-center bg-no-repeat"
             style={{
               backgroundImage:
-                "url('https://i.pinimg.com/1200x/81/c1/79/81c1798f090c8090aefca4886ea768d2.jpg')",
+                `url('${bgimg}')`,
             }}
           >
             <Chat />

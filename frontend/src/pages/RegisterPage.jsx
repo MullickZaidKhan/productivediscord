@@ -153,7 +153,7 @@ const RegisterPage = () => {
         reset();
         setUsernameChecked("");
         setStep(1);
-        window.location.href = "/";
+        window.location.href = "/background";
       },
     });
   };
@@ -187,7 +187,6 @@ const RegisterPage = () => {
         />
         <div className="relative z-10 flex flex-col items-center justify-center w-full px-12 text-center">
         
-
           <h2 className="text-3xl font-bold text-white mb-3">
             Get Started with Us
           </h2>

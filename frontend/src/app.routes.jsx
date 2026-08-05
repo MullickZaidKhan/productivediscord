@@ -5,7 +5,7 @@ import Login from './pages/LoginPage.jsx'
 import Register from './pages/RegisterPage.jsx'
 import RootLayout from './components/layout/RootLayout.jsx'
 import ErrorPage from './components/ErrorPage.jsx'
-
+import Background from './pages/Backgroundpicker.jsx'
 export const router = createBrowserRouter([
   {
     element: <RootLayout />,
@@ -16,9 +16,14 @@ export const router = createBrowserRouter([
         element:<ProtectedRoute><Home /></ProtectedRoute>
       },
       {
+        path: '/background',
+        element:<ProtectedRoute><Background /></ProtectedRoute>
+      },
+      {
         path: '/login',
         element: <Login />
       }
+
       ,
       {
         path: '/register',
