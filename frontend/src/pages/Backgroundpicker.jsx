@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import {
   useGetAllBackgrounds,
   useSetUserBackground,
+  useGetUserBackground,
 } from "../hooks/background.hook.js";
 
 /**
@@ -12,15 +13,14 @@ import {
  * ------------------------------------------------------------------
  * Discord-styled "choose your app background" screen.
  *
- * Wire it up:
- *   - Replace `fetchBackgrounds()` with your real API call. It must
- *     resolve to an array shaped like the sample objects below.
- *   - Replace `saveBackground(id)` with your real "select" API call.
- *   - `MOCK_DATA` is only used as a local fallback so this screen is
- *     easy to preview before the API is connected.
+ * Data flow:
+ *   - useGetAllBackgrounds()  -> full catalog of selectable backgrounds
+ *   - useGetUserBackground()  -> the ONE background currently applied
+ *                                for this user (used to mark "IN USE"
+ *                                and to default the initial selection)
+ *   - useSetUserBackground()  -> mutation to apply the chosen background
  * ------------------------------------------------------------------
  */
-// Data is provided by `useGetAllBackgrounds` hook.
 
 const ALL_TAB = "All";
 
@@ -45,12 +45,27 @@ export default function BackgroundPicker() {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [brokenImgs, setBrokenImgs] = useState({});
+
   const queryClient = useQueryClient();
-  const { data, isLoading, error } = useGetAllBackgrounds();
-  const setUserBackground = useSetUserBackground();
   const navigate = useNavigate();
+  const { data, isLoading, error } = useGetAllBackgrounds();
+  const {
+    data: userBackgroundData,
+    isLoading: isUserBackgroundLoading,
+  } = useGetUserBackground();
+  const setUserBackground = useSetUserBackground();
+
+  // The id of whatever the user currently has applied, straight from
+  // the "current user background" endpoint. Falls back to an `active`
+  // flag on a list item if your API happens to include one instead.
+  const currentActiveId =
+    userBackgroundData?.data?._id ??
+    userBackgroundData?._id ??
+    backgrounds.find((b) => b.active)?._id ??
+    "6a72ea989c51c48df3ebcb47";
+
   useEffect(() => {
-    if (isLoading) {
+    if (isLoading || isUserBackgroundLoading) {
       setStatus("loading");
       return;
     }
@@ -62,10 +77,14 @@ export default function BackgroundPicker() {
 
     const items = data?.data ?? data ?? [];
     setBackgrounds(items);
-    const current = items.find((b) => b.active);
-    setSelectedId(current ? current._id : items[0]?._id ?? null);
     setStatus("ready");
-  }, [data, isLoading, error]);
+  }, [data, isLoading, isUserBackgroundLoading, error]);
+
+  // Default the selection to whatever's already applied, once we know it.
+  useEffect(() => {
+    if (status !== "ready" || selectedId) return;
+    setSelectedId(currentActiveId ?? backgrounds[0]?._id ?? null);
+  }, [status, currentActiveId, backgrounds, selectedId]);
 
   const categories = useMemo(() => {
     const set = new Set(backgrounds.map((b) => b.category));
@@ -82,7 +101,6 @@ export default function BackgroundPicker() {
   }, [backgrounds, activeTab, query]);
 
   const selected = backgrounds.find((b) => b._id === selectedId);
-  const currentActiveId = backgrounds.find((b) => b.active)?._id ?? null;
   const hasChanges = selectedId && selectedId !== currentActiveId;
 
   const handlePick = (bg) => {
@@ -95,15 +113,11 @@ export default function BackgroundPicker() {
     setSaving(true);
     try {
       await setUserBackground.mutateAsync(selectedId);
-      setBackgrounds((prev) =>
-        prev.map((b) => ({ ...b, active: b._id === selectedId }))
-      );
       setSaved(true);
       queryClient.invalidateQueries({ queryKey: ["user-background"] });
-      // redirect to home on success
       navigate("/");
     } catch (e) {
-      // leave UI state to show failure via `saved` remaining false
+      // leave `saved` false so the button reverts and the user can retry
     } finally {
       setSaving(false);
     }
@@ -232,12 +246,7 @@ export default function BackgroundPicker() {
                           setBrokenImgs((prev) => ({ ...prev, [bg._id]: true }))
                         }
 
-                        className={
-                          "h-full w-full object-cover transition-transform duration-300 " +
-                          "group-hover:scale-105 " +
-                          (isSelected ? "" : "")
-                        }
-
+                        className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
                       />
                     ) : (
                       <div className="h-full w-full flex items-center justify-center text-[#6d6f78]">
@@ -299,16 +308,10 @@ export default function BackgroundPicker() {
             {selected ? (
               <>
                 <div className="h-10 w-16 rounded-md overflow-hidden bg-[#1e1f22] shrink-0 border border-white/10">
-                  <img
-                    src={selected.imageUrl}
-                    alt=""
-                    className="h-full w-full object-cover"
-                  />
+                  <img src={selected.imageUrl} alt="" className="h-full w-full object-cover" />
                 </div>
                 <div className="min-w-0">
-                  <p className="text-sm font-medium text-white truncate">
-                    {selected.name}
-                  </p>
+                  <p className="text-sm font-medium text-white truncate">{selected.name}</p>
                   <p className="text-xs text-[#949ba4]">
                     {hasChanges ? "Ready to apply" : "Currently applied"}
                   </p>

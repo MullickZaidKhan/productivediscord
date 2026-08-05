@@ -40,7 +40,7 @@ export default function Sidebar() {
       initial="hidden"
       animate="show"
       variants={staggerContainer(0.05)}
-      className="w-14 sm:w-[66px] shrink-0 p-1.5 sm:p-2.5 h-screen overflow-y-auto bg-[#1e1f22] flex flex-col items-center py-3 sm:py-6 border-r border-t border-b rounded-tr-[15px] rounded-br-[1vw] my-1 "
+      className="w-14 sm:w-[66px] shrink-0 p-1.5 sm:p-2.5 h-screen overflow-y-auto bg-[#1e1f22] flex flex-col items-center py-3 sm:py-6 rounded-tr-[15px] rounded-br-[1vw] my-1 "
     >
       {/* Discord Logo */}
       <motion.button

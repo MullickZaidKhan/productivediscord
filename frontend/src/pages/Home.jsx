@@ -11,9 +11,9 @@ function Home() {
   const userinfo = useSelector((state) => state.authinfoSlice.userinfo);
   const [isOpen, setIsOpen] = useState(false);
 const { data, isLoading } = useGetUserBackground();
-
+ 
 const backgrounds = data?.data || [];
-const bgimg= backgrounds.imageUrl ? backgrounds.imageUrl : "https://i.pinimg.com/1200x/81/c1/79/81c1798f090c8090aefca4886ea768d2.jpg";
+const bgimg= backgrounds.imageUrl ? backgrounds.imageUrl : "https://i.pinimg.com/1200x/62/7e/3a/627e3aa8f4209d6cbcfcd831a30f935e.jpg";
 console.log("Backgrounds:", backgrounds);
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-[#07070700]">

@@ -7,8 +7,17 @@ export const getAllBackgrounds = async () => {
 };
 // Get logged-in user's background
 export const getUserBackground = async () => {
-  const { data } = await api.get("/background/user-background");
-  return data;
+  try {
+    const { data } = await api.get("/background/user-background");
+    return data;
+  } catch (err) {
+    // If the server responds 404 (no background set), return a consistent
+    // shape so the UI can fallback to the default id instead of erroring.
+    if (err?.response?.status === 404) {
+      return { success: false, data: null };
+    }
+    throw err;
+  }
 };
 
 // Update logged-in user's background
