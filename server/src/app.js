@@ -7,6 +7,7 @@ import cors from 'cors'
 
 const app = express()
 app.use(morgan("dev"));
+// app.disable("etag");
 app.use(express.json())
 app.use(cookieParser());
 

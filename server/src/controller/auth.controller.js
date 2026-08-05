@@ -26,13 +26,13 @@ export const register = async (req, res) => {
     console.log("Email:", email);
     console.log("Exist User:", existUser);
 
-    // * if user exists
-    if (existUser) {
-      return res.status(409).json({
-        success: false,
-        message: "something went wrong",
-      });
-    }
+// User already exists
+if (existUser) {
+  return res.status(409).json({
+    success: false,
+    message: "An account with this email already exists.",
+  });
+}
 
     const hashPass = await bcrypt.hash(password, 10);
 
@@ -96,12 +96,13 @@ export const login = async (req, res) => {
     }).select("+password");
 
     // * if user not exists
-    if (!existUser) {
-      return res.status(400).json({
-        success: false,
-        message: "Something went wrong",
-      });
-    }
+// User not found
+if (!existUser) {
+  return res.status(404).json({
+    success: false,
+    message: "Account not found. Please sign up.",
+  });
+}
     console.log(existUser)
     const isRightPassword = await bcrypt.compare(password, existUser.password);
 

@@ -22,12 +22,7 @@ export const AllList = ({ setChatopen }) => {
     friends.length > 0
       ? friends
       : [
-          { name: "Aditya", color: "#8b6f47", initials: "A" },
-          { name: "Aditya Soni", color: "#1a1a1a", initials: "AS" },
-          { name: "Alfiya", color: "#c9a876", initials: "A" },
-          { name: "Almusavveer", color: "#2d7d46", initials: "AL" },
-          { name: "Anas Khan", color: "#4a3f5c", initials: "AK" },
-          { name: "Aniket Jadhav", color: "#6b7280", initials: "AJ" },
+          
         ];
 
   const friendsCount = FRIENDS.length;
