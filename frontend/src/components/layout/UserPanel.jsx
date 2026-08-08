@@ -4,21 +4,25 @@ import { BsMicMuteFill, BsHeadphones } from "react-icons/bs";
 import { User } from "lucide-react";
 import { motion } from "framer-motion";
 import { tapScale } from "../ui/motion.js";
+import { useDispatch } from "react-redux";
+import { openAccountSettings } from "../../redux/settings/settingspage.js";
+
 
 const AVATAR_DECORATION_URL =
   "https://cdn.discordapp.com/media/v1/collectibles-shop/1256321669467865088/animated";
 
 export default function UserPanel(props) {
-  const { userinfo,setIsOpen } = props;
+  const { userinfo, setIsOpen } = props;
+  const dispatch = useDispatch();
 
   return (
-  <motion.div
- onClick={() => setIsOpen(prev => !prev)}
-  whileTap={tapScale}
-  className="cursor-pointer w-full max-w-[30vw] h-16 bg-[#0f0f0f] hover:bg-[#181b24] rounded-xl flex items-center justify-between px-2 sm:px-3 shadow-lg transition-colors gap-14"
->
+    <motion.div
+     
+      whileTap={tapScale}
+      className="cursor-pointer w-full max-w-[30vw] h-16 bg-[#0f0f0f] hover:bg-[#181b24] rounded-xl flex items-center justify-between px-2 sm:px-3 shadow-lg transition-colors gap-14"
+    >
       {/* Left */}
-      <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+      <div className="flex items-center gap-2 sm:gap-3 min-w-0"  onClick={() => setIsOpen((prev) => !prev)}>
         <div className="relative w-11 h-11 shrink-0 flex items-center justify-center">
           {/* Avatar */}
           <img
@@ -26,7 +30,6 @@ export default function UserPanel(props) {
               (userinfo && userinfo.profileimg) ||
               "https://i.pinimg.com/originals/f6/5d/f3/f65df37ea7c3cc3f65f8c29906a81eef.gif"
             }
-
             alt=""
             className="w-9 h-9 rounded-full object-cover"
           />
@@ -35,7 +38,6 @@ export default function UserPanel(props) {
             src={
               (userinfo && userinfo.avatarDecoration) || AVATAR_DECORATION_URL
             }
-
             alt=""
             className="pointer-events-none absolute -inset-0.5 w-12 h-12 object-contain"
           />
@@ -64,7 +66,7 @@ export default function UserPanel(props) {
           <BsHeadphones size={18} className="text-gray-300" />
         </button>
         {/* Settings */}
-        <button className="hidden sm:flex w-9 h-9 rounded-lg hover:bg-[#36373d] items-center justify-center transition-colors active:scale-95">
+        <button onClick={() => dispatch(openAccountSettings())} className="hidden sm:flex w-9 h-9 rounded-lg hover:bg-[#36373d] items-center justify-center transition-colors active:scale-95">
           <HiCog6Tooth size={21} className="text-gray-300" />
         </button>
       </div>

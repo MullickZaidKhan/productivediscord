@@ -9,13 +9,15 @@ import {
   Profile,
   scaleIn,
   useGetUserBackground,
-  Accountsettings,
+  DiscordAccountSettings,
 } from "./home page import/homeimport.js";
 
 function Home() {
   const userinfo = useSelector((state) => state.authinfoSlice.userinfo);
   const [isOpen, setIsOpen] = useState(false);
-  const [showAccountSettings, setShowAccountSettings] = useState(false); // control visibility
+  // const [showAccountSettings, setShowAccountSettings] = useState(false); // control visibility
+  const showAccountSettings = useSelector((state)=>state.AccountSettings.showAccountSettings)
+  console.log(showAccountSettings)
   const { data, isLoading } = useGetUserBackground();
 
   const backgrounds = data?.data || [];
@@ -81,7 +83,7 @@ function Home() {
         )}
       </AnimatePresence> */}
         <AnimatePresence>
-        {!showAccountSettings && (
+        {showAccountSettings && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -90,7 +92,7 @@ function Home() {
             onClick={() => setShowAccountSettings(false)} // click backdrop to close
           >
             <div className="max-w-[95%] w-full max-h-[95%]" onClick={(e) => e.stopPropagation()}>
-              <Accountsettings />
+              <DiscordAccountSettings />
             </div>
           </motion.div>
         )}

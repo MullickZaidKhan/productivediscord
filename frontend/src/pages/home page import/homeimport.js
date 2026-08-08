@@ -6,7 +6,7 @@ import Chat from "../../components/chat/Chat";
 import Profile from "../../components/Profile/Profile.jsx";
 import { scaleIn } from "../../components/ui/motion.js";
 import { useGetUserBackground } from "../../hooks/background.hook.js";
-import Accountsettings from "../../components/settings/accountsettings.jsx";
+import DiscordAccountSettings from "../../components/settings/DiscordAccountSettings.jsx";
 
 export {
   AnimatePresence,
@@ -18,5 +18,5 @@ export {
   Profile,
   scaleIn,
   useGetUserBackground,
-  Accountsettings,
+  DiscordAccountSettings,
 };
