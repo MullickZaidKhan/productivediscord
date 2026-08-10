@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { useDispatch ,useSelector} from "react-redux";
 import { closeAccountSettings } from "../../redux/settings/settingspage.js";
+import {openProfilePageSettings} from "../../redux/Profile/ProfilePageSettings.js" ;
 import ScrollbarStyle from "./ScrollbarStyle";
 import SidebarItem from "./SidebarItem";
 import Field from "./Field";
@@ -146,7 +147,8 @@ export default function DiscordAccountSettings() {
             </div>
 
             {/* Profile header */}
-            <div className="flex items-center gap-2.5 px-2.5 mb-4">
+           <div className="flex items-center gap-2.5 px-2.5 mb-4" onClick={() => { dispatch(closeAccountSettings()); dispatch(openProfilePageSettings()); }}>
+
               <img
                 src="https://api.dicebear.com/7.x/adventurer/svg?seed=Zaidk&backgroundColor=b6e3f4"
                 alt="avatar"

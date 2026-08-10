@@ -98,12 +98,12 @@ export default function SentRequests() {
     <div className="min-h-screen bg-[#31333813] flex justify-center p-6 font-sans">
       <div className="w-full max-w-xl">
         {/* Search box */}
-        <div className="flex items-center gap-2.5 bg-[#1e1f22] border border-[#3f4147] rounded-lg px-3.5 py-2.5 mb-5">
+        <div className="flex items-center gap-2.5 bg-[#1e1f22a6] border border-[#3f4147] rounded-lg px-3.5 py-2.5 mb-5">
           <Search size={16} className="text-[#949ba4] shrink-0" />
           <input
             type="text"
             placeholder="Search"
-            className="bg-transparent outline-none border-none text-[#f2f3f5] placeholder-[#949ba4] text-[15px] w-full"
+            className="bg-transparent outline-none border-none text-[#f2f3f5] placeholder-[#949ba4b0] text-[15px] w-full"
           />
         </div>
 

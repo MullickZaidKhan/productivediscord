@@ -10,6 +10,7 @@ import {
   scaleIn,
   useGetUserBackground,
   DiscordAccountSettings,
+  ProfilePage,
 } from "./home page import/homeimport.js";
 
 function Home() {
@@ -17,7 +18,8 @@ function Home() {
   const [isOpen, setIsOpen] = useState(false);
   // const [showAccountSettings, setShowAccountSettings] = useState(false); // control visibility
   const showAccountSettings = useSelector((state)=>state.AccountSettings.showAccountSettings)
-  console.log(showAccountSettings)
+  const showProfilePageSettings =useSelector((state)=>state.ProfilePageSettings.showProfilePageSettings)
+  console.log(showProfilePageSettings)
   const { data, isLoading } = useGetUserBackground();
 
   const backgrounds = data?.data || [];
@@ -54,7 +56,7 @@ function Home() {
                 exit="hidden"
                 style={{ transformOrigin: "bottom left" }}
               >
-                <Profile className="absolute" userinfo={userinfo} />
+                <Profile className="absolute" userinfo={userinfo} setIsOpen={setIsOpen} />
               </motion.div>
             )}
           </AnimatePresence>
@@ -93,6 +95,23 @@ function Home() {
           >
             <div className="max-w-[95%] w-full max-h-[95%]" onClick={(e) => e.stopPropagation()}>
               <DiscordAccountSettings />
+          
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+        <AnimatePresence>
+        {showProfilePageSettings && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex h-full  items-center justify-center bg-black/60"
+            onClick={() => setShowAccountSettings(false)} // click backdrop to close
+          >
+            <div className="max-w-[95%] w-full max-h-[95%]" onClick={(e) => e.stopPropagation()}>
+              {/* <DiscordAccountSettings /> */}
+              <ProfilePage />
             </div>
           </motion.div>
         )}

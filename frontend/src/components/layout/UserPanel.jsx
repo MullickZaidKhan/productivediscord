@@ -7,7 +7,6 @@ import { tapScale } from "../ui/motion.js";
 import { useDispatch } from "react-redux";
 import { openAccountSettings } from "../../redux/settings/settingspage.js";
 
-
 const AVATAR_DECORATION_URL =
   "https://cdn.discordapp.com/media/v1/collectibles-shop/1256321669467865088/animated";
 

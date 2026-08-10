@@ -3,16 +3,17 @@ import { HiChevronDown, HiCog6Tooth } from "react-icons/hi2";
 import { BsMicMuteFill, BsHeadphones } from "react-icons/bs";
 import { Pencil, ChevronRight, User } from "lucide-react";
 import { motion } from "framer-motion";
-
+import { useDispatch, useSelector } from "react-redux";
+import { openProfilePageSettings } from "../../redux/Profile/ProfilePageSettings.js";
 // UserPanel.jsx
 // export default function UserPanel({ userinfo = {}, isOpen, onToggle }) {
-export default function UserPanel(userinfo) {
+export default function UserPanel({ userinfo, setIsOpen }) {
   const containerRef = useRef(null);
-  console.log(userinfo, "op")
-  const user = "Zaid khan";
-  const profileImg = "https://i.pinimg.com/originals/f6/5d/f3/f65df37ea7c3cc3f65f8c29906a81eef.gif";
-  const displayName = userinfo.userinfo.name || "User";
-  const handle = userinfo.userinfo.username || "User";
+  const dispatch = useDispatch();
+  const displayName = userinfo?.name || "User";
+  const handle = userinfo?.username || "User";
+  const profileImg =
+    "https://i.pinimg.com/originals/f6/5d/f3/f65df37ea7c3cc3f65f8c29906a81eef.gif";
   const statusText = "hi";
 
   //   if (!isOpen) return null; // or keep the trigger button always visible and only guard the popup
@@ -51,16 +52,31 @@ export default function UserPanel(userinfo) {
 
         {/* Body */}
         <div className="pt-10 px-4 pb-4">
-          <h2 className="text-white font-bold text-xl truncate">{displayName}</h2>
+          <h2 className="text-white font-bold text-xl truncate">
+            {displayName}
+          </h2>
           <p className="text-[#b5bac1] text-sm truncate">{handle}</p>
 
           <div className="mt-4 space-y-0.5">
-            <motion.button whileHover={{ x: 2 }} whileTap={{ scale: 0.98 }} className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#232428] text-[#b5bac1] hover:text-white transition-colors text-sm">
+            <motion.button
+                 onClick={() => {
+                     setIsOpen(false);
+            dispatch(openProfilePageSettings());
+         
+          }}
+              whileHover={{ x: 2 }}
+              whileTap={{ scale: 0.98 }}
+              className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#232428] text-[#b5bac1] hover:text-white transition-colors text-sm"
+            >
               <Pencil size={16} />
               <span>Edit Profile</span>
             </motion.button>
 
-            <motion.button whileHover={{ x: 2 }} whileTap={{ scale: 0.98 }} className="w-full flex items-center justify-between px-3 py-2 rounded-lg hover:bg-[#232428] text-[#b5bac1] hover:text-white transition-colors text-sm">
+            <motion.button
+              whileHover={{ x: 2 }}
+              whileTap={{ scale: 0.98 }}
+              className="w-full flex items-center justify-between px-3 py-2 rounded-lg hover:bg-[#232428] text-[#b5bac1] hover:text-white transition-colors text-sm"
+            >
               <div className="flex items-center gap-3">
                 <div className="w-3.5 h-3.5 rounded-full bg-[#23a55a]" />
                 <span>Online</span>
@@ -68,7 +84,11 @@ export default function UserPanel(userinfo) {
               <ChevronRight size={16} />
             </motion.button>
 
-            <motion.button whileHover={{ x: 2 }} whileTap={{ scale: 0.98 }} className="w-full flex items-center justify-between px-3 py-2 rounded-lg hover:bg-[#232428] text-[#b5bac1] hover:text-white transition-colors text-sm">
+            <motion.button
+              whileHover={{ x: 2 }}
+              whileTap={{ scale: 0.98 }}
+              className="w-full flex items-center justify-between px-3 py-2 rounded-lg hover:bg-[#232428] text-[#b5bac1] hover:text-white transition-colors text-sm"
+            >
               <div className="flex items-center gap-3">
                 <User size={16} />
                 <span>Switch Accounts</span>

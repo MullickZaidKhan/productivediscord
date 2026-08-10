@@ -30,7 +30,7 @@ const Sidebar = ({ onClose }) => {
 
       {/* Search Button */}
       <motion.div variants={fadeInUp} className="p-3">
-        <div className="bg-[#1e1f22] hover:bg-[#393c43] cursor-pointer rounded-md py-1.5 px-3 text-sm shadow-sm border border-[#232428] transition-colors">
+        <div className="bg-[#1e1f22b4] hover:bg-[#393c4393] cursor-pointer rounded-md py-1.5 px-3 text-sm shadow-sm border border-[#232428] transition-colors">
           Find or start a conversation
         </div>
       </motion.div>

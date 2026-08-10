@@ -7,7 +7,7 @@ import Profile from "../../components/Profile/Profile.jsx";
 import { scaleIn } from "../../components/ui/motion.js";
 import { useGetUserBackground } from "../../hooks/background.hook.js";
 import DiscordAccountSettings from "../../components/settings/DiscordAccountSettings.jsx";
-
+import ProfilePage from "../../components/Profile/Profilepage.jsx"
 export {
   AnimatePresence,
   motion,
@@ -19,4 +19,5 @@ export {
   scaleIn,
   useGetUserBackground,
   DiscordAccountSettings,
+  ProfilePage,
 };
