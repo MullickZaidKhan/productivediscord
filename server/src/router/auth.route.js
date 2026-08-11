@@ -10,11 +10,11 @@ import {
   verifyJwt,
   accessTokenverifyJwt,
 } from "../middleware/auth.middleware.js";
-
+import upload from '../config/multer.js'
 const authRoute = Router();
 
 //All the post
-authRoute.post("/register", register);
+authRoute.post("/register",upload.single('profileimg'), register);
 authRoute.post("/login", login);
 authRoute.post("/logout", verifyJwt, logout);
 

@@ -36,7 +36,10 @@ const userSchema = new mongoose.Schema(
       minlength: [8, "Password must be at least 8 characters long"],
       select: false,
     },
-
+    profileimg: {
+      type: String,
+      select: false,
+    },
     // Friends List
     friends: [
       {
@@ -48,7 +51,7 @@ const userSchema = new mongoose.Schema(
   {
     timestamps: true,
     versionKey: false,
-  }
+  },
 );
 
 export const User = mongoose.model("User", userSchema);

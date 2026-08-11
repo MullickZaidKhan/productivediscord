@@ -3,10 +3,21 @@ import { Session } from "../model/session.model.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import cookies from "cookie-parser";
-import config from "../config/config.js"; // Aapki config file
-import { signAccessToken, signRefreshToken, hashToken, verifyRefreshToken } from "../lib/jwt.js";
-import { clearAuthCookies, setAuthCookies } from "../lib/cookies.js";
+// import {uploadToImageKit } from "../config/imgkit/image.service.js"
 
+// import imagekit from "../config/imgkit/imagekit.js"
+// import { toFile } from "@imagekit/nodejs";
+
+import { uploadToImageKit } from "../config/imgkit/image.service.js";
+import config from '../config/config.js';
+import {
+  signAccessToken,
+  signRefreshToken,
+  hashToken,
+  verifyRefreshToken,
+} from "../lib/jwt.js";
+import { clearAuthCookies, setAuthCookies } from "../lib/cookies.js";
+import upload from "../config/multer.js"
 export const register = async (req, res) => {
   const { username, name, email, password } = req.body;
 
@@ -18,7 +29,7 @@ export const register = async (req, res) => {
         message: "all Field is required",
       });
     }
-
+    let UPLOADEDPROFILEIMG="";
     // * check user exist or not
     const existUser = await User.findOne({
       email,
@@ -26,23 +37,45 @@ export const register = async (req, res) => {
     console.log("Email:", email);
     console.log("Exist User:", existUser);
 
-// User already exists
-if (existUser) {
-  return res.status(409).json({
-    success: false,
-    message: "An account with this email already exists.",
-  });
-}
+    // User already exists
+    if (existUser) {
+      return res.status(409).json({
+        success: false,
+        message: "An account with this email already exists.",
+      });
+    }
 
     const hashPass = await bcrypt.hash(password, 10);
-
+    console.log("Key prefix:", config.IMAGEKIT_PRIVATE_KEY?.slice(0, 8), "length:", config.IMAGEKIT_PRIVATE_KEY?.length); 
+    // ✅ Upload avatar if exists
+    if (req.file) {
+      console.log("working")
+      console.log(req.file)
+      // const fileToUpload = await toFile(req.file.buffer, req.file.originalname, {
+      //   type: req.file.mimetype,
+      //   lastModified: Date.now(),
+      // });
+      // const uploadedImage = await imagekit.files.upload({
+      //   file: fileToUpload,
+      //   fileName: `${Date.now()}-${req.file.originalname}`,
+      //   folder: "/avatarsTelegramClone",
+      // });
+      // UPLOADEDPROFILEIMG = uploadedImage.url;
+      // console.log("ImageKit response:", UPLOADEDPROFILEIMG);
+      console.log(req.file.buffer, req.file.originalname)
+      const uploadedUrl  = await uploadToImageKit(req.file.buffer, req.file.fieldname);
+      console.log(uploadedUrl)
+      UPLOADEDPROFILEIMG=uploadedUrl
+    }
     // * creating new user
     const user = await User.create({
       username,
       email,
       name,
       password: hashPass,
+      profileimg:UPLOADEDPROFILEIMG,
     });
+
 
     const payload = {
       id: user._id,
@@ -96,14 +129,14 @@ export const login = async (req, res) => {
     }).select("+password");
 
     // * if user not exists
-// User not found
-if (!existUser) {
-  return res.status(404).json({
-    success: false,
-    message: "Account not found. Please sign up.",
-  });
-}
-    console.log(existUser)
+    // User not found
+    if (!existUser) {
+      return res.status(404).json({
+        success: false,
+        message: "Account not found. Please sign up.",
+      });
+    }
+    console.log(existUser);
     const isRightPassword = await bcrypt.compare(password, existUser.password);
 
     if (!isRightPassword) {
@@ -210,15 +243,15 @@ export const refresh = async (req, res) => {
         refreshToken: hashToken(newRefreshToken),
         expiryDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
         verify: true,
-      }
+      },
     );
 
     setAuthCookies(res, newAccessToken, newRefreshToken);
 
     return res.status(200).json({
       success: true,
-      message: "Refreshed."
-    })
+      message: "Refreshed.",
+    });
   } catch (err) {
     console.log(err);
     return res.status(500).json({
@@ -236,22 +269,24 @@ export const checkUsername = async (req, res) => {
 
     if (!username.length) {
       return res.status(400).json({
-        success: false
-      })
+        success: false,
+      });
     }
 
     if (username.length <= 5) {
       return res.status(400).json({
-        message: "Username must contain at least 5 and no more than 18 characters",
+        message:
+          "Username must contain at least 5 and no more than 18 characters",
         success: false,
-      })
+      });
     }
 
     if (username.length > 18) {
       return res.status(400).json({
-        message: "Username must contain at least 5 and no more than 18 characters",
+        message:
+          "Username must contain at least 5 and no more than 18 characters",
         success: false,
-      })
+      });
     }
 
     // Only allow letters, numbers, dots and underscores (Instagram-style)
@@ -271,7 +306,7 @@ export const checkUsername = async (req, res) => {
       return res.status(400).json({
         message: "This username has already been taken",
         success: false,
-      })
+      });
     }
 
     return res.status(200).json({
@@ -285,4 +320,5 @@ export const checkUsername = async (req, res) => {
       message: "Something went wrong while checking username",
     });
   }
-}
+};
+ 
