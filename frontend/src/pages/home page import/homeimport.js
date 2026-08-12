@@ -8,6 +8,7 @@ import { scaleIn } from "../../components/ui/motion.js";
 import { useGetUserBackground } from "../../hooks/background.hook.js";
 import DiscordAccountSettings from "../../components/settings/DiscordAccountSettings.jsx";
 import ProfilePage from "../../components/Profile/Profilepage.jsx"
+import Avatarpicker from "../../components/popup/Avatarpicker.jsx"
 export {
   AnimatePresence,
   motion,
@@ -20,4 +21,5 @@ export {
   useGetUserBackground,
   DiscordAccountSettings,
   ProfilePage,
+  Avatarpicker,
 };

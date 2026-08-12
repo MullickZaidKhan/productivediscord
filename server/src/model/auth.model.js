@@ -38,7 +38,7 @@ const userSchema = new mongoose.Schema(
     },
     profileimg: {
       type: String,
-      select: false,
+      
     },
     // Friends List
     friends: [

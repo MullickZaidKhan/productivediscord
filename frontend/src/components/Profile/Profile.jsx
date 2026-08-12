@@ -12,7 +12,7 @@ export default function UserPanel({ userinfo, setIsOpen }) {
   const dispatch = useDispatch();
   const displayName = userinfo?.name || "User";
   const handle = userinfo?.username || "User";
-  const profileImg =
+  const profileImg =userinfo?.profileimg||
     "https://i.pinimg.com/originals/f6/5d/f3/f65df37ea7c3cc3f65f8c29906a81eef.gif";
   const statusText = "hi";
 

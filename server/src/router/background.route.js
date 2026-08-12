@@ -3,11 +3,13 @@ import {
       getAllBackgrounds,
   getUserBackground,
   setUserBackground,
+  setprofileimg,
 } from "../controller/background.controller.js";
 import {
   verifyJwt,
   accessTokenverifyJwt,
 } from "../middleware/auth.middleware.js";
+import upload from '../config/multer.js'
 const router = express.Router();
 // Public - Get all backgrounds (used on signup page)
 router.get("/all", getAllBackgrounds);
@@ -18,4 +20,6 @@ router.get("/user-background", verifyJwt, getUserBackground);
 
 router.put("/user-background", verifyJwt, setUserBackground);
 
+//setprofile img
+router.put("/set-profileimg", verifyJwt,  upload.single("profileimg"),setprofileimg);
 export default router;

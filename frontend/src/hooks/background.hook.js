@@ -3,6 +3,7 @@ import {
   getAllBackgrounds,
   getUserBackground,
   setUserBackground,
+  setUserProfile,
 } from "../api/background.api";
 
 // Get all available backgrounds
@@ -34,5 +35,11 @@ export const useSetUserBackground = () => {
         queryKey: ["user-background"],
       });
     },
+  });
+};
+
+export const useSetUserProfile = () => {
+  return useMutation({
+    mutationFn: setUserProfile,
   });
 };

@@ -11,6 +11,7 @@ import {
   useGetUserBackground,
   DiscordAccountSettings,
   ProfilePage,
+  Avatarpicker,
 } from "./home page import/homeimport.js";
 
 function Home() {
@@ -20,12 +21,15 @@ function Home() {
   const showAccountSettings = useSelector((state)=>state.AccountSettings.showAccountSettings)
   const showProfilePageSettings =useSelector((state)=>state.ProfilePageSettings.showProfilePageSettings)
   console.log(showProfilePageSettings)
+  const op = true
   const { data, isLoading } = useGetUserBackground();
 
   const backgrounds = data?.data || [];
   const bgimg = backgrounds.imageUrl
     ? backgrounds.imageUrl
     : "https://i.pinimg.com/1200x/62/7e/3a/627e3aa8f4209d6cbcfcd831a30f935e.jpg";
+
+
 
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-[#07070700]">
@@ -116,6 +120,24 @@ function Home() {
           </motion.div>
         )}
       </AnimatePresence>
+         <AnimatePresence>
+        {op && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            // className="fixed inset-0 z-50 flex h-full  items-center justify-center bg-black/60"
+            className="fixed inset-0 z-50 flex h-full  items-center justify-center "
+            onClick={() => setShowAccountSettings(false)} // click backdrop to close
+          >
+            <div className="  w-full h-full" onClick={(e) => e.stopPropagation()}>
+              {/* <DiscordAccountSettings /> */}
+              <Avatarpicker />
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
     </div>
   );
 }

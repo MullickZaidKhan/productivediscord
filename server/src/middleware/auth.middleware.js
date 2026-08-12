@@ -1,4 +1,5 @@
 import { verifyAccessToken } from "../lib/jwt.js";
+import { User } from "../model/auth.model.js";
 
 export const verifyJwt = async function (req, res, next) {
   try {
@@ -37,12 +38,31 @@ export const accessTokenverifyJwt = async function (req, res) {
     }
 
     const payload = verifyAccessToken(token);
-    const User =  payload;
-    
-    res.status(201).json({
-      success:true,
-      payloadtofrontend:User,
-    })
+    const userId = payload.id || payload._id;
+
+    const existUser = await User.findById(userId).select(
+      "username name email profileimg"
+    );
+
+    if (!existUser) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    const responsePayload = {
+      id: existUser._id,
+      username: existUser.username,
+      name: existUser.name,
+      email: existUser.email,
+      profileimg: existUser.profileimg,
+    };
+
+    res.status(200).json({
+      success: true,
+      payloadtofrontend: responsePayload,
+    });
   } catch (error) {
     console.log(error);
     res.status(500).json({

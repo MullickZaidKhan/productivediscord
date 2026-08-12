@@ -1,4 +1,4 @@
-import {api} from "../api/axios";
+import { api } from "../api/axios";
 
 // Get all backgrounds (Public)
 export const getAllBackgrounds = async () => {
@@ -26,5 +26,19 @@ export const setUserBackground = async (backgroundId) => {
     backgroundId,
   });
 
+  return data;
+};
+
+export const setUserProfile = async (profileimg) => {
+  const isFormData = profileimg instanceof FormData;
+ 
+  const { data } = await api.put(
+    "/background/set-profileimg",
+    isFormData ? profileimg : { profileimg },
+    isFormData
+      ? { headers: { "Content-Type": "multipart/form-data" } }
+      : undefined
+  );
+ 
   return data;
 };

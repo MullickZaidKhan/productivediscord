@@ -9,7 +9,7 @@ import cookies from "cookie-parser";
 // import { toFile } from "@imagekit/nodejs";
 
 import { uploadToImageKit } from "../config/imgkit/image.service.js";
-import config from '../config/config.js';
+import config from "../config/config.js";
 import {
   signAccessToken,
   signRefreshToken,
@@ -17,7 +17,8 @@ import {
   verifyRefreshToken,
 } from "../lib/jwt.js";
 import { clearAuthCookies, setAuthCookies } from "../lib/cookies.js";
-import upload from "../config/multer.js"
+import upload from "../config/multer.js";
+
 export const register = async (req, res) => {
   const { username, name, email, password } = req.body;
 
@@ -29,7 +30,7 @@ export const register = async (req, res) => {
         message: "all Field is required",
       });
     }
-    let UPLOADEDPROFILEIMG="";
+    let UPLOADEDPROFILEIMG = "";
     // * check user exist or not
     const existUser = await User.findOne({
       email,
@@ -46,42 +47,48 @@ export const register = async (req, res) => {
     }
 
     const hashPass = await bcrypt.hash(password, 10);
-    console.log("Key prefix:", config.IMAGEKIT_PRIVATE_KEY?.slice(0, 8), "length:", config.IMAGEKIT_PRIVATE_KEY?.length); 
+    console.log(
+      "Key prefix:",
+      config.IMAGEKIT_PRIVATE_KEY?.slice(0, 8),
+      "length:",
+      config.IMAGEKIT_PRIVATE_KEY?.length,
+    );
     // ✅ Upload avatar if exists
-    if (req.file) {
-      console.log("working")
-      console.log(req.file)
-      // const fileToUpload = await toFile(req.file.buffer, req.file.originalname, {
-      //   type: req.file.mimetype,
-      //   lastModified: Date.now(),
-      // });
-      // const uploadedImage = await imagekit.files.upload({
-      //   file: fileToUpload,
-      //   fileName: `${Date.now()}-${req.file.originalname}`,
-      //   folder: "/avatarsTelegramClone",
-      // });
-      // UPLOADEDPROFILEIMG = uploadedImage.url;
-      // console.log("ImageKit response:", UPLOADEDPROFILEIMG);
-      console.log(req.file.buffer, req.file.originalname)
-      const uploadedUrl  = await uploadToImageKit(req.file.buffer, req.file.fieldname);
-      console.log(uploadedUrl)
-      UPLOADEDPROFILEIMG=uploadedUrl
-    }
+    // if (req.file) {
+    //   console.log("working")
+    //   console.log(req.file)
+    //   // const fileToUpload = await toFile(req.file.buffer, req.file.originalname, {
+    //   //   type: req.file.mimetype,
+    //   //   lastModified: Date.now(),
+    //   // });
+    //   // const uploadedImage = await imagekit.files.upload({
+    //   //   file: fileToUpload,
+    //   //   fileName: `${Date.now()}-${req.file.originalname}`,
+    //   //   folder: "/avatarsTelegramClone",
+    //   // });
+    //   // UPLOADEDPROFILEIMG = uploadedImage.url;
+    //   // console.log("ImageKit response:", UPLOADEDPROFILEIMG);
+    //   console.log(req.file.buffer, req.file.originalname)
+    //   const uploadedUrl  = await uploadToImageKit(req.file.buffer, req.file.fieldname);
+    //   console.log(uploadedUrl)
+    UPLOADEDPROFILEIMG =
+      "https://ik.imagekit.io/w5wx4gdmoj/discord_products/Frame%206.png";
+    // }
     // * creating new user
     const user = await User.create({
       username,
       email,
       name,
       password: hashPass,
-      profileimg:UPLOADEDPROFILEIMG,
+      profileimg: UPLOADEDPROFILEIMG,
     });
-
 
     const payload = {
       id: user._id,
       username: user.username,
       name: user.name,
       email: user.email,
+      profileimg: user.profileimg,
     };
     // refreshToken generated
     const refreshToken = signRefreshToken(payload);
@@ -151,6 +158,7 @@ export const login = async (req, res) => {
       username: existUser.username,
       name: existUser.name,
       email: existUser.email,
+      profileimg: existUser.profileimg,
     };
 
     const refreshToken = signRefreshToken(payload);
@@ -321,4 +329,3 @@ export const checkUsername = async (req, res) => {
     });
   }
 };
- 
