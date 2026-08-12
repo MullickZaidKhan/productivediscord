@@ -12,16 +12,22 @@ import {
   DiscordAccountSettings,
   ProfilePage,
   Avatarpicker,
+  PopupBackgroundpicker,
 } from "./home page import/homeimport.js";
 
 function Home() {
   const userinfo = useSelector((state) => state.authinfoSlice.userinfo);
+  const userlogin = useSelector((state) => state.authinfoSlice.login);
+  console.log(userlogin,"home");
+  console.log(userinfo,"home");
+  
   const [isOpen, setIsOpen] = useState(false);
   // const [showAccountSettings, setShowAccountSettings] = useState(false); // control visibility
   const showAccountSettings = useSelector((state)=>state.AccountSettings.showAccountSettings)
   const showProfilePageSettings =useSelector((state)=>state.ProfilePageSettings.showProfilePageSettings)
   console.log(showProfilePageSettings)
   const op = true
+  const bg = true
   const { data, isLoading } = useGetUserBackground();
 
   const backgrounds = data?.data || [];
@@ -121,7 +127,7 @@ function Home() {
         )}
       </AnimatePresence>
          <AnimatePresence>
-        {op && (
+        {!op && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -133,6 +139,23 @@ function Home() {
             <div className="  w-full h-full" onClick={(e) => e.stopPropagation()}>
               {/* <DiscordAccountSettings /> */}
               <Avatarpicker />
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+         <AnimatePresence>
+        {!bg && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            // className="fixed inset-0 z-50 flex h-full  items-center justify-center bg-black/60"
+            className="fixed inset-0 z-50 flex h-full  items-center justify-center "
+            onClick={() => setShowAccountSettings(false)} // click backdrop to close
+          >
+            <div className="  w-full h-full" onClick={(e) => e.stopPropagation()}>
+              {/* <DiscordAccountSettings /> */}
+              <PopupBackgroundpicker />
             </div>
           </motion.div>
         )}

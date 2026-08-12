@@ -12,12 +12,11 @@ api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
-  
+
     if (!originalRequest) {
       return Promise.reject(error);
     }
 
-    // Don't retry the refresh request itself
     if (originalRequest.url?.includes("auth/refresh")) {
       return Promise.reject(error);
     }
@@ -27,11 +26,12 @@ api.interceptors.response.use(
 
       try {
         await api.get("auth/refresh");
-
-        // Retry the original request
         return api(originalRequest);
       } catch (err) {
-        window.location.href = "/login";
+        // No redirect here. Just let the rejection propagate.
+        // useAccessToken() will resolve to isError: true,
+        // useAuthStatus() will resolve to "unauthenticated",
+        // and ProtectedRoute/PublicRoute handle the redirect via <Navigate>.
         return Promise.reject(err);
       }
     }

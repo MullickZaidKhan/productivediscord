@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useSetUserProfile } from "../../hooks/background.hook";
-import {setUser} from "../../redux/authSlice.js"
+import {setLoggedIn} from "../../redux/authSlice.js"
 import { useSelector, useDispatch } from 'react-redux'
 import {
   Ghost,
@@ -169,7 +169,7 @@ const saveProfileImage = () => {
 
     mutate(formData, {
       onSuccess: (data) => {
-         dispatch(setUser(data.data));
+         dispatch(setLoggedIn(data.data));
         // console.log("Profile image uploaded successfully:", data);
       },
       onError: (error) => {
@@ -179,7 +179,7 @@ const saveProfileImage = () => {
   } else {
     mutate(current.src, {
       onSuccess: (data) => {
-         dispatch(setUser(data.data));
+         dispatch(setLoggedIn(data.data));
         console.log("Profile image selected successfully:", data);
       },
       onError: (error) => {

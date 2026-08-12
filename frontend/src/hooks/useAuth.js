@@ -4,7 +4,8 @@ import { login, register, accesstoken, refreshtoken, checkUsername } from "../ap
 import { AuthContext } from "../context/auth.context.jsx";
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useEffect, useState } from "react";
-
+import  { setLoggedIn, setLoggedOut } from "../redux/authSlice.js"
+import { useSelector, useDispatch } from 'react-redux'
 // export const useAuth = () => {
 //     const { user, setUser } = useContext(AuthContext);
 //     const handleLogin = async (username, password) => {
@@ -132,4 +133,19 @@ export const checkUsernamehook = (username) => {
         enabled: debouncedUsername?.length >= 5,
         retry: false,
     });
+};
+
+
+export const useAuthStatus = () => {
+  const dispatch = useDispatch();
+  const { data, isLoading, isError, isSuccess } = useAccessToken();
+console.log(data,"from useAuthStatus hook")
+  useEffect(() => {
+    if (isSuccess) dispatch(setLoggedIn(data));
+    if (isError) dispatch(setLoggedOut());
+  }, [isSuccess, isError, data, dispatch]);
+
+  if (isLoading) return "loading";
+  if (isError || !data) return "unauthenticated";
+  return "authenticated";
 };

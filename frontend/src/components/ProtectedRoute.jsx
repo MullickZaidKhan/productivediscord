@@ -1,44 +1,69 @@
-// components/ProtectedRoute.jsx
-import React, { useEffect, useContext, useRef } from 'react';
-import { AuthContext } from '../context/auth.context.jsx';
-import { Navigate } from 'react-router-dom';
-import { useAccessToken } from '../hooks/useAuth.js';
-import { useSelector, useDispatch } from 'react-redux'
-import { setLogin, setUser } from '../redux/authSlice.js'
-import AppSkeleton from './ui/AppSkeleton.jsx'
+// // components/ProtectedRoute.jsx
+// import React, { useEffect, useContext, useRef } from 'react';
+// import { AuthContext } from '../context/auth.context.jsx';
+// import { Navigate } from 'react-router-dom';
+// import { useAccessToken } from '../hooks/useAuth.js';
+// import { useSelector, useDispatch } from 'react-redux'
+// import { setLogin, setUser } from '../redux/authSlice.js'
+// import AppSkeleton from './ui/AppSkeleton.jsx'
 
-function ProtectedRoute({ children }) {
-  const dispatch = useDispatch();
-  // 1. Call custom hook at top level
+// function ProtectedRoute({ children }) {
+//   const dispatch = useDispatch();
+//   // 1. Call custom hook at top level
 
-  const { data, isLoading, isError, error } = useAccessToken();
+//   const { data, isLoading, isError, error } = useAccessToken();
 
-  console.log("Query State ->", { data, isLoading, isError, error });
+//   console.log("Query State ->", { data, isLoading, isError, error });
 
-  const login = useSelector((state) => state.authinfoSlice.login);
-  // const userinfo = useSelector((state) => state.authinfoSlice.userinfo);
+//   // const login = useSelector((state) => state.authinfoSlice.login);
+//   // // const userinfo = useSelector((state) => state.authinfoSlice.userinfo);
 
-  // 2. Sync fetched data into AuthContext safely AFTER render
-  useEffect(() => {
-    if (data && !isError) {
-      dispatch(setLogin(true));
-      dispatch(setUser(data));
-    }
-  }, [data, isError, dispatch]);
+//   // 2. Sync fetched data into AuthContext safely AFTER render
+//   useEffect(() => {
+//     if (data && !isError) {
+//       dispatch(setLogin(true));
+//       dispatch(setUser(data));
+//     }
+//   }, [data, isError, dispatch]);
+// const userlogin = useSelector(
+//   (state) => state.authinfoSlice.login
+// );
 
-  // 2. Show a loading state while fetching the token/user state
-  if (isLoading) {
-    return <AppSkeleton />;
-  }
+// const userinfo = useSelector(
+//   (state) => state.authinfoSlice.userinfo
+// );
 
-  // 3. Check for authentication once loading is complete
-  if (isError || (!isLoading && !data && !login)) {
-    console.log("User is not authenticated. Redirecting to login page.");
-    return <Navigate to="/login" replace />;
-  }
+// console.log("HOME Redux:", {
+//   userlogin,
+//   userinfo,
+// });
+//   // 2. Show a loading state while fetching the token/user state
+//   if (isLoading) {
+//     return <AppSkeleton />;
+//   }
 
-  // 4. Render protected content if authenticated
-  return <div>{children}</div>;
-}
+//   // 3. Check for authentication once loading is complete
+//   if (isError || (!isLoading && !data && !login)) {
+//     console.log("User is not authenticated. Redirecting to login page.");
+//     return <Navigate to="/login" replace />;
+//   }
+
+//   // 4. Render protected content if authenticated
+//   return <div>{children}</div>;
+// }
+
+// export default ProtectedRoute;
+
+
+import { Navigate } from "react-router-dom";
+import { useAuthStatus } from "../hooks/useAuth";
+
+const ProtectedRoute = ({ children }) => {
+  const status = useAuthStatus();
+
+  if (status === "loading") return <div>Loading...</div>;
+  if (status === "unauthenticated") return <Navigate to="/login" replace />;
+  return children;
+};
 
 export default ProtectedRoute;

@@ -6,7 +6,7 @@ import {
   useGetAllBackgrounds,
   useSetUserBackground,
   useGetUserBackground,
-} from "../hooks/background.hook.js";
+} from "../hooks/background.hook";
 
 /**
  * BackgroundPicker

@@ -419,9 +419,9 @@ export default function ProfilePage() {
 
   const [name, setName] = useState(userinfo?.name || "Zaidk");
   const [username, setUsername] = useState(userinfo?.username || "zaidk0064_98925");
-  const [avatar, setAvatar] = useState(DEFAULT_AVATAR);
+  const [avatar, setAvatar] = useState(userinfo?.profileimg ||DEFAULT_AVATAR);
   const [banner, setBanner] = useState(null); // null => gray fallback
-
+ 
   const [pronouns, setPronouns] = useState("");
   const [bio, setBio] = useState("");
   const [note, setNote] = useState("");

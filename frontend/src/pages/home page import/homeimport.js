@@ -9,6 +9,7 @@ import { useGetUserBackground } from "../../hooks/background.hook.js";
 import DiscordAccountSettings from "../../components/settings/DiscordAccountSettings.jsx";
 import ProfilePage from "../../components/Profile/Profilepage.jsx"
 import Avatarpicker from "../../components/popup/Avatarpicker.jsx"
+import PopupBackgroundpicker from "../../components/popup/PopupBackgroundpicker.jsx"
 export {
   AnimatePresence,
   motion,
@@ -22,4 +23,5 @@ export {
   DiscordAccountSettings,
   ProfilePage,
   Avatarpicker,
+  PopupBackgroundpicker,
 };

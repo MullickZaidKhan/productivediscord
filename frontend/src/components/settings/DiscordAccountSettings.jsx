@@ -63,6 +63,7 @@ export default function DiscordAccountSettings() {
   const [username, setUsername] = useState(userinfo?.username || "");
   const [email, setEmail] = useState(userinfo?.email || "");
   const [phone, setPhone] = useState(userinfo?.phone || "");
+  const [profileimg, setprofileimg] = useState(userinfo?.profileimg || "");
   const [emailRevealed, setEmailRevealed] = useState(false);
   const [modal, setModal] = useState(null); // 'username' | 'email' | 'phone' | 'password'
   const [toast, setToast] = useState(null);
@@ -150,7 +151,7 @@ export default function DiscordAccountSettings() {
            <div className="flex items-center gap-2.5 px-2.5 mb-4" onClick={() => { dispatch(closeAccountSettings()); dispatch(openProfilePageSettings()); }}>
 
               <img
-                src="https://api.dicebear.com/7.x/adventurer/svg?seed=Zaidk&backgroundColor=b6e3f4"
+                src={profileimg}
                 alt="avatar"
                 className="w-8 h-8 rounded-full object-cover"
               />
@@ -250,7 +251,7 @@ export default function DiscordAccountSettings() {
                     <div className="h-[60px]" />
                     <div className="bg-[#2b2d31] px-4 pb-4 pt-0 relative">
                       <img
-                        src="https://api.dicebear.com/7.x/adventurer/svg?seed=Zaidk&backgroundColor=b6e3f4"
+                        src={profileimg}
                         className="w-[80px] h-[80px] rounded-full border-[6px] border-[#2b2d31] -mt-10 mb-2"
                         alt="avatar"
                       />
