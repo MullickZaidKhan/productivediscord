@@ -5,7 +5,7 @@
 // import { useAccessToken } from '../hooks/useAuth.js';
 // import { useSelector, useDispatch } from 'react-redux'
 // import { setLogin, setUser } from '../redux/authSlice.js'
-// import AppSkeleton from './ui/AppSkeleton.jsx'
+import AppSkeleton from './ui/AppSkeleton.jsx'
 
 // function ProtectedRoute({ children }) {
 //   const dispatch = useDispatch();
@@ -61,7 +61,7 @@ import { useAuthStatus } from "../hooks/useAuth";
 const ProtectedRoute = ({ children }) => {
   const status = useAuthStatus();
 
-  if (status === "loading") return <div>Loading...</div>;
+  if (status === "loading") return <AppSkeleton/>;
   if (status === "unauthenticated") return <Navigate to="/login" replace />;
   return children;
 };

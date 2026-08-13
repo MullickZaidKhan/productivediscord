@@ -13,7 +13,7 @@ export default function UserPanel({ userinfo, setIsOpen }) {
   const displayName = userinfo?.name || "User";
   const handle = userinfo?.username || "User";
   const profileImg =userinfo?.profileimg||
-    "https://i.pinimg.com/originals/f6/5d/f3/f65df37ea7c3cc3f65f8c29906a81eef.gif";
+    "https://ik.imagekit.io/w5wx4gdmoj/discord_products/Frame%206.png?updatedAt=1786460933931";
   const statusText = "hi";
 
   //   if (!isOpen) return null; // or keep the trigger button always visible and only guard the popup

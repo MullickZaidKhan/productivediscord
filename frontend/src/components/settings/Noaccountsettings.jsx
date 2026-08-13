@@ -15,6 +15,7 @@ import {
   Check,
   Menu,
   ArrowLeft,
+   Code2, LogOut,
 } from "lucide-react";
 import { useDispatch } from "react-redux";
 import { closeAccountSettings } from "../../redux/settings/settingspage.js";
@@ -336,6 +337,17 @@ export default function DiscordAccountSettings() {
                   )}
                 </div>
               ))}
+              <div className="w-full border-t border-[#2b2d31] pt-3">
+                <div className="flex items-center gap-3 px-3 py-2 text-[#a3a6aa] hover:text-white cursor-pointer">
+                  <Code2 size={20} />
+                  <span className="text-[15px]">Developer</span>
+                </div>
+
+                <div className="flex items-center gap-3 px-3 py-2 mt-1 text-[#ff6b6b] hover:text-red-400 cursor-pointer">
+                  <LogOut size={20} />
+                  <span className="text-[15px]">Log Out</span>
+                </div>
+              </div>
             </nav>
           </div>
         </div>

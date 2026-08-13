@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import {
   Search,
@@ -16,14 +15,20 @@ import {
   Check,
   Menu,
   ArrowLeft,
+  Code2,
+  LogOut,
 } from "lucide-react";
-import { useDispatch ,useSelector} from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import { closeAccountSettings } from "../../redux/settings/settingspage.js";
-import {openProfilePageSettings} from "../../redux/Profile/ProfilePageSettings.js" ;
+import { openProfilePageSettings } from "../../redux/Profile/ProfilePageSettings.js";
 import ScrollbarStyle from "./ScrollbarStyle";
 import SidebarItem from "./SidebarItem";
 import Field from "./Field";
 import EditModal from "./EditModal";
+import { useLogout } from "../../hooks/useAuth.js";
+
+import { setLoggedOut } from "../../redux/authSlice.js";
 
 const NAV_SECTIONS = [
   {
@@ -33,8 +38,18 @@ const NAV_SECTIONS = [
   {
     label: null,
     items: [
-      { key: "password", label: "Password & Security", icon: Shield, indent: true },
-      { key: "standing", label: "Account Standing", icon: ShieldCheck, indent: true },
+      {
+        key: "password",
+        label: "Password & Security",
+        icon: Shield,
+        indent: true,
+      },
+      {
+        key: "standing",
+        label: "Account Standing",
+        icon: ShieldCheck,
+        indent: true,
+      },
       { key: "family", label: "Family Center", icon: Users, indent: true },
     ],
   },
@@ -56,21 +71,36 @@ const NAV_SECTIONS = [
 ];
 
 export default function DiscordAccountSettings() {
-  
   const [activeKey, setActiveKey] = useState("account");
   const userinfo = useSelector((state) => state.authinfoSlice.userinfo);
   const [displayName, setDisplayName] = useState(userinfo?.name || "");
   const [username, setUsername] = useState(userinfo?.username || "");
   const [email, setEmail] = useState(userinfo?.email || "");
   const [phone, setPhone] = useState(userinfo?.phone || "");
-  const [profileimg, setprofileimg] = useState(userinfo?.profileimg || "");
+  const [profileimg, setprofileimg] = useState(
+    userinfo?.profileimg ||
+      "https://ik.imagekit.io/w5wx4gdmoj/discord_products/Frame%206.png?updatedAt=1786460933931",
+  );
   const [emailRevealed, setEmailRevealed] = useState(false);
   const [modal, setModal] = useState(null); // 'username' | 'email' | 'phone' | 'password'
   const [toast, setToast] = useState(null);
   const [search, setSearch] = useState("");
   const [mobileNavOpen, setMobileNavOpen] = useState(false); // small-screen sidebar drawer
   const dispatch = useDispatch();
-
+  const { mutate: handleLogout, isPending } = useLogout();
+  const navigate = useNavigate();
+const onLogout = () => {
+  handleLogout(undefined, {
+    onSuccess: () => {
+      dispatch(setLoggedOut());
+      navigate("/login", { replace: true });
+    },
+    onError: () => {
+      dispatch(setLoggedOut());
+      navigate("/login", { replace: true });
+    },
+  });
+};
   useEffect(() => {
     return () => {
       dispatch(closeAccountSettings());
@@ -148,8 +178,13 @@ export default function DiscordAccountSettings() {
             </div>
 
             {/* Profile header */}
-           <div className="flex items-center gap-2.5 px-2.5 mb-4" onClick={() => { dispatch(closeAccountSettings()); dispatch(openProfilePageSettings()); }}>
-
+            <div
+              className="flex items-center gap-2.5 px-2.5 mb-4"
+              onClick={() => {
+                dispatch(closeAccountSettings());
+                dispatch(openProfilePageSettings());
+              }}
+            >
               <img
                 src={profileimg}
                 alt="avatar"
@@ -206,6 +241,21 @@ export default function DiscordAccountSettings() {
                   )}
                 </div>
               ))}
+              <div className="border-t border-[#3f4147] my-2 mx-2.5" />
+              <div className="w-full border-t border-[#2b2d31] pt-3">
+                <div className="flex items-center gap-3 px-2.5 pt-1 pb-1 text-[#a3a6aa] hover:text-white cursor-pointer">
+                  <Code2 size={20} />
+                  <span className="text-[15px]">Developer</span>
+                </div>
+
+                <div
+                  className="flex items-center gap-3 px-2.5 pt-1 pb-1 mt-1 text-[#ff6b6b] hover:text-red-400 cursor-pointer"
+                  onClick={onLogout}
+                >
+                  <LogOut size={20} />
+                  <span className="text-[15px]">Log Out</span>
+                </div>
+              </div>
             </nav>
           </div>
         </div>
@@ -242,12 +292,12 @@ export default function DiscordAccountSettings() {
             <div className="w-full max-w-[740px] mx-auto pt-6 sm:pt-[60px] pb-20 px-10 sm:px-18 min-w-0">
               {activeKey === "account" && (
                 <>
-                  <h1 className="hidden sm:block text-white text-xl font-semibold mb-6">
+                  <h1 className="hidden sm:block text-white text-xl font-semibold mb-10">
                     Account
                   </h1>
 
                   {/* Banner card */}
-                  <div className="rounded-[8px] overflow-hidden mb-6 bg-gradient-to-r from-[#5865f2] to-[#3a1e8a]">
+                  {/* <div className="rounded-[8px] overflow-hidden mb-6 bg-gradient-to-r from-[#5865f2] to-[#3a1e8a]">
                     <div className="h-[60px]" />
                     <div className="bg-[#2b2d31] px-4 pb-4 pt-0 relative">
                       <img
@@ -263,7 +313,7 @@ export default function DiscordAccountSettings() {
                         Edit User Profile
                       </button>
                     </div>
-                  </div>
+                  </div> */}
 
                   <h2 className="text-white text-lg font-semibold mb-1">
                     Account Info

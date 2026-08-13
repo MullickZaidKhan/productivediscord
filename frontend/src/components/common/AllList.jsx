@@ -18,11 +18,7 @@ export const AllList = ({ setChatopen }) => {
   const dispatch = useDispatch();
   const { data: friends = [], isLoading, isError } = useFriends();
 
-  const FRIENDS =
-    friends.length > 0
-      ? friends
-      : [
-        ];
+  const FRIENDS = friends.length > 0 ? friends : [];
 
   const friendsCount = FRIENDS.length;
 
@@ -77,94 +73,129 @@ export const AllList = ({ setChatopen }) => {
                       Failed to load friends.
                     </div>
                   ) : (
-                    FRIENDS.map((f, i) => (
-                      <motion.div
-                        key={f.name}
-                         onClick={() => handleFriendClick(f)}
-                        initial={{ opacity: 0, y: 24 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -24 }}
-                        transition={{
-                          duration: 0.35,
-                          delay: i * 0.06,
-                          ease: [0.22, 1, 0.36, 1],
-                        }}
-                        whileHover={{
-                          backgroundColor: "rgba(255,255,255,0.03)",
-                        }}
-                        className="rounded-md"
-                      >
-                        <div className="flex items-center gap-5 px-2 py-2.5">
-                          <div className="relative shrink-0">
-                            <div
-                              className="w-9 h-9 rounded-full flex items-center justify-center text-white text-xs font-medium"
-                              style={{
-                                backgroundColor: f.color || "#6b7280",
-                              }}
-                            >
-                              {f.initials ? (
-                                f.initials
-                              ) : f.name ? (
-                                f.name.slice(0, 2).toUpperCase()
-                              ) : (
-                                <UsersRound
-                                  size={16}
-                                  className="text-white"
-                                />
-                              )}
-                            </div>
-                            <span className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-[#80848e] border-[3px] border-[#313338]" />
-                          </div>
+                    FRIENDS.map(
+                      (f, i) => (
+                        console.log(f,"f from  the all list "),
+                        (
+                          <motion.div
+                            key={f.name}
+                            onClick={() => handleFriendClick(f)}
+                            initial={{ opacity: 0, y: 24 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -24 }}
+                            transition={{
+                              duration: 0.35,
+                              delay: i * 0.06,
+                              ease: [0.22, 1, 0.36, 1],
+                            }}
+                            whileHover={{
+                              backgroundColor: "rgba(255,255,255,0.03)",
+                            }}
+                            className="rounded-md"
+                          >
+                            <div className="flex items-center gap-5 px-2 py-2.5">
+                              {/* <div className="relative shrink-0">
+                                <div
+                                  className="w-9 h-9 rounded-full flex items-center justify-center text-white text-xs font-medium"
+                                  style={{
+                                    backgroundColor: f.color || "#6b7280",
+                                  }}
+                                >
+                                  {f.initials ? (
+                                    f.initials
+                                  ) : f.name ? (
+                                    f.name.slice(0, 2).toUpperCase()
+                                  ) : (
+                                    <UsersRound
+                                      size={16}
+                                      className="text-white"
+                                    />
+                                  )}
+                                </div>
+                                <span className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-[#80848e] border-[3px] border-[#313338]" />
+                              </div> */}
+                              <div className="relative shrink-0">
+                                <div className="w-9 h-9 rounded-full overflow-hidden flex items-center justify-center text-white text-xs font-medium">
+                                  {f.profileimg ? (
+                                    <img
+                                      src={f.profileimg}
+                                      alt={f.name || "User"}
+                                      className="w-full h-full object-cover"
+                                    />
+                                  ) : (
+                                    <div
+                                      className="w-full h-full rounded-full flex items-center justify-center"
+                                      style={{
+                                        backgroundColor: f.color || "#6b7280",
+                                      }}
+                                    >
+                                      {f.initials ? (
+                                        f.initials
+                                      ) : f.name ? (
+                                        f.name.slice(0, 2).toUpperCase()
+                                      ) : (
+                                        <UsersRound
+                                          size={16}
+                                          className="text-white"
+                                        />
+                                      )}
+                                    </div>
+                                  )}
+                                </div>
 
-                          <div className="min-w-0 flex-1">
-                            <div className="text-white text-sm font-medium truncate">
-                              {f.name}
-                            </div>
-                            <div className="text-[#949ba4] text-xs">
-                              Offline
-                            </div>
-                          </div>
+                                <span className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-[#80848e] border-[3px] border-[#313338]" />
+                              </div>
+                              <div className="min-w-0 flex-1">
+                                <div className="text-white text-sm font-medium truncate">
+                                  {f.name}
+                                </div>
+                                <div className="text-[#949ba4] text-xs">
+                                  Offline
+                                </div>
+                              </div>
 
-                          <div className="flex items-center gap-1.5 shrink-0">
-                            <motion.button
-                              whileHover={{
-                                scale: 1.08,
-                                backgroundColor: "rgba(255,255,255,0.08)",
-                              }}
-                              onClick={() => handleFriendClick(f)}
-                              whileTap={{ scale: 0.92 }}
-                              transition={{ duration: 0.12 }}
-                              className="w-9 h-9 rounded-full flex items-center justify-center"
-                            >
-                              <svg
-                                className="w-5 h-5 text-[#b5bac1]"
-                                fill="currentColor"
-                                viewBox="0 0 24 24"
-                              >
-                                <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z" />
-                              </svg>
-                            </motion.button>
-                            <motion.button
-                              whileHover={{
-                                scale: 1.08,
-                                backgroundColor: "rgba(255,255,255,0.08)",
-                              }}
-                              whileTap={{ scale: 0.92 }}
-                              transition={{ duration: 0.12 }}
-                              className="w-9 h-9 rounded-full flex items-center justify-center"
-                            >
-                              <MoreVertical
-                                size={17}
-                                className="text-[#b5bac1]"
-                              />
-                            </motion.button>
-                          </div>
-                        </div>
-                        {i < FRIENDS.length - 1 && (
-                          <div className="h-px bg-[#3f414785] mx-2" />
-                        )}
-                      </motion.div>
-                    ))
+                              <div className="flex items-center gap-1.5 shrink-0">
+                                <motion.button
+                                  whileHover={{
+                                    scale: 1.08,
+                                    backgroundColor: "rgba(255,255,255,0.08)",
+                                  }}
+                                  onClick={() => handleFriendClick(f)}
+                                  whileTap={{ scale: 0.92 }}
+                                  transition={{ duration: 0.12 }}
+                                  className="w-9 h-9 rounded-full flex items-center justify-center"
+                                >
+                                  <svg
+                                    className="w-5 h-5 text-[#b5bac1]"
+                                    fill="currentColor"
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z" />
+                                  </svg>
+                                </motion.button>
+                                <motion.button
+                                  whileHover={{
+                                    scale: 1.08,
+                                    backgroundColor: "rgba(255,255,255,0.08)",
+                                  }}
+                                  whileTap={{ scale: 0.92 }}
+                                  transition={{ duration: 0.12 }}
+                                  className="w-9 h-9 rounded-full flex items-center justify-center"
+                                >
+                                  <MoreVertical
+                                    size={17}
+                                    className="text-[#b5bac1]"
+                                  />
+                                </motion.button>
+                              </div>
+                            </div>
+                            {i < FRIENDS.length - 1 && (
+                              <div className="h-px bg-[#3f414785] mx-2" />
+                            )}
+                          </motion.div>
+                        )
+                      ),
+                    )
                   )}
                 </AnimatePresence>
               </div>

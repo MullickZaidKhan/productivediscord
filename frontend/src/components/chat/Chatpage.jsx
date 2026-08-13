@@ -195,6 +195,7 @@ export default function ChatPage() {
   }, []);
 
   const contact = useSelector((state) => state.chat.userinfo ?? CONTACT);
+  console.log(contact,"from the cht page")
 
   return (
     <div className="flex-1 min-w-0 min-h-0 h-full bg-[#0000008e] flex flex-col">
@@ -214,7 +215,35 @@ export default function ChatPage() {
           >
             <ChevronLeft className="text-white" />
           </button>
-          <Avatar name={contact.name} size={30} />
+          {/* <Avatar name={contact.name} size={30} /> */}
+            <div className="w-9 h-9 rounded-full overflow-hidden flex items-center justify-center text-white text-xs font-medium">
+                                  {contact.profileimg ? (
+                                    <img
+                                      src={contact.profileimg}
+                                      alt={contact.name || "User"}
+                                      className="w-full h-full object-cover"
+                                    />
+                                  ) : (
+                                    <div
+                                      className="w-full h-full rounded-full flex items-center justify-center"
+                                      style={{
+                                        backgroundColor: contact.color || "#6b7280",
+                                      }}
+                                    >
+                                      {contact.initials ? (
+                                        contact.initials
+                                      ) : contact.name ? (
+                                        contact.name.slice(0, 2).toUpperCase()
+                                      ) : (
+                                        <UsersRound
+                                          size={16}
+                                          className="text-white"
+                                        />
+                                      )}
+                                    </div>
+                                  )}
+                                </div>
+
           <span className="font-semibold text-[15px] text-white truncate">
             {contact.name}
           </span>

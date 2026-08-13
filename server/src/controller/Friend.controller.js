@@ -255,7 +255,7 @@ export const getFriends = async (req, res) => {
     // Commit details: return user friends list with selected profile fields
     const user = await User.findById(req.user.id).populate(
       "friends",
-      "username name email",
+      "username name email profileimg",
     );
 
     return res.status(200).json({

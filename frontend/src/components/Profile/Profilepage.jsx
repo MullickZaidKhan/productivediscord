@@ -14,7 +14,7 @@ import {
 import {closeProfilePageSettings} from "../../redux/Profile/ProfilePageSettings.js" ;
 import { useDispatch ,useSelector} from "react-redux";
 const DEFAULT_AVATAR =
-  "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=300&h=300&fit=crop";
+  "https://ik.imagekit.io/w5wx4gdmoj/discord_products/Frame%206.png?updatedAt=1786460933931";
 
 const WIDGET_LIBRARY = [
   { id: "marvel-rivals", label: "Marvel Rivals", img: "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=300&h=200&fit=crop" },
