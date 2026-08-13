@@ -17,6 +17,7 @@ import {
   ArrowLeft,
   Code2,
   LogOut,
+  Palette,
 } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -27,9 +28,48 @@ import SidebarItem from "./SidebarItem";
 import Field from "./Field";
 import EditModal from "./EditModal";
 import { useLogout } from "../../hooks/useAuth.js";
-
+import Backgroundpicker from "../../pages/Backgroundpicker.jsx"
 import { setLoggedOut } from "../../redux/authSlice.js";
 
+// const NAV_SECTIONS = [
+//   {
+//     label: null,
+//     items: [{ key: "account", label: "Account", icon: User }],
+//   },
+//   {
+//     label: null,
+//     items: [
+//       {
+//         key: "password",
+//         label: "Password & Security",
+//         icon: Shield,
+//         indent: true,
+//       },
+//       {
+//         key: "standing",
+//         label: "Account Standing",
+//         icon: ShieldCheck,
+//         indent: true,
+//       },
+//       { key: "family", label: "Family Center", icon: Users, indent: true },
+//     ],
+//   },
+//   {
+//     label: null,
+//     items: [
+//       { key: "privacy", label: "Data & Privacy", icon: Info },
+//       { key: "messaging", label: "Messaging Permissions", icon: MessageCircle },
+//       { key: "notifications", label: "Notifications", icon: Bell },
+//     ],
+//   },
+//   {
+//     label: "Billing",
+//     items: [
+//       { key: "nitro", label: "Nitro", icon: Gem },
+//       { key: "boost", label: "Server Boost", icon: Rocket },
+//     ],
+//   },
+// ];
 const NAV_SECTIONS = [
   {
     label: null,
@@ -50,26 +90,55 @@ const NAV_SECTIONS = [
         icon: ShieldCheck,
         indent: true,
       },
-      { key: "family", label: "Family Center", icon: Users, indent: true },
+      {
+        key: "family",
+        label: "Family Center",
+        icon: Users,
+        indent: true,
+      },
     ],
   },
   {
     label: null,
     items: [
-      { key: "privacy", label: "Data & Privacy", icon: Info },
-      { key: "messaging", label: "Messaging Permissions", icon: MessageCircle },
-      { key: "notifications", label: "Notifications", icon: Bell },
+      {
+        key: "privacy",
+        label: "Data & Privacy",
+        icon: Info,
+      },
+      {
+        key: "theme",
+        label: "Theme",
+        icon: Palette,
+      },
+      {
+        key: "messaging",
+        label: "Messaging Permissions",
+        icon: MessageCircle,
+      },
+      {
+        key: "notifications",
+        label: "Notifications",
+        icon: Bell,
+      },
     ],
   },
   {
     label: "Billing",
     items: [
-      { key: "nitro", label: "Nitro", icon: Gem },
-      { key: "boost", label: "Server Boost", icon: Rocket },
+      {
+        key: "nitro",
+        label: "Nitro",
+        icon: Gem,
+      },
+      {
+        key: "boost",
+        label: "Server Boost",
+        icon: Rocket,
+      },
     ],
   },
 ];
-
 export default function DiscordAccountSettings() {
   const [activeKey, setActiveKey] = useState("account");
   const userinfo = useSelector((state) => state.authinfoSlice.userinfo);
@@ -146,12 +215,12 @@ const onLogout = () => {
   )?.label;
 
   return (
-    <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/60 p-0 sm:p-6">
+    <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/40 p-0 sm:p-6">
       <ScrollbarStyle />
       {/* Floating popup card. Full-bleed on phones, centered card with rounded
           corners and a max size on tablet/desktop. */}
       <div
-        className="relative bg-[#313338] w-full h-full sm:h-[92vh] sm:max-h-[840px] sm:w-[92vw] sm:max-w-[1000px] sm:rounded-[15px] shadow-2xl flex overflow-hidden font-[500] antialiased"
+        className="relative bg-[#313338] w-full h-full sm:h-[92vh] sm:max-h-[840px] sm:w-[92vw] sm:max-w-[95%] sm:rounded-[15px] shadow-2xl flex overflow-hidden font-[500] antialiased"
         style={{
           fontFamily:
             "'gg sans', 'Helvetica Neue', Helvetica, Arial, sans-serif",
@@ -289,7 +358,7 @@ const onLogout = () => {
 
           {/* Scrollable content area only — header and close icon live outside this */}
           <div className="flex-1 overflow-y-auto dc-scroll min-h-0">
-            <div className="w-full max-w-[740px] mx-auto pt-6 sm:pt-[60px] pb-20 px-10 sm:px-18 min-w-0">
+            <div className="w-full max-w-[95%] mx-auto pt-6 sm:pt-[60px] pb-20 px-5 sm:px-10 min-w-0">
               {activeKey === "account" && (
                 <>
                   <h1 className="hidden sm:block text-white text-xl font-semibold mb-10">
@@ -369,8 +438,12 @@ const onLogout = () => {
                   </div>
                 </>
               )}
-
-              {activeKey !== "account" && (
+               {activeKey === "theme" && (
+                <div className="flex flex-col items-center justify-center h-full w-full text-[#949ba4] text-center">
+                < Backgroundpicker />
+                </div>
+              )}
+              {activeKey !== "account" && activeKey !== "theme" && (
                 <div className="flex flex-col items-center justify-center h-[60vh] text-[#949ba4] text-center">
                   <div className="text-white text-xl font-semibold mb-2">
                     {activeLabel}

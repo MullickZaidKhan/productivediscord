@@ -124,22 +124,22 @@ export default function BackgroundPicker() {
   };
 
   return (
-    <div className="min-h-screen w-full bg-[#313338] text-[#f2f3f5] flex flex-col">
+    <div className="min-h-full w-full bg-[#313338] text-[#f2f3f5] flex flex-col">
       {/* Header */}
-      <header className="sticky top-0 z-20 border-b border-black/20 bg-[#313338]/95 backdrop-blur">
+      <header className="sticky -top-1 pt-2 z-20  border-black/20 bg-[#313338]/95 backdrop-blur">
         <div className="max-w-6xl mx-auto px-5 py-4 flex flex-col gap-4">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wide text-[#949ba4] mb-1">
+              {/* <p className="text-xs font-semibold uppercase tracking-wide text-[#949ba4] mb-1">
                 Appearance
-              </p>
-              <h1 className="text-xl sm:text-2xl font-bold text-white">
+              </p> */}
+              <h1 className="text-2xl sm:text-2xl font-light text-white">
                 Choose your background
               </h1>
-              <p className="text-sm text-[#b5bac1] mt-1">
+              {/* <p className="text-sm text-[#b5bac1] mt-1">
                 Pick an image below and it becomes the background across the app.
                 Click a card, then hit Apply.
-              </p>
+              </p> */}
             </div>
 
             {/* Search */}
@@ -163,7 +163,7 @@ export default function BackgroundPicker() {
                   key={cat}
                   onClick={() => setActiveTab(cat)}
                   className={
-                    "shrink-0 rounded-full px-3.5 py-1.5 text-sm font-medium transition-colors " +
+                    "shrink-0 rounded-[6px] px-3.5 py-1.5 text-sm font-medium transition-colors " +
                     (isActive
                       ? "bg-[#5865f2] text-white"
                       : "bg-[#2b2d31] text-[#b5bac1] hover:bg-[#3a3c42] hover:text-white")
@@ -217,7 +217,7 @@ export default function BackgroundPicker() {
         )}
 
         {status === "ready" && filtered.length > 0 && (
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-2 gap-4">
             {filtered.map((bg) => {
               const isSelected = bg._id === selectedId;
               const isCurrentlyActive = bg._id === currentActiveId;
@@ -229,7 +229,7 @@ export default function BackgroundPicker() {
                   onClick={() => handlePick(bg)}
                   aria-pressed={isSelected}
                   className={
-                    "group relative text-left rounded-xl overflow-hidden bg-[#2b2d31] border transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#5865f2] " +
+                    "group relative text-left rounded-[10px] overflow-hidden bg-[#2b2d31] border transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#5865f2] " +
                     (isSelected
                       ? "border-[#5865f2] ring-2 ring-[#5865f2]"
                       : "border-white/5 hover:border-white/20")
@@ -290,10 +290,10 @@ export default function BackgroundPicker() {
                     </div>
                   </div>
 
-                  <div className="p-3">
+                  {/* <div className="p-3">
                     <p className="text-sm font-semibold text-white truncate">{bg.name}</p>
                     <p className="text-xs text-[#949ba4] mt-0.5">{bg.category}</p>
-                  </div>
+                  </div> */}
                 </button>
               );
             })}
@@ -302,7 +302,7 @@ export default function BackgroundPicker() {
       </main>
 
       {/* Sticky footer / apply bar */}
-      <footer className="sticky bottom-0 z-20 border-t border-black/20 bg-[#2b2d31]">
+      <footer className="sticky bottom-0 z-20 border-black/20 bg-[#313338b4]">
         <div className="max-w-6xl mx-auto px-5 py-3 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3 min-w-0">
             {selected ? (
