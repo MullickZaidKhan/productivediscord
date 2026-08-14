@@ -133,8 +133,8 @@ export default function BackgroundPicker() {
               {/* <p className="text-xs font-semibold uppercase tracking-wide text-[#949ba4] mb-1">
                 Appearance
               </p> */}
-              <h1 className="text-2xl sm:text-2xl font-light text-white">
-                Choose your background
+              <h1 className="text-[30px] sm:text-[15px] font-bold items-start   text-white">
+               Pick a Background
               </h1>
               {/* <p className="text-sm text-[#b5bac1] mt-1">
                 Pick an image below and it becomes the background across the app.
@@ -217,7 +217,7 @@ export default function BackgroundPicker() {
         )}
 
         {status === "ready" && filtered.length > 0 && (
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-2 gap-4">
             {filtered.map((bg) => {
               const isSelected = bg._id === selectedId;
               const isCurrentlyActive = bg._id === currentActiveId;

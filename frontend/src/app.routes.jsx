@@ -16,10 +16,7 @@ export const router = createBrowserRouter([
         path: '/',
         element:<ProtectedRoute><Home /></ProtectedRoute>
       },
-      {
-        path: '/background',
-        element:<ProtectedRoute><Background /></ProtectedRoute>
-      },
+   
       {
         path: '/login',
         element: <PublicRoute><Login /></PublicRoute>

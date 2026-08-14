@@ -261,7 +261,7 @@ const onLogout = () => {
               />
               <div>
                 <div className="text-white text-[15px] font-semibold leading-tight">
-                  Zaidk
+                  {displayName}
                 </div>
                 <button className="text-[11px] text-[#949ba4] hover:text-[#dbdee1] flex items-center gap-1">
                   Edit Profiles <Pencil size={10} />
