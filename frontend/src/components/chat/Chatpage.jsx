@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   Phone,
   ChevronLeft,
   Video,
   Pin,
   Users,
+  UsersRound,
   Gift,
   Smile,
   Grid3x3,
@@ -12,66 +13,12 @@ import {
   Plus,
 } from "lucide-react";
 import { useSelector, useDispatch } from "react-redux";
+import { useQueryClient } from "@tanstack/react-query";
 import { openChat, closeChat } from "../../redux/chat/Chatslice.js";
-// ---- Mock data, matching the screenshot exactly ----
-const CONTACT = { name: "Sawan Kumar", color: "#c07a3e" }; // warm avatar tone
-
-const ROLE_STYLES = {
-  CODE: { dot: "#5865f2", text: "#8ea1ff" },
-  Path: { dot: "#3ba55d", text: "#7fd99a" },
-};
-
-const MESSAGES = [
-  {
-    id: "m1",
-    author: "Zaid",
-    role: "CODE",
-    time: "7:14 AM",
-    type: "link",
-    content:
-      "https://www.instagram.com/reel/DbhPl79IVQo/?igsh=MW05aHhtNGptb2pheA==",
-  },
-  {
-    id: "m2",
-    author: "Sawan Kumar",
-    role: "Path",
-    time: "7:15 AM",
-    type: "text",
-    content: "Bahut hi jyada complicated hai",
-  },
-  {
-    id: "m3",
-    author: "Zaid",
-    role: "CODE",
-    time: "7:16 AM",
-    type: "text",
-    content: "Yes bro per maja aaega",
-  },
-  {
-    id: "m4",
-    author: "Sawan Kumar",
-    role: "Path",
-    time: "7:16 AM",
-    type: "text",
-    content: "Tum hi khelo mere baski na",
-  },
-  {
-    id: "m5",
-    author: "Zaid",
-    role: "CODE",
-    time: "7:17 AM",
-    type: "emoji",
-    content: "😂😭",
-  },
-  {
-    id: "m6",
-    author: "Sawan Kumar",
-    role: "Path",
-    time: "7:18 AM",
-    type: "emoji",
-    content: "😌",
-  },
-];
+import {
+  useSendDirectMessage,
+  usegetDirectMessages,
+} from "../../hooks/chat/directMessage.hook.js";
 
 // Deterministic color per name, used only as an avatar fallback background
 const AVATAR_PALETTE = [
@@ -90,85 +37,158 @@ function avatarColor(name) {
   return AVATAR_PALETTE[Math.abs(hash) % AVATAR_PALETTE.length];
 }
 
-function Avatar({ name, size = 40 }) {
-  const letter = name.trim().charAt(0).toUpperCase();
+// function Avatar({ name, size = 40, profileimg, initials, color }) {
+//   const letter = (name || "?").trim().charAt(0).toUpperCase();
+//   return (
+//     // <div
+//     //   style={{ width: size, height: size, backgroundColor: avatarColor(name || "?") }}
+//     //   className="rounded-full flex items-center justify-center font-semibold text-white shrink-0 select-none"
+//     // >
+//     //   <span style={{ fontSize: size * 0.42 }}>{letter}</span>
+//     // </div>
+//     <div>
+//       {profileimg ? (
+//         <img
+//           src={profileimg}
+//           alt={name || "User"}
+//           className="w-full h-full object-cover"
+//         />
+//       ) : (
+//         <div
+//           className="w-full h-full rounded-full flex items-center justify-center"
+//           style={{ backgroundColor: contact.color || "#6b7280" }}
+//         >
+//           {letter.initials ? (
+//             letter.initials
+//           ) : name ? (
+//             name.slice(0, 2).toUpperCase()
+//           ) : (
+//             <UsersRound size={16} className="text-white" />
+//           )}
+//         </div>
+//       )}
+//     </div>
+//   );
+// }
+
+// Formats an ISO createdAt string into "7:14 AM" style local time
+function Avatar({ name, size = 40, profileimg, initials, color }) {
+  const letter = (name || "?").trim().charAt(0).toUpperCase();
   return (
     <div
-      style={{ width: size, height: size, backgroundColor: avatarColor(name) }}
-      className="rounded-full flex items-center justify-center font-semibold text-white shrink-0 select-none"
+      style={{ width: size, height: size }}
+      className="rounded-full overflow-hidden shrink-0 select-none"
     >
-      <span style={{ fontSize: size * 0.42 }}>{letter}</span>
+      {profileimg ? (
+        <img
+          src={profileimg}
+          alt={name || "User"}
+          className="w-full h-full object-cover"
+        />
+      ) : (
+        <div
+          className="w-full h-full rounded-full flex items-center justify-center font-semibold text-white"
+          style={{ backgroundColor: color || avatarColor(name || "?") }}
+        >
+          {initials ? (
+            initials
+          ) : name ? (
+            name.slice(0, 2).toUpperCase()
+          ) : (
+            <UsersRound size={size * 0.4} className="text-white" />
+          )}
+        </div>
+      )}
     </div>
   );
 }
 
-function RoleBadge({ role }) {
-  const style = ROLE_STYLES[role] ?? { dot: "#949ba4", text: "#949ba4" };
-  return (
-    <span className="inline-flex items-center gap-1 text-[11px] font-medium ml-1.5 align-middle">
-      <span
-        className="w-2.5 h-2.5 rounded-full"
-        style={{ backgroundColor: style.dot }}
-      />
-      <span style={{ color: style.text }}>{role}</span>
-    </span>
-  );
+function formatTime(isoString) {
+  if (!isoString) return "";
+  const date = new Date(isoString);
+  return date.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
 }
 
-function MessageRow({ message, index, visible }) {
-  const isEmojiOnly = message.type === "emoji";
+// Groups raw API messages by the day they were sent, for the date dividers
+function groupMessagesByDay(messages) {
+  const groups = [];
+  if (!Array.isArray(messages)) return groups;
+
+  let currentKey = null;
+  let currentGroup = null;
+
+  messages.forEach((message) => {
+    const date = new Date(message.createdAt);
+    const key = date.toDateString();
+    const label = date.toLocaleDateString([], {
+      month: "long",
+      day: "numeric",
+      year: "numeric",
+    });
+
+    if (key !== currentKey) {
+      currentKey = key;
+      currentGroup = { label, messages: [] };
+      groups.push(currentGroup);
+    }
+    currentGroup.messages.push(message);
+  });
+
+  return groups;
+}
+
+function MessageRow({ message, author }) {
+  const hasImage = Boolean(message.image);
+  const hasText = Boolean(message.text);
+  console.log(author);
   return (
-    <div
-      className="group flex gap-4 px-4 md:px-6 py-0.5 hover:bg-white/[0.03] rounded transition-all duration-300 ease-out"
-      style={{
-        opacity: visible ? 1 : 0,
-        transform: visible ? "translateY(0px)" : "translateY(8px)",
-        transitionDelay: `${index * 70}ms`,
-      }}
-    >
-      <div className="pt-0.5">
-        <Avatar name={message.author} />
+    <div className="msg-row-in group flex gap-4 px-4 md:px-6 py-0.5 hover:bg-white/[0.03] rounded">
+      <div className="pt-0.5 shrink-0">
+        <Avatar
+          name={author.name}
+          profileimg={author.profileimg}
+          initials={author.initials}
+          color={author.color}
+        />
       </div>
       <div className="min-w-0">
         <div className="flex items-baseline">
           <span className="text-[15px] font-medium text-white hover:underline cursor-pointer">
-            {message.author}
+            {author.name}
           </span>
-          <RoleBadge role={message.role} />
           <span className="text-[11px] text-[#949ba4] ml-2">
-            {message.time}
+            {formatTime(message.createdAt)}
           </span>
+          {message.edited && (
+            <span className="text-[10px] text-[#6d6f78] ml-1.5">(edited)</span>
+          )}
         </div>
 
-        {message.type === "link" && (
-          <a
-            href="#"
-            onClick={(e) => e.preventDefault()}
-            className="text-[15px] text-[#00a8fc] hover:underline break-all"
-          >
-            {message.content}
-          </a>
+        {hasImage && (
+          <img
+            src={message.image}
+            alt="attachment"
+            className="mt-1 max-w-xs rounded-lg border border-[#26282c]"
+          />
         )}
 
-        {message.type === "text" && (
-          <p className="text-[15px] text-[#dbdee1] leading-[1.375rem]">
-            {message.content}
+        {hasText && (
+          <p className="text-[15px] text-[#dbdee1] leading-[1.375rem] whitespace-pre-wrap break-words">
+            {message.text}
           </p>
-        )}
-
-        {isEmojiOnly && (
-          <p className="text-[28px] leading-[1.6] -mt-0.5">{message.content}</p>
         )}
       </div>
     </div>
   );
 }
 
-function InputIcon({ children, label }) {
+function InputIcon({ children, label, onClick, disabled }) {
   return (
     <button
       aria-label={label}
-      className="text-[#b5bac1] hover:text-[#dbdee1] transition-colors duration-150 hover:scale-110 active:scale-95"
+      onClick={onClick}
+      disabled={disabled}
+      className="text-[#b5bac1] hover:text-[#dbdee1] transition-colors duration-150 hover:scale-110 active:scale-95 disabled:opacity-40 disabled:hover:scale-100"
     >
       {children}
     </button>
@@ -177,31 +197,98 @@ function InputIcon({ children, label }) {
 
 export default function ChatPage() {
   const dispatch = useDispatch();
-  const [visibleCount, setVisibleCount] = useState(0);
-  const [headerIn, setHeaderIn] = useState(false);
+  const queryClient = useQueryClient();
 
+  const [headerIn, setHeaderIn] = useState(false);
+  const [draft, setDraft] = useState("");
+  const scrollRef = useRef(null);
+
+  const contact = useSelector((state) => state.chat.userinfo);
+
+  // Adjust this selector to match wherever the logged-in user is stored in your auth slice.
+  const currentUser = useSelector((state) => state.authinfoSlice.userinfo);
+
+  const {
+    data: messagesResponse,
+    isLoading: messagesLoading,
+    isError: messagesError,
+  } = usegetDirectMessages(contact?._id);
+
+  const { mutate: sendDirectMessage, isPending: isSending } =
+    useSendDirectMessage();
+
+  const messages = useMemo(() => {
+    // Handles either { data: [...] } or an axios-wrapped { data: { data: [...] } }
+    if (Array.isArray(messagesResponse)) return messagesResponse;
+    if (Array.isArray(messagesResponse?.data)) return messagesResponse.data;
+    if (Array.isArray(messagesResponse?.data?.data))
+      return messagesResponse.data.data;
+    return [];
+  }, [messagesResponse]);
+
+  const sortedMessages = useMemo(
+    () =>
+      [...messages].sort(
+        (a, b) => new Date(a.createdAt) - new Date(b.createdAt),
+      ),
+    [messages],
+  );
+
+  const groupedMessages = useMemo(
+    () => groupMessagesByDay(sortedMessages),
+    [sortedMessages],
+  );
+
+  // Header fade-in
   useEffect(() => {
     const headerTimer = setTimeout(() => setHeaderIn(true), 30);
-    const timers = MESSAGES.map((_, i) =>
-      setTimeout(
-        () => setVisibleCount((c) => Math.max(c, i + 1)),
-        120 + i * 90,
-      ),
-    );
-    return () => {
-      clearTimeout(headerTimer);
-      timers.forEach(clearTimeout);
-    };
+    return () => clearTimeout(headerTimer);
   }, []);
 
-  const contact = useSelector((state) => state.chat.userinfo ?? CONTACT);
-  console.log(contact,"from the cht page")
+  // Keep the view scrolled to the newest message
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [messages.length]);
+
+  if (!contact) {
+    return (
+      <div className="flex-1 min-w-0 min-h-0 h-full bg-[#0000008e] flex items-center justify-center text-[#949ba4] text-sm">
+        Select a conversation to start chatting
+      </div>
+    );
+  }
+
+  const handleSend = () => {
+    const text = draft.trim();
+    if (!text || isSending) return;
+
+    sendDirectMessage(
+      { receiver: contact._id, text },
+      {
+        onSuccess: () => {
+          setDraft("");
+          queryClient.invalidateQueries({
+            queryKey: ["directMessages", contact._id],
+          });
+        },
+      },
+    );
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleSend();
+    }
+  };
 
   return (
     <div className="flex-1 min-w-0 min-h-0 h-full bg-[#0000008e] flex flex-col">
       {/* Header */}
       <div
-        className="flex items-center justify-between px-4 h-12 border-b border-[#26282c] shadow-sm shrink-0 transition-all duration-300 ease-out  py-2"
+        className="flex items-center justify-between px-4 h-12 border-b border-[#26282c] shadow-sm shrink-0 transition-all duration-300 ease-out py-2"
         style={{
           opacity: headerIn ? 1 : 0,
           transform: headerIn ? "translateY(0px)" : "translateY(-6px)",
@@ -209,45 +296,41 @@ export default function ChatPage() {
       >
         <div className="flex items-center gap-2.5 min-w-0">
           <button
-            onClick={() => {dispatch(closeChat())}}
+            onClick={() => dispatch(closeChat())}
             className="rounded-full p-1 hover:bg-white/10 transition-colors"
             aria-label="Close chat"
           >
             <ChevronLeft className="text-white" />
           </button>
-          {/* <Avatar name={contact.name} size={30} /> */}
-            <div className="w-9 h-9 rounded-full overflow-hidden flex items-center justify-center text-white text-xs font-medium">
-                                  {contact.profileimg ? (
-                                    <img
-                                      src={contact.profileimg}
-                                      alt={contact.name || "User"}
-                                      className="w-full h-full object-cover"
-                                    />
-                                  ) : (
-                                    <div
-                                      className="w-full h-full rounded-full flex items-center justify-center"
-                                      style={{
-                                        backgroundColor: contact.color || "#6b7280",
-                                      }}
-                                    >
-                                      {contact.initials ? (
-                                        contact.initials
-                                      ) : contact.name ? (
-                                        contact.name.slice(0, 2).toUpperCase()
-                                      ) : (
-                                        <UsersRound
-                                          size={16}
-                                          className="text-white"
-                                        />
-                                      )}
-                                    </div>
-                                  )}
-                                </div>
+
+          <div className="w-9 h-9 rounded-full overflow-hidden flex items-center justify-center text-white text-xs font-medium">
+            {contact.profileimg ? (
+              <img
+                src={contact.profileimg}
+                alt={contact.name || "User"}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div
+                className="w-full h-full rounded-full flex items-center justify-center"
+                style={{ backgroundColor: contact.color || "#6b7280" }}
+              >
+                {contact.initials ? (
+                  contact.initials
+                ) : contact.name ? (
+                  contact.name.slice(0, 2).toUpperCase()
+                ) : (
+                  <UsersRound size={16} className="text-white" />
+                )}
+              </div>
+            )}
+          </div>
 
           <span className="font-semibold text-[15px] text-white truncate">
             {contact.name}
           </span>
         </div>
+
         <div className="flex items-center gap-4 text-[#b5bac1]">
           <InputIcon label="Call">
             <Phone size={20} />
@@ -264,34 +347,56 @@ export default function ChatPage() {
         </div>
       </div>
 
-      {/* Faded preview of earlier scrolled content */}
-      <div className="px-6 pt-3 pb-2 shrink-0">
-        <p className="text-[13px] text-[#5c5e66] truncate select-none">
-          Build with Visual Studio Code, anywhere, anytime, already in your
-          browser.
-        </p>
-      </div>
-
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto pb-2">
-        <div className="flex items-center gap-3 px-6 my-3 select-none">
-          <div className="h-px bg-[#3f4147] flex-1" />
-          <span className="text-[12px] text-[#949ba4] font-medium">
-            August 3, 2026
-          </span>
-          <div className="h-px bg-[#3f4147] flex-1" />
-        </div>
+      <div ref={scrollRef} className="flex-1 overflow-y-auto pb-2">
+        {messagesLoading && (
+          <p className="text-center text-[13px] text-[#6d6f78] mt-6">
+            Loading messages…
+          </p>
+        )}
 
-        <div className="flex flex-col gap-2.5">
-          {MESSAGES.map((message, i) => (
-            <MessageRow
-              key={message.id}
-              message={message}
-              index={i}
-              visible={i < visibleCount}
-            />
-          ))}
-        </div>
+        {messagesError && (
+          <p className="text-center text-[13px] text-[#ed4245] mt-6">
+            Couldn't load messages. Please try again.
+          </p>
+        )}
+
+        {!messagesLoading && !messagesError && messages.length === 0 && (
+          <p className="text-center text-[13px] text-[#6d6f78] mt-6">
+            No messages yet. Say hello 👋
+          </p>
+        )}
+
+        {groupedMessages.map((group) => (
+          <div key={group.label}>
+            <div className="flex items-center gap-3 px-6 my-3 select-none">
+              <div className="h-px bg-[#3f4147] flex-1" />
+              <span className="text-[12px] text-[#949ba4] font-medium">
+                {group.label}
+              </span>
+              <div className="h-px bg-[#3f4147] flex-1" />
+            </div>
+
+            <div className="flex flex-col gap-2.5">
+              {group.messages.map((message) => {
+                const isOwn = message.sender === currentUser?.id;
+                const author = isOwn
+                  ? {
+                      name: currentUser?.name || "You",
+                      profileimg: currentUser?.profileimg,
+                    }
+                  : { name: contact.name, profileimg: contact?.profileimg };
+                return (
+                  <MessageRow
+                    key={message._id}
+                    message={message}
+                    author={author}
+                  />
+                );
+              })}
+            </div>
+          </div>
+        ))}
       </div>
 
       {/* Message input */}
@@ -302,8 +407,11 @@ export default function ChatPage() {
           </InputIcon>
           <input
             type="text"
+            value={draft}
+            onChange={(e) => setDraft(e.target.value)}
+            onKeyDown={handleKeyDown}
             placeholder={`Message @${contact.name}`}
-            className="flex-1 bg-transparent outline-none text-[15px] placeholder-[#6d6f78]"
+            className="flex-1 bg-transparent outline-none text-cyan-50 text-[15px] placeholder-[#6d6f78]"
           />
           <div className="flex items-center gap-3.5">
             <InputIcon label="Send a gift">
@@ -315,7 +423,11 @@ export default function ChatPage() {
             <InputIcon label="Open sticker picker">
               <Grid3x3 size={20} />
             </InputIcon>
-            <InputIcon label="Open emoji picker">
+            <InputIcon
+              label="Send message"
+              onClick={handleSend}
+              disabled={isSending || !draft.trim()}
+            >
               <Smile size={20} />
             </InputIcon>
           </div>

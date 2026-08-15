@@ -1,32 +1,42 @@
-import { createBrowserRouter } from 'react-router-dom'
-import Home from './pages/Home.jsx'
-import ProtectedRoute from './components/ProtectedRoute.jsx'
-import PublicRoute from './components/PublicRoute.jsx'
-import Login from './pages/LoginPage.jsx'
-import Register from './pages/RegisterPage.jsx'
-import RootLayout from './components/layout/RootLayout.jsx'
-import ErrorPage from './components/ErrorPage.jsx'
-import Background from './pages/Backgroundpicker.jsx'
+import { createBrowserRouter } from "react-router-dom";
+import Home from "./pages/Home.jsx";
+import ProtectedRoute from "./components/ProtectedRoute.jsx";
+import PublicRoute from "./components/PublicRoute.jsx";
+import Login from "./pages/LoginPage.jsx";
+import Register from "./pages/RegisterPage.jsx";
+import RootLayout from "./components/layout/RootLayout.jsx";
+import ErrorPage from "./components/ErrorPage.jsx";
+import Background from "./pages/Backgroundpicker.jsx";
 export const router = createBrowserRouter([
   {
     element: <RootLayout />,
     errorElement: <ErrorPage />,
     children: [
       {
-        path: '/',
-        element:<ProtectedRoute><Home /></ProtectedRoute>
+        path: "/",
+        element: (
+          <ProtectedRoute>
+            <Home />
+          </ProtectedRoute>
+        ),
       },
-   
-      {
-        path: '/login',
-        element: <PublicRoute><Login /></PublicRoute>
-      }
 
-      ,
       {
-        path: '/register',
-        element:  <PublicRoute><Register /></PublicRoute>
-      }
-    ]
-  }
-])
+        path: "/login",
+        element: (
+          <PublicRoute>
+            <Login />
+          </PublicRoute>
+        ),
+      },
+      {
+        path: "/register",
+        element: (
+          <PublicRoute>
+            <Register />
+          </PublicRoute>
+        ),
+      },
+    ],
+  },
+]);
