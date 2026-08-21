@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import Sidebar from "../components/layout/Sidebar";
 import UserPanel from "../components/layout/UserPanel";
@@ -12,7 +12,8 @@ import ProfilePage from "../components/Profile/Profilepage.jsx";
 import Avatarpicker from "../components/popup/Avatarpicker.jsx";
 import PopupBackgroundpicker from "../components/popup/PopupBackgroundpicker.jsx";
 import { SocketProvider } from "../context/SocketContext.jsx";
-
+import { ImageOff } from "lucide-react";
+import{ createSocket }from "../socket.io-client/socket.io-client.js"
 function Home() {
   const userinfo = useSelector((state) => state.authinfoSlice.userinfo);
   const [isOpen, setIsOpen] = useState(false);
@@ -20,10 +21,11 @@ function Home() {
   const showAccountSettings = useSelector(
     (state) => state.AccountSettings.showAccountSettings,
   );
+
   const showProfilePageSettings = useSelector(
     (state) => state.ProfilePageSettings.showProfilePageSettings,
   );
-  console.log(showProfilePageSettings);
+  // console.log(showProfilePageSettings);
   const op = true;
   const bg = true;
   const { data } = useGetUserBackground();

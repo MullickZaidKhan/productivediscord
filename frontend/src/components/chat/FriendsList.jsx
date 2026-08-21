@@ -106,7 +106,7 @@ const FriendsList = ({ onOpenMenu, setChatopen }) => {
     setActiveTab(tabcontext);
   };
 
-  console.log(tabcontext);
+  // console.log(tabcontext);
 
   return (
     <div className="flex-1 min-w-0 min-h-0 h-full bg-[#0000008e] flex flex-col">

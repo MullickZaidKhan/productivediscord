@@ -6,8 +6,8 @@ import { connectDB } from "./src/config/db.js";
 import dns from "dns";
 import { Server } from "socket.io";
 import { createServer } from "node:http";
-import { registerSocket } from "./src/socket/index.js";
-import { socketAuthMiddleware } from "./src/socket/socketAuth.js";
+import { adduserinSocket } from "./src/Socket.IO/index.js";
+import { socketAuthMiddleware } from "./src/Socket.IO/socketAuth.js";
 
 const server = createServer(app);
 const io = new Server(server, {
@@ -18,7 +18,7 @@ const io = new Server(server, {
 });
 
 io.use(socketAuthMiddleware);
-registerSocket(io);
+adduserinSocket(io);
 // Use Google DNS
 dns.setServers(["8.8.8.8", "8.8.4.4"]);
 

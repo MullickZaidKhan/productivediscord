@@ -4,6 +4,7 @@ import { FriendRequest } from "../model/friendRequest.model.js";
 
 // Friend controller: handles sending, accepting, rejecting, listing, and removing friends.
 
+
 export const sendFriendRequest = async (req, res) => {
   try {
     const senderId = req.user.id;

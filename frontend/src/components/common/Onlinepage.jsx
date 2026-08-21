@@ -1,16 +1,50 @@
 import { motion } from "framer-motion";
+import { useState,useEffect } from "react";
 import { staggerContainer, fadeInUp } from "../ui/motion.js";
 import { useFriends } from "../../hooks/useFriend.js";
 import { usePresence } from "../../hooks/useSocket.js";
 import { useDispatch } from "react-redux";
 import { setUserInfo } from "../../redux/chat/Chatslice.js";
-
+import{ createSocket }from "../../socket.io-client/socket.io-client.js"
 const Onlinepage = ({ setChatopen }) => {
   const dispatch = useDispatch();
+  
   const { data: friends = [], isLoading, isError } = useFriends();
   const { isFriendOnline, isConnected } = usePresence();
+const [onlineFriends, setOnlineFriends] = useState([]);
 
-  const onlineFriends = friends.filter((f) => isFriendOnline(f._id));
+useEffect(() => {
+  console.log("🔵 Creating socket...");
+
+  const socket = createSocket();
+
+  socket.on("connect", () => {
+    console.log("🟢 Socket connected:", socket.id);
+  });
+
+  socket.on("presence:init", (friends) => {
+    console.log("🔥🔥 PRESENCE INIT RECEIVED");
+    console.log("👥 Online friends:", friends);
+
+    setOnlineFriends(friends);
+  });
+
+  socket.on("connect_error", (error) => {
+    console.log("🔴 Socket error:", error.message);
+  });
+
+  // IMPORTANT
+  socket.connect();
+
+  return () => {
+    socket.off("connect");
+    socket.off("presence:init");
+    socket.off("connect_error");
+
+    socket.disconnect();
+  };
+}, []);
+  // const onlineFriends = friends.filter((f) => isFriendOnline(f._id));
   const onlineCount = onlineFriends.length;
 
   const handleFriendClick = (friend) => {
