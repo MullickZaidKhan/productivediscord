@@ -1,4 +1,3 @@
-import React from "react";
 import {
   MessageCirclePlus,
   UsersRound,
@@ -11,16 +10,19 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { staggerContainer, fadeInUp } from "../ui/motion.js";
 import { useFriends } from "../../hooks/useFriend.js";
+import { usePresence } from "../../hooks/useSocket.js";
 import { useDispatch } from "react-redux";
 import { setUserInfo } from "../../redux/chat/Chatslice.js";
 
 export const AllList = ({ setChatopen }) => {
   const dispatch = useDispatch();
   const { data: friends = [], isLoading, isError } = useFriends();
+  const { isFriendOnline } = usePresence();
 
   const FRIENDS = friends.length > 0 ? friends : [];
 
   const friendsCount = FRIENDS.length;
+  const onlineCount = FRIENDS.filter((f) => isFriendOnline(f._id)).length;
 
   const handleFriendClick = (friend) => {
     dispatch(setUserInfo(friend));
@@ -56,7 +58,7 @@ export const AllList = ({ setChatopen }) => {
               transition={{ duration: 0.25, delay: 0.05 }}
               className="text-[#96989d] text-xs font-semibold mt-5 mb-2 px-1"
             >
-              All friends — {friendsCount}
+              All friends — {friendsCount} &nbsp;·&nbsp; Online — {onlineCount}
             </motion.div>
             <div className="h-px bg-[#3f4147] mb-1" />
 
@@ -75,8 +77,6 @@ export const AllList = ({ setChatopen }) => {
                   ) : (
                     FRIENDS.map(
                       (f, i) => (
-                        console.log(f,"f from  the all list "),
-                        (
                           <motion.div
                             key={f.name}
                             onClick={() => handleFriendClick(f)}
@@ -143,14 +143,14 @@ export const AllList = ({ setChatopen }) => {
                                   )}
                                 </div>
 
-                                <span className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-[#80848e] border-[3px] border-[#313338]" />
+                                <span className={`absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-[3px] border-[#313338] ${isFriendOnline(f._id) ? "bg-[#23a55a]" : "bg-[#80848e]"}`} />
                               </div>
                               <div className="min-w-0 flex-1">
                                 <div className="text-white text-sm font-medium truncate">
                                   {f.name}
                                 </div>
-                                <div className="text-[#949ba4] text-xs">
-                                  Offline
+                                <div className={`text-xs ${isFriendOnline(f._id) ? "text-[#23a55a]" : "text-[#949ba4]"}`}>
+                                  {isFriendOnline(f._id) ? "Online" : "Offline"}
                                 </div>
                               </div>
 
@@ -193,7 +193,6 @@ export const AllList = ({ setChatopen }) => {
                               <div className="h-px bg-[#3f414785] mx-2" />
                             )}
                           </motion.div>
-                        )
                       ),
                     )
                   )}

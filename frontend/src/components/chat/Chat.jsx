@@ -4,7 +4,7 @@ import Sidebar from './Sidebar';
 import FriendsList from './FriendsList';
 import ActiveNow from './ActiveNow';
 import { EASE } from '../ui/motion.js';
-import ChatPage from './Chatpage.jsx';
+import ChatPage from './Chat-page/Chatpage.jsx';
 import { useSelector, useDispatch } from 'react-redux'
 import { openChat, closeChat } from '../../redux/chat/Chatslice.js'
 

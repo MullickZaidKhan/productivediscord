@@ -14,11 +14,11 @@ import {
 } from "lucide-react";
 import { useSelector, useDispatch } from "react-redux";
 import { useQueryClient } from "@tanstack/react-query";
-import { openChat, closeChat } from "../../redux/chat/Chatslice.js";
+import { openChat, closeChat } from "../../../redux/chat/Chatslice.js";
 import {
   useSendDirectMessage,
   usegetDirectMessages,
-} from "../../hooks/chat/directMessage.hook.js";
+} from "../../../hooks/chat/directMessage.hook.js";
 
 // Deterministic color per name, used only as an avatar fallback background
 const AVATAR_PALETTE = [

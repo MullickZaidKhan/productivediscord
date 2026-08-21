@@ -1,43 +1,40 @@
-import React, { useState, useRef, useEffect } from "react";
-import {
-  AnimatePresence,
-  motion,
-  Sidebar,
-  UserPanel,
-  useSelector,
-  Chat,
-  Profile,
-  scaleIn,
-  useGetUserBackground,
-  DiscordAccountSettings,
-  ProfilePage,
-  Avatarpicker,
-  PopupBackgroundpicker,
-} from "./home page import/homeimport.js";
+import { useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import Sidebar from "../components/layout/Sidebar";
+import UserPanel from "../components/layout/UserPanel";
+import { useSelector } from "react-redux";
+import Chat from "../components/chat/Chat";
+import Profile from "../components/Profile/Profile.jsx";
+import { scaleIn } from "../components/ui/motion.js";
+import { useGetUserBackground } from "../hooks/background.hook.js";
+import DiscordAccountSettings from "../components/settings/DiscordAccountSettings.jsx";
+import ProfilePage from "../components/Profile/Profilepage.jsx";
+import Avatarpicker from "../components/popup/Avatarpicker.jsx";
+import PopupBackgroundpicker from "../components/popup/PopupBackgroundpicker.jsx";
+import { SocketProvider } from "../context/SocketContext.jsx";
 
 function Home() {
   const userinfo = useSelector((state) => state.authinfoSlice.userinfo);
-  const userlogin = useSelector((state) => state.authinfoSlice.login);
-  console.log(userlogin,"home");
-  console.log(userinfo,"home");
-  
   const [isOpen, setIsOpen] = useState(false);
   // const [showAccountSettings, setShowAccountSettings] = useState(false); // control visibility
-  const showAccountSettings = useSelector((state)=>state.AccountSettings.showAccountSettings)
-  const showProfilePageSettings =useSelector((state)=>state.ProfilePageSettings.showProfilePageSettings)
-  console.log(showProfilePageSettings)
-  const op = true
-  const bg = true
-  const { data, isLoading } = useGetUserBackground();
+  const showAccountSettings = useSelector(
+    (state) => state.AccountSettings.showAccountSettings,
+  );
+  const showProfilePageSettings = useSelector(
+    (state) => state.ProfilePageSettings.showProfilePageSettings,
+  );
+  console.log(showProfilePageSettings);
+  const op = true;
+  const bg = true;
+  const { data } = useGetUserBackground();
 
   const backgrounds = data?.data || [];
   const bgimg = backgrounds.imageUrl
     ? backgrounds.imageUrl
     : "https://i.pinimg.com/1200x/62/7e/3a/627e3aa8f4209d6cbcfcd831a30f935e.jpg";
 
-
-
   return (
+    <SocketProvider>
     <div className="flex h-screen w-screen overflow-hidden bg-[#07070700]">
       {/* Left Side */}
       <Sidebar />
@@ -66,7 +63,11 @@ function Home() {
                 exit="hidden"
                 style={{ transformOrigin: "bottom left" }}
               >
-                <Profile className="absolute" userinfo={userinfo} setIsOpen={setIsOpen} />
+                <Profile
+                  className="absolute"
+                  userinfo={userinfo}
+                  setIsOpen={setIsOpen}
+                />
               </motion.div>
             )}
           </AnimatePresence>
@@ -94,7 +95,7 @@ function Home() {
           </motion.div>
         )}
       </AnimatePresence> */}
-        <AnimatePresence>
+      <AnimatePresence>
         {showAccountSettings && (
           <motion.div
             initial={{ opacity: 0 }}
@@ -103,14 +104,16 @@ function Home() {
             className="fixed inset-0 z-50 flex h-full  items-center justify-center bg-black/60"
             onClick={() => setShowAccountSettings(false)} // click backdrop to close
           >
-            <div className="max-w-[95%] w-full max-h-[95%]" onClick={(e) => e.stopPropagation()}>
+            <div
+              className="max-w-[95%] w-full max-h-[95%]"
+              onClick={(e) => e.stopPropagation()}
+            >
               <DiscordAccountSettings />
-          
             </div>
           </motion.div>
         )}
       </AnimatePresence>
-        <AnimatePresence>
+      <AnimatePresence>
         {showProfilePageSettings && (
           <motion.div
             initial={{ opacity: 0 }}
@@ -119,14 +122,17 @@ function Home() {
             className="fixed inset-0 z-50 flex h-full  items-center justify-center bg-black/60"
             onClick={() => setShowAccountSettings(false)} // click backdrop to close
           >
-            <div className="max-w-[95%] w-full max-h-[95%]" onClick={(e) => e.stopPropagation()}>
+            <div
+              className="max-w-[95%] w-full max-h-[95%]"
+              onClick={(e) => e.stopPropagation()}
+            >
               {/* <DiscordAccountSettings /> */}
               <ProfilePage />
             </div>
           </motion.div>
         )}
       </AnimatePresence>
-         <AnimatePresence>
+      <AnimatePresence>
         {!op && (
           <motion.div
             initial={{ opacity: 0 }}
@@ -136,14 +142,17 @@ function Home() {
             className="fixed inset-0 z-50 flex h-full  items-center justify-center "
             onClick={() => setShowAccountSettings(false)} // click backdrop to close
           >
-            <div className="  w-full h-full" onClick={(e) => e.stopPropagation()}>
+            <div
+              className="  w-full h-full"
+              onClick={(e) => e.stopPropagation()}
+            >
               {/* <DiscordAccountSettings /> */}
               <Avatarpicker />
             </div>
           </motion.div>
         )}
       </AnimatePresence>
-         <AnimatePresence>
+      <AnimatePresence>
         {!bg && (
           <motion.div
             initial={{ opacity: 0 }}
@@ -153,15 +162,18 @@ function Home() {
             className="fixed inset-0 z-50 flex h-full  items-center justify-center "
             onClick={() => setShowAccountSettings(false)} // click backdrop to close
           >
-            <div className="  w-full h-full" onClick={(e) => e.stopPropagation()}>
+            <div
+              className="  w-full h-full"
+              onClick={(e) => e.stopPropagation()}
+            >
               {/* <DiscordAccountSettings /> */}
               <PopupBackgroundpicker />
             </div>
           </motion.div>
         )}
       </AnimatePresence>
-
     </div>
+    </SocketProvider>
   );
 }
 

@@ -9,7 +9,8 @@ import { useGetUserBackground } from "../../hooks/background.hook.js";
 import DiscordAccountSettings from "../../components/settings/DiscordAccountSettings.jsx";
 import ProfilePage from "../../components/Profile/Profilepage.jsx"
 import Avatarpicker from "../../components/popup/Avatarpicker.jsx"
-import PopupBackgroundpicker from "../../components/popup/PopupBackgroundpicker.jsx"
+import PopupBackgroundpicker from "../../components/popup/PopupBackgroundpicker.jsx";
+import {createSocket} from '../../socket.io-client/socket.io-client.js'
 export {
   AnimatePresence,
   motion,
@@ -24,4 +25,5 @@ export {
   ProfilePage,
   Avatarpicker,
   PopupBackgroundpicker,
+  createSocket,
 };
