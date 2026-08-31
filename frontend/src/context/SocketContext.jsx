@@ -1,101 +1,114 @@
-import { useEffect, useState, useCallback, useRef } from "react";
-import { useSelector } from "react-redux";
-import { createSocket } from "../socket.io-client/socket.io-client.js";
-import { SocketContext } from "./socket.context.js";
+// import { useEffect, useState, useCallback, useRef } from "react";
+// import { useSelector } from "react-redux";
+// import { createSocket } from "../socket.io-client/socket.io-client.js";
+// import { SocketContext } from "./socket.context.js";
 
-export function SocketProvider({ children }) {
-  const userinfo = useSelector((state) => state.authinfoSlice.userinfo);
-  const [onlineFriendIds, setOnlineFriendIds] = useState([]);
-  const [isConnected, setIsConnected] = useState(false);
-  const socketRef = useRef(null);
+// export function SocketProvider({ children }) {
+//   const userinfo = useSelector((state) => state.authinfoSlice.userinfo);
+//   const [onlineFriendIds, setOnlineFriendIds] = useState([]);
+//   const [isConnected, setIsConnected] = useState(false);
+//   const socketRef = useRef(null);
 
-  useEffect(() => {
-    if (!userinfo?.id) return;
+//   useEffect(() => {
+//     if (!userinfo?.id) return;
 
-    const s = createSocket();
-    socketRef.current = s;
+//     const s = createSocket();
+//     socketRef.current = s;
 
-    s.on("connect", () => {
-      console.log("Socket connected:", s.id);
-      setIsConnected(true);
-    });
+//     s.on("connect", () => {
+//       console.log("Socket connected:", s.id);
+//       setIsConnected(true);
+//     });
 
-    s.on("presence:friends", ({ onlineFriendIds: ids }) => {
-      console.log("Presence snapshot:", ids);
-      setOnlineFriendIds(ids);
-    });
+//     s.on("presence:friends", ({ onlineFriendIds: ids = [] }) => {
+//       console.log("Presence snapshot:", ids);
+//       setOnlineFriendIds(ids.map((id) => String(id)));
+//     });
 
-    s.on("friend:online", ({ userId }) => {
-      console.log("Friend came online:", userId);
-      setOnlineFriendIds((prev) => {
-        if (prev.includes(userId)) return prev;
-        return [...prev, userId];
-      });
-    });
+//     s.on("presence:init", (payload) => {
+//       const ids = Array.isArray(payload)
+//         ? payload.map((friend) => String(friend._id ?? friend.id))
+//         : Array.isArray(payload?.onlineFriendIds)
+//           ? payload.onlineFriendIds.map((id) => String(id))
+//           : [];
 
-    s.on("friend:offline", ({ userId }) => {
-      console.log("Friend went offline:", userId);
-      setOnlineFriendIds((prev) => prev.filter((id) => id !== userId));
-    });
+//       if (ids.length || payload == []) {
+//         setOnlineFriendIds(ids);
+//       }
+//     });
 
-    s.on("disconnect", (reason) => {
-      console.log("Socket disconnected:", reason);
-      setIsConnected(false);
-      if (reason === "io server disconnect") {
-        s.connect();
-      }
-    });
+//     s.on("friend:online", ({ userId }) => {
+//       console.log("Friend came online:", userId);
+//       setOnlineFriendIds((prev) => {
+//         const nextId = String(userId);
+//         if (prev.includes(nextId)) return prev;
+//         return [...prev, nextId];
+//       });
+//     });
 
-    s.on("connect_error", (error) => {
-      console.error("Socket connection error:", error.message);
-      if (
-        error.message === "Invalid or expired token" ||
-        error.message === "Authentication required"
-      ) {
-        import("../api/Auth.api.js")
-          .then(({ refreshtoken }) => {
-            refreshtoken()
-              .then(() => {
-                s.connect();
-              })
-              .catch(() => {
-                console.error("Token refresh failed, cannot reconnect socket");
-              });
-          });
-      }
-    });
+//     s.on("friend:offline", ({ userId }) => {
+//       console.log("Friend went offline:", userId);
+//       setOnlineFriendIds((prev) => prev.filter((id) => id !== String(userId)));
+//     });
 
-    s.connect();
+//     s.on("disconnect", (reason) => {
+//       console.log("Socket disconnected:", reason);
+//       setIsConnected(false);
+//       if (reason === "io server disconnect") {
+//         s.connect();
+//       }
+//     });
 
-    return () => {
-      s.off("connect");
-      s.off("presence:friends");
-      s.off("friend:online");
-      s.off("friend:offline");
-      s.off("disconnect");
-      s.off("connect_error");
-      s.disconnect();
-      socketRef.current = null;
-      setIsConnected(false);
-      setOnlineFriendIds([]);
-    };
-  }, [userinfo?.id]);
+//     s.on("connect_error", (error) => {
+//       console.error("Socket connection error:", error.message);
+//       if (
+//         error.message === "Invalid or expired token" ||
+//         error.message === "Authentication required"
+//       ) {
+//         import("../api/Auth.api.js")
+//           .then(({ refreshtoken }) => {
+//             refreshtoken()
+//               .then(() => {
+//                 s.connect();
+//               })
+//               .catch(() => {
+//                 console.error("Token refresh failed, cannot reconnect socket");
+//               });
+//           });
+//       }
+//     });
 
-  const isFriendOnline = useCallback(
-    (friendId) => onlineFriendIds.includes(friendId),
-    [onlineFriendIds]
-  );
+//     s.connect();
 
-  const value = {
-    socket: socketRef,
-    onlineFriendIds,
-    isConnected,
-    isFriendOnline,
-  };
+//     return () => {
+//       s.off("connect");
+//       s.off("presence:friends");
+//       s.off("friend:online");
+//       s.off("friend:offline");
+//       s.off("disconnect");
+//       s.off("connect_error");
+//       s.disconnect();
+//       socketRef.current = null;
+//       setIsConnected(false);
+//       setOnlineFriendIds([]);
+//     };
+//   }, [userinfo?.id]);
 
-  return (
-    <SocketContext.Provider value={value}>
-      {children}
-    </SocketContext.Provider>
-  );
-}
+//   const isFriendOnline = useCallback(
+//     (friendId) => onlineFriendIds.includes(friendId),
+//     [onlineFriendIds]
+//   );
+
+//   const value = {
+//     socket: socketRef,
+//     onlineFriendIds,
+//     isConnected,
+//     isFriendOnline,
+//   };
+
+//   return (
+//     <SocketContext.Provider value={value}>
+//       {children}
+//     </SocketContext.Provider>
+//   );
+// }

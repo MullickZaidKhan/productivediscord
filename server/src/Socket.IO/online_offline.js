@@ -92,3 +92,4 @@ export function isOnline(userId) {
   const sockets = onlineUsers.get(userId);
   return sockets !== undefined && sockets.size > 0;
 }
+

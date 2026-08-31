@@ -135,7 +135,7 @@ const FriendsList = ({ onOpenMenu, setChatopen }) => {
             <button
               key={tab}
               onClick={() => {
-                console.log(tab);
+                // console.log(tab);
                 setTab(tab);
               }}
               className={`relative px-2 py-1 rounded-md text-sm font-medium transition-colors whitespace-nowrap active:scale-95 ${

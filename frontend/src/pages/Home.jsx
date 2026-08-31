@@ -1,4 +1,4 @@
-import { useState,useEffect } from "react";
+import { useState, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import Sidebar from "../components/layout/Sidebar";
 import UserPanel from "../components/layout/UserPanel";
@@ -11,9 +11,10 @@ import DiscordAccountSettings from "../components/settings/DiscordAccountSetting
 import ProfilePage from "../components/Profile/Profilepage.jsx";
 import Avatarpicker from "../components/popup/Avatarpicker.jsx";
 import PopupBackgroundpicker from "../components/popup/PopupBackgroundpicker.jsx";
-import { SocketProvider } from "../context/SocketContext.jsx";
+// import { SocketProvider } from "../context/SocketContext.jsx";
 import { ImageOff } from "lucide-react";
-import{ createSocket }from "../socket.io-client/socket.io-client.js"
+
+import { Socket_usePresence } from "../socket.io-client/socketusePresence.js";
 function Home() {
   const userinfo = useSelector((state) => state.authinfoSlice.userinfo);
   const [isOpen, setIsOpen] = useState(false);
@@ -30,13 +31,13 @@ function Home() {
   const bg = true;
   const { data } = useGetUserBackground();
 
+  Socket_usePresence();
   const backgrounds = data?.data || [];
   const bgimg = backgrounds.imageUrl
     ? backgrounds.imageUrl
     : "https://i.pinimg.com/1200x/62/7e/3a/627e3aa8f4209d6cbcfcd831a30f935e.jpg";
 
   return (
-    <SocketProvider>
     <div className="flex h-screen w-screen overflow-hidden bg-[#07070700]">
       {/* Left Side */}
       <Sidebar />
@@ -175,7 +176,6 @@ function Home() {
         )}
       </AnimatePresence>
     </div>
-    </SocketProvider>
   );
 }
 

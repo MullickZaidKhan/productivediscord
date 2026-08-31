@@ -8,7 +8,7 @@ import {
   checkUsername,
   logout,
 } from "../api/Auth.api.js";
-import { AuthContext } from "../context/auth.context.jsx";
+// import { AuthContext } from "../context/auth.context.jsx";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { setLoggedIn, setLoggedOut } from "../redux/authSlice.js";

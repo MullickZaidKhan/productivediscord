@@ -30,7 +30,10 @@ import EditModal from "./EditModal";
 import { useLogout } from "../../hooks/useAuth.js";
 import Backgroundpicker from "../../pages/Backgroundpicker.jsx"
 import { setLoggedOut } from "../../redux/authSlice.js";
-
+import {
+  createSocket,
+  getSocket,
+} from "../../socket.io-client/socket.io-client.js";
 // const NAV_SECTIONS = [
 //   {
 //     label: null,
@@ -161,10 +164,33 @@ export default function DiscordAccountSettings() {
 const onLogout = () => {
   handleLogout(undefined, {
     onSuccess: () => {
+      const socket = getSocket();
+
+      if (socket) {
+        socket.off("connect");
+        socket.off("connect_error");
+        socket.off("disconnect");
+        socket.disconnect();
+
+        console.log("🔴 Socket disconnected on logout");
+      }
+
       dispatch(setLoggedOut());
       navigate("/login", { replace: true });
     },
+
     onError: () => {
+      const socket = getSocket();
+
+      if (socket) {
+        socket.off("connect");
+        socket.off("connect_error");
+        socket.off("disconnect");
+        socket.disconnect();
+
+        console.log("🔴 Socket disconnected on logout");
+      }
+
       dispatch(setLoggedOut());
       navigate("/login", { replace: true });
     },
