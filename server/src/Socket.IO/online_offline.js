@@ -1,3 +1,5 @@
+import { Socket } from "socket.io";
+
 const onlineUsers = new Map(); // userId -> Set<socketId>
 const socketUsers = new Map(); // socketId -> userId
 
@@ -34,6 +36,7 @@ export function addUserSocket(userId, socketId) {
         })),
       ),
     );
+    getonlineUsers('6a70c96f69c9097d1cdae1ae')
     return true;
  
 }
@@ -91,5 +94,11 @@ export function removeConnection(userId, socketId) {
 export function isOnline(userId) {
   const sockets = onlineUsers.get(userId);
   return sockets !== undefined && sockets.size > 0;
+}
+
+export function getonlineUsers(receiverId){
+ const socket =onlineUsers.get(receiverId)
+  console.log(socket,"from get id")
+  return socket
 }
 

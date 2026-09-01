@@ -1,7 +1,10 @@
 import { User } from "../../model/auth.model.js";
 import { directMessage } from "../../model/chat/directMessage.model.js";
+import { mainchat } from "../../Socket.IO/chat/mainsocket.js";
+import { getIO } from "../../Socket.IO/socket.js";
 
 export const SenddirectMessage = async (req, res) => {
+  const io = getIO();
   try {
     const { receiver, text, replyTo } = req.body;
     console.log(req.body);
@@ -34,6 +37,7 @@ export const SenddirectMessage = async (req, res) => {
       edited: false,
       editedAt: null,
     });
+    mainchat(io,receiver,directMessageinchat)
     // 4️⃣ Send response immediately
     res.status(201).json({
       message: "Message sent successfully",

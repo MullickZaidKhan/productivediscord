@@ -19,7 +19,7 @@ import {
   useSendDirectMessage,
   usegetDirectMessages,
 } from "../../../hooks/chat/directMessage.hook.js";
-
+import { createSocket } from "../../../socket.io-client/socket.io-client.js";
 // Deterministic color per name, used only as an avatar fallback background
 const AVATAR_PALETTE = [
   "#5865f2",
@@ -36,40 +36,6 @@ function avatarColor(name) {
     hash = name.charCodeAt(i) + ((hash << 5) - hash);
   return AVATAR_PALETTE[Math.abs(hash) % AVATAR_PALETTE.length];
 }
-
-// function Avatar({ name, size = 40, profileimg, initials, color }) {
-//   const letter = (name || "?").trim().charAt(0).toUpperCase();
-//   return (
-//     // <div
-//     //   style={{ width: size, height: size, backgroundColor: avatarColor(name || "?") }}
-//     //   className="rounded-full flex items-center justify-center font-semibold text-white shrink-0 select-none"
-//     // >
-//     //   <span style={{ fontSize: size * 0.42 }}>{letter}</span>
-//     // </div>
-//     <div>
-//       {profileimg ? (
-//         <img
-//           src={profileimg}
-//           alt={name || "User"}
-//           className="w-full h-full object-cover"
-//         />
-//       ) : (
-//         <div
-//           className="w-full h-full rounded-full flex items-center justify-center"
-//           style={{ backgroundColor: contact.color || "#6b7280" }}
-//         >
-//           {letter.initials ? (
-//             letter.initials
-//           ) : name ? (
-//             name.slice(0, 2).toUpperCase()
-//           ) : (
-//             <UsersRound size={16} className="text-white" />
-//           )}
-//         </div>
-//       )}
-//     </div>
-//   );
-// }
 
 // Formats an ISO createdAt string into "7:14 AM" style local time
 function Avatar({ name, size = 40, profileimg, initials, color }) {
@@ -198,11 +164,21 @@ function InputIcon({ children, label, onClick, disabled }) {
 export default function ChatPage() {
   const dispatch = useDispatch();
   const queryClient = useQueryClient();
-
+  const socket =createSocket()
   const [headerIn, setHeaderIn] = useState(false);
   const [draft, setDraft] = useState("");
   const scrollRef = useRef(null);
+  useEffect(() => {
+    const handleMessageReceive = (messageData) => {
+      console.log("📩 MESSAGE RECEIVED:", messageData);
+    };
 
+    socket.on("message:receive", handleMessageReceive);
+
+    return () => {
+      socket.off("message:receive", handleMessageReceive);
+    };
+  }, [socket]);
   const contact = useSelector((state) => state.chat.userinfo);
 
   // Adjust this selector to match wherever the logged-in user is stored in your auth slice.
@@ -216,9 +192,9 @@ export default function ChatPage() {
   const onlineFriends = useSelector(
     (state) => state.onlineFriendsslice?.ONLINE_USERS || [],
   );
-const findtheuserisonline = onlineFriends.some(
-  (person) => String(person.id) === String(contact?._id)
-);
+  const findtheuserisonline = onlineFriends.some(
+    (person) => String(person.id) === String(contact?._id),
+  );
 
   const { mutate: sendDirectMessage, isPending: isSending } =
     useSendDirectMessage();

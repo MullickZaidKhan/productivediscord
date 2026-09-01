@@ -8,6 +8,8 @@ import { Server } from "socket.io";
 import { createServer } from "node:http";
 import { adduserinSocket } from "./src/Socket.IO/index.js";
 import { socketAuthMiddleware } from "./src/Socket.IO/socketAuth.js";
+import {setIO} from "./src/Socket.IO/socket.js"
+import {mainchat} from "./src/Socket.IO/chat/mainsocket.js"
 
 const server = createServer(app);
 const io = new Server(server, {
@@ -19,6 +21,8 @@ const io = new Server(server, {
 
 io.use(socketAuthMiddleware);
 adduserinSocket(io);
+mainchat(io);
+setIO(io);
 // Use Google DNS
 dns.setServers(["8.8.8.8", "8.8.4.4"]);
 
