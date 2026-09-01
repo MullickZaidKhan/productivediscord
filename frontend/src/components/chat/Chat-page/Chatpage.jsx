@@ -213,6 +213,12 @@ export default function ChatPage() {
     isLoading: messagesLoading,
     isError: messagesError,
   } = usegetDirectMessages(contact?._id);
+  const onlineFriends = useSelector(
+    (state) => state.onlineFriendsslice?.ONLINE_USERS || [],
+  );
+const findtheuserisonline = onlineFriends.some(
+  (person) => String(person.id) === String(contact?._id)
+);
 
   const { mutate: sendDirectMessage, isPending: isSending } =
     useSendDirectMessage();
@@ -303,27 +309,39 @@ export default function ChatPage() {
             <ChevronLeft className="text-white" />
           </button>
 
-          <div className="w-9 h-9 rounded-full overflow-hidden flex items-center justify-center text-white text-xs font-medium">
-            {contact.profileimg ? (
-              <img
-                src={contact.profileimg}
-                alt={contact.name || "User"}
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <div
-                className="w-full h-full rounded-full flex items-center justify-center"
-                style={{ backgroundColor: contact.color || "#6b7280" }}
-              >
-                {contact.initials ? (
-                  contact.initials
-                ) : contact.name ? (
-                  contact.name.slice(0, 2).toUpperCase()
-                ) : (
-                  <UsersRound size={16} className="text-white" />
-                )}
-              </div>
-            )}
+          <div className="relative shrink-0">
+            {/* Avatar */}
+            <div className="w-8 h-8 rounded-full overflow-hidden flex items-center justify-center text-white text-xs font-medium">
+              {contact.profileimg ? (
+                <img
+                  src={contact.profileimg}
+                  alt={contact.name || "User"}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div
+                  className="w-full h-full rounded-full flex items-center justify-center"
+                  style={{
+                    backgroundColor: contact.color || "#6b7280",
+                  }}
+                >
+                  {contact.initials ? (
+                    contact.initials
+                  ) : contact.name ? (
+                    contact.name.slice(0, 2).toUpperCase()
+                  ) : (
+                    <UsersRound size={16} className="text-white" />
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Online / Offline status */}
+            <span
+              className={`absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-[3px] border-[#313338] ${
+                findtheuserisonline ? "bg-[#23a559]" : "bg-[#80848e]"
+              }`}
+            />
           </div>
 
           <span className="font-semibold text-[15px] text-white truncate">

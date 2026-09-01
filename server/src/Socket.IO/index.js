@@ -12,7 +12,6 @@
 //     // Add user
 //     addUserSocket(userId, socket.id);
 
-
 //     // Get user's friends
 //     const user = await User.findById(userId).select("friends").lean();
 
@@ -21,7 +20,6 @@
 //     const friends = user?.friends || [];
 
 //     // console.log("👥 FRIEND IDS:", friends);
-
 
 //     // Find online friends
 //     const onlineFriends = friends.filter((friendId) =>
@@ -37,8 +35,6 @@
 //       .lean();
 
 //     console.log("👥 ONLINE FRIENDS WITH NAME:", onlineFriendsWithName);
-
-
 
 //     // Send to client
 //     socket.emit(
@@ -89,12 +85,7 @@
 //   }
 // }
 
-
-import {
-  addUserSocket,
-  removeConnection,
-  isOnline,
-} from "./online_offline.js";
+import { addUserSocket, removeConnection, isOnline } from "./online_offline.js";
 
 import { User } from "../model/auth.model.js";
 
@@ -113,9 +104,7 @@ export function adduserinSocket(io) {
     await sendPresence(io, userId);
 
     // Get this user's friends
-    const user = await User.findById(userId)
-      .select("friends")
-      .lean();
+    const user = await User.findById(userId).select("friends").lean();
 
     const friends = user?.friends || [];
 
@@ -126,24 +115,48 @@ export function adduserinSocket(io) {
       }
     }
 
+//     ```js
+// // When user disconnects
+// socket.on("disconnect", async () => {
+//   console.log("🔴 SOCKET DISCONNECTED:", socket.id);
+//   console.log("👤 User ID:", userId);
+
+//   const wentOffline = removeConnection(userId, socket.id);
+
+//   console.log("🚦 Completely offline:", wentOffline);
+//   console.log("🟢 ONLINE USERS AFTER DISCONNECT:", getOnlineUsers());
+
+//   // Only notify friends when this was the user's LAST socket
+//   if (wentOffline) {
+//     const user = await User.findById(userId)
+//       .select("friends")
+//       .lean();
+
+//     const friends = user?.friends || [];
+
+//     // Tell every ONLINE friend that this user went offline
+//     for (const friendId of friends) {
+//       if (isOnline(friendId.toString())) {
+//         await sendPresence(io, friendId.toString());
+//       }
+//     }
+//   }
+// });
+// ```;
+
     // When user disconnects
     socket.on("disconnect", async () => {
-      const wentOffline = removeConnection(
-        userId,
-        socket.id
-      );
+      const wentOffline = removeConnection(userId, socket.id);
 
       console.log("🔴 SOCKET DISCONNECTED:", socket.id);
 
-      // Only update friends if this user actually went offline
+      // User is completely offline
       if (wentOffline) {
-        const user = await User.findById(userId)
-          .select("friends")
-          .lean();
+        const user = await User.findById(userId).select("friends").lean();
 
         const friends = user?.friends || [];
 
-        // Tell online friends that this user is now offline
+        // Update all online friends
         for (const friendId of friends) {
           if (isOnline(friendId.toString())) {
             await sendPresence(io, friendId.toString());
@@ -154,21 +167,18 @@ export function adduserinSocket(io) {
   });
 }
 
-
 // ------------------------------------
 // SEND ONLINE FRIENDS TO ONE USER
 // ------------------------------------
 
 async function sendPresence(io, userId) {
-  const user = await User.findById(userId)
-    .select("friends")
-    .lean();
+  const user = await User.findById(userId).select("friends").lean();
 
   const friends = user?.friends || [];
 
   // Find which friends are online
   const onlineFriends = friends.filter((friendId) =>
-    isOnline(friendId.toString())
+    isOnline(friendId.toString()),
   );
 
   // Get their information
@@ -191,4 +201,3 @@ async function sendPresence(io, userId) {
     }
   }
 }
-

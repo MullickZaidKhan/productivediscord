@@ -126,7 +126,7 @@ export default function BackgroundPicker() {
   return (
     <div className="min-h-full w-full bg-[#313338] text-[#f2f3f5] flex flex-col">
       {/* Header */}
-      <header className="sticky -top-1 pt-2 z-20  border-black/20 bg-[#313338]/95 backdrop-blur">
+      <header className="sticky -top-1 pt-2 z-9 border-black/20 bg-[#313338]/95 backdrop-blur">
         <div className="max-w-6xl mx-auto px-5 py-4 flex flex-col gap-4">
           <div className="flex items-start justify-between gap-4">
             <div>
