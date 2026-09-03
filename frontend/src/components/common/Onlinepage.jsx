@@ -62,7 +62,7 @@ const Onlinepage = ({ setChatopen }) => {
             <motion.div
               key={friend._id}
               variants={fadeInUp}
-              onClick={() => handleFriendClick(friend)}
+              onClick={() =>{ handleFriendClick(friend),console.log(friend)}}
               className="flex items-center gap-3 px-3 py-1 rounded-md hover:bg-[#3e3f45] hover:bg-opacity-50 group cursor-pointer transition-colors"
             >
               <div className="relative shrink-0">

@@ -1,5 +1,5 @@
 import { addUserSocket, removeConnection, isOnline } from "./online_offline.js";
-
+import { sendTypingEvent } from "./chat/mainsocket.js";
 import { User } from "../model/auth.model.js";
 
 export function adduserinSocket(io) {
@@ -15,7 +15,37 @@ export function adduserinSocket(io) {
 
     // Send updated presence to this user
     await sendPresence(io, userId);
+        // ------------------------------------
+    // TYPING START
+    // ------------------------------------
 
+    socket.on("typing:start", async ({ senderId, receiverId }) => {
+      console.log("⌨️ TYPING START RECEIVED");
+      console.log("Sender:", senderId);
+      console.log("Receiver:", receiverId);
+
+      await sendTypingEvent(
+        senderId,
+        receiverId,
+        "typing:start"
+      );
+    });
+
+    // ------------------------------------
+    // TYPING STOP
+    // ------------------------------------
+
+    socket.on("typing:stop", async ({ senderId, receiverId }) => {
+      console.log("⌨️ TYPING STOP RECEIVED");
+      console.log("Sender:", senderId);
+      console.log("Receiver:", receiverId);
+
+      await sendTypingEvent(
+        senderId,
+        receiverId,
+        "typing:stop"
+      );
+    });
     // Get this user's friends
     const user = await User.findById(userId).select("friends").lean();
 

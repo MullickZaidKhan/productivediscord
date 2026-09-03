@@ -11,6 +11,7 @@ import {
   Grid3x3,
   Image as ImageIcon,
   Plus,
+  Flag,
 } from "lucide-react";
 import { useSelector, useDispatch } from "react-redux";
 import { useQueryClient } from "@tanstack/react-query";
@@ -45,7 +46,8 @@ function TypingIndicator({ name }) {
         <span className="typing-dot" style={{ animationDelay: "300ms" }} />
       </div>
       <span>
-        <span className="font-semibold text-[#dbdee1]">{name}</span> is typing...
+        <span className="font-semibold text-[#dbdee1]">{name}</span> is
+        typing...
       </span>
       <style>{`
         .typing-dot {
@@ -191,34 +193,44 @@ function InputIcon({ children, label, onClick, disabled }) {
 export default function ChatPage() {
   const dispatch = useDispatch();
   const queryClient = useQueryClient();
-  const [isContactTyping, setIsContactTyping] = useState(true);
-const typingTimeoutRef = useRef(null);
+  const [isContactTyping, setIsContactTyping] = useState(false);
+  const typingTimeoutRef = useRef(null);
   const [headerIn, setHeaderIn] = useState(false);
   const [draft, setDraft] = useState("");
   const scrollRef = useRef(null);
   const contact = useSelector((state) => state.chat.userinfo);
   const socket = useMemo(() => createSocket(), []);
   useEffect(() => {
-    const handleMessageReceive = (messageData) => {
+    const handleMessageReceive = ({ message, senderId }) => {
+      console.log(
+        String(senderId) !== String(contact?._id),
+        "socket check the chat",
+      );
+
+      console.log("📩 MESSAGE RECEIVED:", message);
+      console.log("🕐 createdAt:", message?.createdAt);
+
+      if (String(senderId) !== String(contact?._id)) {
+        console.log("⛔ Message belongs to another conversation");
+        return;
+      }
+
       queryClient.setQueryData(
         ["directMessages", contact?._id],
         (previousDataofchat) => {
-          console.log("🗃️ PREVIOUS CACHE:");
-          if (Array.isArray(previousDataofchat.data?.data)) {
-            console.log("Array.isArray(previousDataofchat.data?.data");
+          if (Array.isArray(previousDataofchat?.data?.data)) {
             return {
               ...previousDataofchat,
               data: {
                 ...previousDataofchat.data,
-                data: [...previousDataofchat.data.data, messageData],
+                data: [...previousDataofchat.data.data, message],
               },
             };
           }
+
           return previousDataofchat;
         },
       );
-      console.log("📩 MESSAGE RECEIVED:", messageData);
-      console.log("🕐 createdAt:", messageData?.createdAt);
     };
 
     socket.on("message:receive", handleMessageReceive);
@@ -229,60 +241,34 @@ const typingTimeoutRef = useRef(null);
   }, [socket, queryClient, contact?._id]);
 
   // Adjust this selector to match wherever the logged-in user is stored in your auth slice.
-  // useEffect(() => {
-  //   if (!contact?._id) return;
 
-  //   const handleMessageReceive = (messageData) => {
-  //     console.log("📩 MESSAGE RECEIVED:", messageData);
-
-  //     queryClient.setQueryData(
-  //       ["directMessages", contact._id],
-  //       (previousData) => {
-  //         console.log("🗃️ PREVIOUS CACHE:", previousData);
-
-  //         // No cache exists yet
-  //         if (!previousData) {
-  //           return {
-  //             message: "Messages fetched successfully",
-  //             data: [messageData],
-  //           };
-  //         }
-
-  //         // API cache = { message, data: [...] }
-  //         // if (Array.isArray(previousData.data)) {
-  //         //     console.log("Array.isArray(previousData.data)")
-  //         //   return {
-  //         //     ...previousData,
-  //         //     data: [...previousData.data, messageData],
-  //         //   };
-  //         // }
-
-  //         // Axios cache = { data: { message, data: [...] }, ... }
-  //         if (Array.isArray(previousData.data?.data)) {
-  //           console.log("Array.isArray(previousData.data?.data")
-  //           return {
-  //             ...previousData,
-  //             data: {
-  //               ...previousData.data,
-  //               data: [...previousData.data.data, messageData],
-  //             },
-  //           };
-  //         }
-
-  //         console.warn("⚠️ Unknown cache structure:", previousData);
-
-  //         return previousData;
-  //       }
-  //     );
-  //   };
-
-  //   socket.on("message:receive", handleMessageReceive);
-
-  //   return () => {
-  //     socket.off("message:receive", handleMessageReceive);
-  //   };
-  // }, [socket, queryClient, contact?._id]);
   const currentUser = useSelector((state) => state.authinfoSlice.userinfo);
+  useEffect(() => {
+    const handleTypingStart = ({ userId }) => {
+      console.log("⌨️ TYPING START RECEIVED:", userId);
+      console.log("👤 CURRENT CONTACT:", contact?._id);
+
+      if (String(userId) === String(contact?._id)) {
+        setIsContactTyping(true);
+      }
+    };
+
+    const handleTypingStop = ({ userId }) => {
+      console.log("⌨️ TYPING STOP RECEIVED:", userId);
+
+      if (String(userId) === String(contact?._id)) {
+        setIsContactTyping(false);
+      }
+    };
+
+    socket.on("typing:start", handleTypingStart);
+    socket.on("typing:stop", handleTypingStop);
+
+    return () => {
+      socket.off("typing:start", handleTypingStart);
+      socket.off("typing:stop", handleTypingStop);
+    };
+  }, [socket, contact?._id]);
 
   const {
     data: messagesResponse,
@@ -358,7 +344,32 @@ const typingTimeoutRef = useRef(null);
       },
     );
   };
+  const handleTyping = (e) => {
+    const value = e.target.value;
 
+    setDraft(value);
+
+    if (!contact?._id || !currentUser?.id) return;
+
+    // Send typing:start to server
+    socket.emit("typing:start", {
+      senderId: currentUser.id,
+      receiverId: contact._id,
+    });
+
+    // Clear previous timeout
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+    }
+
+    // After 1 second without typing, send typing:stop
+    typingTimeoutRef.current = setTimeout(() => {
+      socket.emit("typing:stop", {
+        senderId: currentUser.id,
+        receiverId: contact._id,
+      });
+    }, 1000);
+  };
   const handleKeyDown = (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
@@ -492,7 +503,7 @@ const typingTimeoutRef = useRef(null);
           </div>
         ))}
       </div>
-  {isContactTyping && <TypingIndicator name={contact.name} />}
+      {isContactTyping && <TypingIndicator name={contact.name} />}
       {/* Message input */}
       <div className="px-4 pb-6 p-8 pt-1 shrink-0">
         <div className="flex items-center gap-3 bg-[#383a40] rounded-lg px-4 py-2.5 focus-within:ring-1 focus-within:ring-[#4a4d55] transition-all duration-200">
@@ -502,7 +513,8 @@ const typingTimeoutRef = useRef(null);
           <input
             type="text"
             value={draft}
-            onChange={(e) => setDraft(e.target.value)}
+            // onChange={(e) => setDraft(e.target.value)}
+            onChange={handleTyping}
             onKeyDown={handleKeyDown}
             placeholder={`Message @${contact.name}`}
             className="flex-1 bg-transparent outline-none text-cyan-50 text-[15px] placeholder-[#6d6f78]"
