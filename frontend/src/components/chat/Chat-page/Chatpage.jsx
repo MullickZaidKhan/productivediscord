@@ -164,7 +164,7 @@ function InputIcon({ children, label, onClick, disabled }) {
 export default function ChatPage() {
   const dispatch = useDispatch();
   const queryClient = useQueryClient();
-  const socket =createSocket()
+  const socket = createSocket();
   const [headerIn, setHeaderIn] = useState(false);
   const [draft, setDraft] = useState("");
   const scrollRef = useRef(null);
