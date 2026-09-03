@@ -36,7 +36,34 @@ function avatarColor(name) {
     hash = name.charCodeAt(i) + ((hash << 5) - hash);
   return AVATAR_PALETTE[Math.abs(hash) % AVATAR_PALETTE.length];
 }
-
+function TypingIndicator({ name }) {
+  return (
+    <div className="flex items-center gap-2 px-4 md:px-6 h-8 text-[13px] text-[#949ba4] select-none">
+      <div className="flex items-end gap-0.5 h-3">
+        <span className="typing-dot" style={{ animationDelay: "0ms" }} />
+        <span className="typing-dot" style={{ animationDelay: "150ms" }} />
+        <span className="typing-dot" style={{ animationDelay: "300ms" }} />
+      </div>
+      <span>
+        <span className="font-semibold text-[#dbdee1]">{name}</span> is typing...
+      </span>
+      <style>{`
+        .typing-dot {
+          width: 5px;
+          height: 5px;
+          border-radius: 9999px;
+          background-color: #949ba4;
+          display: inline-block;
+          animation: typing-bounce 1.2s infinite ease-in-out;
+        }
+        @keyframes typing-bounce {
+          0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
+          30% { transform: translateY(-4px); opacity: 1; }
+        }
+      `}</style>
+    </div>
+  );
+}
 // Formats an ISO createdAt string into "7:14 AM" style local time
 function Avatar({ name, size = 40, profileimg, initials, color }) {
   const letter = (name || "?").trim().charAt(0).toUpperCase();
@@ -106,7 +133,7 @@ function groupMessagesByDay(messages) {
 function MessageRow({ message, author }) {
   const hasImage = Boolean(message.image);
   const hasText = Boolean(message.text);
-  console.log(author);
+  // console.log(author);
   return (
     <div className="msg-row-in group flex gap-4 px-4 md:px-6 py-0.5 hover:bg-white/[0.03] rounded">
       <div className="pt-0.5 shrink-0">
@@ -164,13 +191,34 @@ function InputIcon({ children, label, onClick, disabled }) {
 export default function ChatPage() {
   const dispatch = useDispatch();
   const queryClient = useQueryClient();
-  const socket = createSocket();
+  const [isContactTyping, setIsContactTyping] = useState(true);
+const typingTimeoutRef = useRef(null);
   const [headerIn, setHeaderIn] = useState(false);
   const [draft, setDraft] = useState("");
   const scrollRef = useRef(null);
+  const contact = useSelector((state) => state.chat.userinfo);
+  const socket = useMemo(() => createSocket(), []);
   useEffect(() => {
     const handleMessageReceive = (messageData) => {
+      queryClient.setQueryData(
+        ["directMessages", contact?._id],
+        (previousDataofchat) => {
+          console.log("🗃️ PREVIOUS CACHE:");
+          if (Array.isArray(previousDataofchat.data?.data)) {
+            console.log("Array.isArray(previousDataofchat.data?.data");
+            return {
+              ...previousDataofchat,
+              data: {
+                ...previousDataofchat.data,
+                data: [...previousDataofchat.data.data, messageData],
+              },
+            };
+          }
+          return previousDataofchat;
+        },
+      );
       console.log("📩 MESSAGE RECEIVED:", messageData);
+      console.log("🕐 createdAt:", messageData?.createdAt);
     };
 
     socket.on("message:receive", handleMessageReceive);
@@ -178,10 +226,62 @@ export default function ChatPage() {
     return () => {
       socket.off("message:receive", handleMessageReceive);
     };
-  }, [socket]);
-  const contact = useSelector((state) => state.chat.userinfo);
+  }, [socket, queryClient, contact?._id]);
 
   // Adjust this selector to match wherever the logged-in user is stored in your auth slice.
+  // useEffect(() => {
+  //   if (!contact?._id) return;
+
+  //   const handleMessageReceive = (messageData) => {
+  //     console.log("📩 MESSAGE RECEIVED:", messageData);
+
+  //     queryClient.setQueryData(
+  //       ["directMessages", contact._id],
+  //       (previousData) => {
+  //         console.log("🗃️ PREVIOUS CACHE:", previousData);
+
+  //         // No cache exists yet
+  //         if (!previousData) {
+  //           return {
+  //             message: "Messages fetched successfully",
+  //             data: [messageData],
+  //           };
+  //         }
+
+  //         // API cache = { message, data: [...] }
+  //         // if (Array.isArray(previousData.data)) {
+  //         //     console.log("Array.isArray(previousData.data)")
+  //         //   return {
+  //         //     ...previousData,
+  //         //     data: [...previousData.data, messageData],
+  //         //   };
+  //         // }
+
+  //         // Axios cache = { data: { message, data: [...] }, ... }
+  //         if (Array.isArray(previousData.data?.data)) {
+  //           console.log("Array.isArray(previousData.data?.data")
+  //           return {
+  //             ...previousData,
+  //             data: {
+  //               ...previousData.data,
+  //               data: [...previousData.data.data, messageData],
+  //             },
+  //           };
+  //         }
+
+  //         console.warn("⚠️ Unknown cache structure:", previousData);
+
+  //         return previousData;
+  //       }
+  //     );
+  //   };
+
+  //   socket.on("message:receive", handleMessageReceive);
+
+  //   return () => {
+  //     socket.off("message:receive", handleMessageReceive);
+  //   };
+  // }, [socket, queryClient, contact?._id]);
   const currentUser = useSelector((state) => state.authinfoSlice.userinfo);
 
   const {
@@ -392,7 +492,7 @@ export default function ChatPage() {
           </div>
         ))}
       </div>
-
+  {isContactTyping && <TypingIndicator name={contact.name} />}
       {/* Message input */}
       <div className="px-4 pb-6 p-8 pt-1 shrink-0">
         <div className="flex items-center gap-3 bg-[#383a40] rounded-lg px-4 py-2.5 focus-within:ring-1 focus-within:ring-[#4a4d55] transition-all duration-200">
