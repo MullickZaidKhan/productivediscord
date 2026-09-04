@@ -11,10 +11,10 @@ export const Socket_usePresence = () => {
       socket.connect();
     }
     socket.on("connect", () => {
-      console.log("✅ Socket connected:", socket.id);
+      // console.log("✅ Socket connected:", socket.id);
     });
     socket.on("presence:init", (friends) => {
-      console.log("🟢 Online friends:", friends);
+      // console.log("🟢 Online friends:", friends);
       dispatch(setonlineuser(friends));
     });
   }, [dispatch]);

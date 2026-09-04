@@ -202,13 +202,13 @@ export default function ChatPage() {
   const socket = useMemo(() => createSocket(), []);
   useEffect(() => {
     const handleMessageReceive = ({ message, senderId }) => {
-      console.log(
-        String(senderId) !== String(contact?._id),
-        "socket check the chat",
-      );
+      // console.log(
+      //   String(senderId) !== String(contact?._id),
+      //   "socket check the chat",
+      // );
 
-      console.log("📩 MESSAGE RECEIVED:", message);
-      console.log("🕐 createdAt:", message?.createdAt);
+      // console.log("📩 MESSAGE RECEIVED:", message);
+      // console.log("🕐 createdAt:", message?.createdAt);
 
       if (String(senderId) !== String(contact?._id)) {
         console.log("⛔ Message belongs to another conversation");
@@ -245,8 +245,8 @@ export default function ChatPage() {
   const currentUser = useSelector((state) => state.authinfoSlice.userinfo);
   useEffect(() => {
     const handleTypingStart = ({ userId }) => {
-      console.log("⌨️ TYPING START RECEIVED:", userId);
-      console.log("👤 CURRENT CONTACT:", contact?._id);
+      // console.log("⌨️ TYPING START RECEIVED:", userId);
+      // console.log("👤 CURRENT CONTACT:", contact?._id);
 
       if (String(userId) === String(contact?._id)) {
         setIsContactTyping(true);
@@ -254,7 +254,7 @@ export default function ChatPage() {
     };
 
     const handleTypingStop = ({ userId }) => {
-      console.log("⌨️ TYPING STOP RECEIVED:", userId);
+      // console.log("⌨️ TYPING STOP RECEIVED:", userId);
 
       if (String(userId) === String(contact?._id)) {
         setIsContactTyping(false);
