@@ -329,3 +329,67 @@ export const checkUsername = async (req, res) => {
     });
   }
 };
+
+export const savePublicKey = async (req, res) => {
+  try {
+    const { publicKey } = req.body;
+
+    if (!publicKey) {
+      return res.status(400).json({
+        message: "Public key is required",
+      });
+    }
+
+    const user = await User.findByIdAndUpdate(
+      req.user.id,
+      { publicKey },
+      { new: true }
+    );
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    return res.status(200).json({
+      message: "Public key saved successfully",
+    });
+  } catch (error) {
+    console.error("Save Public Key Error:", error);
+
+    return res.status(500).json({
+      message: "Failed to save public key",
+    });
+  }
+};
+
+export const getPublicKey = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const user = await User.findById(userId).select("publicKey");
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    if (!user.publicKey) {
+      return res.status(404).json({
+        message: "Public key not found",
+      });
+    }
+
+    return res.status(200).json({
+      publicKey: user.publicKey,
+    });
+  } catch (error) {
+    console.error("Get Public Key Error:", error);
+
+    return res.status(500).json({
+      message: "Failed to get public key",
+    });
+  }
+};

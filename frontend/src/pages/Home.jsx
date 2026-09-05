@@ -15,6 +15,14 @@ import PopupBackgroundpicker from "../components/popup/PopupBackgroundpicker.jsx
 import { ImageOff } from "lucide-react";
 
 import { Socket_usePresence } from "../socket.io-client/socketusePresence.js";
+
+import {
+  getOrCreateKeyPair,
+  arrayBufferToBase64,
+} from "../crypto/cryptoUtils.js";
+
+import { useSavePublicKey, useGetPublicKey } from "../hooks/useCrypto.js";
+
 function Home() {
   const userinfo = useSelector((state) => state.authinfoSlice.userinfo);
   const [isOpen, setIsOpen] = useState(false);
@@ -36,6 +44,53 @@ function Home() {
   const bgimg = backgrounds.imageUrl
     ? backgrounds.imageUrl
     : "https://i.pinimg.com/1200x/62/7e/3a/627e3aa8f4209d6cbcfcd831a30f935e.jpg";
+
+  const { mutateAsync: savePublicKey } = useSavePublicKey();
+
+  // const userBId = "6a6f174c0944b6b0532f658e";
+
+  // const {
+  //   data: userBPublicKey,
+  //   isLoading: isUserBKeyLoading,
+  //   error: userBKeyError,
+  // } = useGetPublicKey(userBId);
+
+  useEffect(() => {
+    if (!userinfo?.id) return;
+
+    async function setupE2EE() {
+      try {
+        // 1. Current logged-in user's key pair
+        const keyPair = await getOrCreateKeyPair(userinfo.id);
+
+        // 2. Public key ko export karo
+        const publicKeyBuffer = await crypto.subtle.exportKey(
+          "raw",
+          keyPair.publicKey,
+        );
+
+        // 3. Base64 me convert karo
+        const publicKeyBase64 = arrayBufferToBase64(publicKeyBuffer);
+
+        console.log("My Public Key:", publicKeyBase64);
+
+        // 4. Server par public key save karo
+        const response = await savePublicKey(publicKeyBase64);
+
+        console.log("Public Key Save Response:", response);
+      } catch (error) {
+        console.error("E2EE Setup Error:", error);
+      }
+    }
+
+    setupE2EE();
+  }, [userinfo?.id, savePublicKey]);
+
+  // useEffect(() => {
+  //   if (userBPublicKey) {
+  //     console.log("User B Public Key:", userBPublicKey);
+  //   }
+  // }, [userBPublicKey]);
 
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-[#07070700]">

@@ -20,6 +20,7 @@ import {
   useSendDirectMessage,
   usegetDirectMessages,
 } from "../../../hooks/chat/directMessage.hook.js";
+import { useGetPublicKey } from "../../../hooks/useCrypto.js"
 import { createSocket } from "../../../socket.io-client/socket.io-client.js";
 // Deterministic color per name, used only as an avatar fallback background
 const AVATAR_PALETTE = [
@@ -199,6 +200,18 @@ export default function ChatPage() {
   const [draft, setDraft] = useState("");
   const scrollRef = useRef(null);
   const contact = useSelector((state) => state.chat.userinfo);
+  const userBId = contact?._id;
+  const {
+  data: userBPublicKey,
+  isLoading: isUserBKeyLoading,
+  error: userBKeyError,
+} = useGetPublicKey(contact?._id);
+  useEffect(() => {
+    if (userBPublicKey) {
+      console.log("User B Public Key:", userBPublicKey);
+    }
+  }, [userBPublicKey]);
+
   const socket = useMemo(() => createSocket(), []);
   useEffect(() => {
     const handleMessageReceive = ({ message, senderId }) => {

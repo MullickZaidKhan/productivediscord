@@ -123,7 +123,7 @@ export const checkUsernamehook = (username) => {
 export const useAuthStatus = () => {
   const dispatch = useDispatch();
   const { data, isLoading, isError, isSuccess } = useAccessToken();
-  // console.log(data, "from useAuthStatus hook");
+  console.log(data, "from useAuthStatus hook");
   useEffect(() => {
     if (isSuccess) dispatch(setLoggedIn(data));
     if (isError) dispatch(setLoggedOut());
