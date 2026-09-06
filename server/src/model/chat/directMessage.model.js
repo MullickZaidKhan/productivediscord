@@ -14,10 +14,14 @@ const directMessageSchema = new mongoose.Schema(
       required: true,
     },
 
-    text: {
+    encryptedText: {
       type: String,
-      trim: true,
-      default: "",
+      default: null,
+    },
+
+    iv: {
+      type: String,
+      default: null,
     },
 
     image: {

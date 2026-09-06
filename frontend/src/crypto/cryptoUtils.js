@@ -142,3 +142,18 @@ export function base64ToUint8Array(base64) {
 
   return Uint8Array.from(binary, (char) => char.charCodeAt(0));
 }
+
+export async function createSharedKey(userId, otherPublicKeyBase64) {
+  const myKeyPair = await getOrCreateKeyPair(userId);
+
+  const otherPublicKey = await ImportPublicKey(
+    otherPublicKeyBase64
+  );
+
+  const sharedKey = await deriveSharedKey(
+    myKeyPair.privateKey,
+    otherPublicKey
+  );
+
+  return sharedKey;
+}

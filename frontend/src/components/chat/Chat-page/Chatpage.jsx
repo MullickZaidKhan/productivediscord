@@ -20,7 +20,15 @@ import {
   useSendDirectMessage,
   usegetDirectMessages,
 } from "../../../hooks/chat/directMessage.hook.js";
-import { useGetPublicKey } from "../../../hooks/useCrypto.js"
+import { useGetPublicKey } from "../../../hooks/useCrypto.js";
+import {
+  createSharedKey,
+  encryptMessage,
+  decryptMessage,
+  base64ToUint8Array,
+  arrayBufferToBase64,
+  uint8ArrayToBase64,
+} from "../../../crypto/cryptoUtils.js";
 import { createSocket } from "../../../socket.io-client/socket.io-client.js";
 // Deterministic color per name, used only as an avatar fallback background
 const AVATAR_PALETTE = [
@@ -198,52 +206,107 @@ export default function ChatPage() {
   const typingTimeoutRef = useRef(null);
   const [headerIn, setHeaderIn] = useState(false);
   const [draft, setDraft] = useState("");
+  const [decryptedMessages, setDecryptedMessages] = useState([]);
+  const [isSharedKeyReady, setIsSharedKeyReady] = useState(false);
   const scrollRef = useRef(null);
+
   const contact = useSelector((state) => state.chat.userinfo);
+
+  const currentUser = useSelector((state) => state.authinfoSlice.userinfo);
   const userBId = contact?._id;
+  const sharedKeyRef = useRef(null);
   const {
-  data: userBPublicKey,
-  isLoading: isUserBKeyLoading,
-  error: userBKeyError,
-} = useGetPublicKey(contact?._id);
+    data: userBPublicKey,
+    isLoading: isUserBKeyLoading,
+    error: userBKeyError,
+  } = useGetPublicKey(contact?._id);
   useEffect(() => {
     if (userBPublicKey) {
       console.log("User B Public Key:", userBPublicKey);
     }
   }, [userBPublicKey]);
 
+  useEffect(() => {
+    if (!currentUser?.id || !contact?._id || !userBPublicKey?.publicKey) {
+      return;
+    }
+
+    const setupSharedKey = async () => {
+      try {
+        const sharedKey = await createSharedKey(
+          currentUser.id,
+          userBPublicKey.publicKey,
+        );
+
+        sharedKeyRef.current = sharedKey;
+        setIsSharedKeyReady(true);
+
+        console.log("🔐 Shared Key Ready:", sharedKey);
+      } catch (error) {
+        console.error("❌ Failed to create shared key:", error);
+        sharedKeyRef.current = null;
+        setIsSharedKeyReady(false);
+      }
+    };
+
+    setupSharedKey();
+  }, [currentUser?.id, contact?._id, userBPublicKey]);
+
   const socket = useMemo(() => createSocket(), []);
   useEffect(() => {
-    const handleMessageReceive = ({ message, senderId }) => {
-      // console.log(
-      //   String(senderId) !== String(contact?._id),
-      //   "socket check the chat",
-      // );
-
-      // console.log("📩 MESSAGE RECEIVED:", message);
-      // console.log("🕐 createdAt:", message?.createdAt);
-
+    const handleMessageReceive = async ({ message, senderId }) => {
       if (String(senderId) !== String(contact?._id)) {
         console.log("⛔ Message belongs to another conversation");
         return;
       }
 
-      queryClient.setQueryData(
-        ["directMessages", contact?._id],
-        (previousDataofchat) => {
-          if (Array.isArray(previousDataofchat?.data?.data)) {
-            return {
-              ...previousDataofchat,
-              data: {
-                ...previousDataofchat.data,
-                data: [...previousDataofchat.data.data, message],
-              },
-            };
+      try {
+        let decryptedMessage = message;
+
+        // E2EE message
+        if (message.encryptedText && message.iv) {
+          if (!sharedKeyRef.current) {
+            console.error("❌ Shared key is not ready");
+            return;
           }
 
-          return previousDataofchat;
-        },
-      );
+          const encryptedBytes = base64ToUint8Array(message.encryptedText);
+
+          const ivBytes = base64ToUint8Array(message.iv);
+
+          const text = await decryptMessage(
+            encryptedBytes.buffer,
+            ivBytes,
+            sharedKeyRef.current,
+          );
+
+          decryptedMessage = {
+            ...message,
+            text,
+          };
+
+          console.log("🔓 Socket Message Decrypted:", decryptedMessage);
+        }
+
+        queryClient.setQueryData(
+          ["directMessages", contact?._id],
+          (previousDataofchat) => {
+            if (Array.isArray(previousDataofchat?.data?.data)) {
+              return {
+                ...previousDataofchat,
+                data: {
+                  ...previousDataofchat.data,
+                  data: [...previousDataofchat.data.data, decryptedMessage],
+                },
+              };
+            }
+
+            return previousDataofchat;
+          },
+        );
+      } catch (error) {
+        console.error("❌ Socket Message Decryption Error:", error);
+      }
     };
 
     socket.on("message:receive", handleMessageReceive);
@@ -255,7 +318,6 @@ export default function ChatPage() {
 
   // Adjust this selector to match wherever the logged-in user is stored in your auth slice.
 
-  const currentUser = useSelector((state) => state.authinfoSlice.userinfo);
   useEffect(() => {
     const handleTypingStart = ({ userId }) => {
       // console.log("⌨️ TYPING START RECEIVED:", userId);
@@ -306,13 +368,60 @@ export default function ChatPage() {
       return messagesResponse.data.data;
     return [];
   }, [messagesResponse]);
+  // 👇 ADD DECRYPTION HERE
+  useEffect(() => {
+    if (!messages.length || !sharedKeyRef.current) {
+      return;
+    }
 
+    const decryptMessages = async () => {
+      try {
+        const decrypted = await Promise.all(
+          messages.map(async (message) => {
+            // Old plaintext message
+            if (!message.encryptedText || !message.iv) {
+              return {
+                ...message,
+                text: message.text || "",
+              };
+            }
+
+            const encryptedBytes = base64ToUint8Array(message.encryptedText);
+
+            const ivBytes = base64ToUint8Array(message.iv);
+
+            const text = await decryptMessage(
+              encryptedBytes.buffer,
+              ivBytes,
+              sharedKeyRef.current,
+            );
+
+            // Replace encrypted message with plaintext
+            return {
+              ...message,
+              text: text,
+            };
+          }),
+        );
+
+        setDecryptedMessages(decrypted);
+
+        console.log("🔓 Decrypted Messages:", decrypted);
+      } catch (error) {
+        console.error("❌ Message Decryption Error:", error);
+      }
+    };
+
+    decryptMessages();
+  }, [messages,isSharedKeyReady
+    
+  ]);
   const sortedMessages = useMemo(
     () =>
-      [...messages].sort(
+      [...decryptedMessages].sort(
         (a, b) => new Date(a.createdAt) - new Date(b.createdAt),
       ),
-    [messages],
+    [decryptedMessages],
   );
 
   const groupedMessages = useMemo(
@@ -341,21 +450,62 @@ export default function ChatPage() {
     );
   }
 
-  const handleSend = () => {
+  // const handleSend = () => {
+  //   const text = draft.trim();
+  //   if (!text || isSending) return;
+
+  //   sendDirectMessage(
+  //     { receiver: contact._id, text },
+  //     {
+  //       onSuccess: () => {
+  //         setDraft("");
+  //         queryClient.invalidateQueries({
+  //           queryKey: ["directMessages", contact._id],
+  //         });
+  //       },
+  //     },
+  //   );
+  // };
+  const handleSend = async () => {
     const text = draft.trim();
+
     if (!text || isSending) return;
 
-    sendDirectMessage(
-      { receiver: contact._id, text },
-      {
-        onSuccess: () => {
-          setDraft("");
-          queryClient.invalidateQueries({
-            queryKey: ["directMessages", contact._id],
-          });
+    if (!sharedKeyRef.current) {
+      console.error("❌ Shared key is not ready");
+      return;
+    }
+
+    try {
+      const { encrypted, iv } = await encryptMessage(
+        text,
+        sharedKeyRef.current,
+      );
+      const encryptedBase64 = arrayBufferToBase64(encrypted);
+      const ivBase64 = uint8ArrayToBase64(iv);
+      sendDirectMessage(
+        {
+          receiver: contact._id,
+          encryptedText: encryptedBase64,
+          iv: ivBase64,
         },
-      },
-    );
+        {
+          onSuccess: () => {
+            setDraft("");
+
+            queryClient.invalidateQueries({
+              queryKey: ["directMessages", contact._id],
+            });
+          },
+        },
+      );
+      console.log("🔐 Ciphertext Base64:", encryptedBase64);
+      console.log("🔑 IV Base64:", ivBase64);
+      console.log("🔐 Encrypted Message:", encrypted);
+      console.log("🔑 IV:", iv);
+    } catch (error) {
+      console.error("❌ Message Encryption Error:", error);
+    }
   };
   const handleTyping = (e) => {
     const value = e.target.value;

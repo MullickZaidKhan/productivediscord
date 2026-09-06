@@ -6,14 +6,13 @@ import { getIO } from "../../Socket.IO/socket.js";
 export const SenddirectMessage = async (req, res) => {
   const io = getIO();
   try {
-    const { receiver, text, replyTo } = req.body;
+    const { receiver, encryptedText, iv, replyTo } = req.body;
     console.log(req.body);
     // Validation
     if (!receiver) {
       return res.status(400).json({ message: "Receiver is required" });
     }
-    const trimmedText = text?.trim() || "";
-    if (!trimmedText && !req.file) {
+    if (!encryptedText && !req.file) {
       return res.status(400).json({ message: "Message cannot be empty" });
     }
     const userId = req.user.id;
@@ -31,13 +30,14 @@ export const SenddirectMessage = async (req, res) => {
     const directMessageinchat = await directMessage.create({
       sender: userId,
       receiver,
-      text: trimmedText,
+      encryptedText,
+      iv,
       image,
       replyTo: replyTo || null,
       edited: false,
       editedAt: null,
     });
-    mainchat(io,receiver,directMessageinchat)
+    mainchat(io, receiver, directMessageinchat);
     // 4️⃣ Send response immediately
     res.status(201).json({
       message: "Message sent successfully",
@@ -81,7 +81,7 @@ export const getdirectMessage = async (req, res) => {
         .find(query)
 
         .select(
-          "_id sender receiver text image seen createdAt replyTo editedAt edited",
+          "_id sender receiver encryptedText iv text image seen createdAt replyTo editedAt edited",
         )
         .populate({
           path: "replyTo",
