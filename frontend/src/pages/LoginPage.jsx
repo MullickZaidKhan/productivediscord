@@ -10,7 +10,7 @@ import { useNavigate } from "react-router-dom";
 import { useAccessToken } from "../hooks/useAuth.js";
 import { motion } from "framer-motion";
 import { staggerContainer, fadeInUp } from "../components/ui/motion.js";
-
+import { getDeviceId } from "../lib/device.js";
 const LoginPage = () => {
   const {
     register,
@@ -25,8 +25,12 @@ const LoginPage = () => {
 
   const onSubmit = (formData) => {
     setLoginError("");
-
-    loginMutation.mutate(formData, {
+      const deviceId = getDeviceId();
+      const loginData = {
+    ...formData,
+    deviceId,
+  };
+    loginMutation.mutate(loginData, {
       onSuccess: ({ data }) => {
         navigate("/");
       },

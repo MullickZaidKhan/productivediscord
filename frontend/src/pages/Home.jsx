@@ -111,7 +111,7 @@ function Home() {
 
         {/* Bottom User Panel */}
         <div className="shrink-0 px-2 py-2 sm:px-3 absolute bottom-5 left-3">
-          {/* <UserPanel userinfo={userinfo} setIsOpen={setIsOpen} /> */}
+          <UserPanel userinfo={userinfo} setIsOpen={setIsOpen} />
           <AnimatePresence>
             {isOpen && (
               <motion.div

@@ -55,7 +55,7 @@ export async function deriveSharedKey(privateKey, otherPublicKey) {
     privateKey,
     { name: "AES-GCM", length: 256 },
     true,
-    ["encrypt", "decrypt"]
+    ["encrypt", "decrypt"],
   );
   return sharedKey;
 }
@@ -63,9 +63,7 @@ export async function deriveSharedKey(privateKey, otherPublicKey) {
 export async function encryptMessage(message, sharedKey) {
   const encoder = new TextEncoder();
 
-  const iv = window.crypto.getRandomValues(
-    new Uint8Array(12)
-  );
+  const iv = window.crypto.getRandomValues(new Uint8Array(12));
 
   const encrypted = await window.crypto.subtle.encrypt(
     {
@@ -73,7 +71,7 @@ export async function encryptMessage(message, sharedKey) {
       iv: iv,
     },
     sharedKey,
-    encoder.encode(message)
+    encoder.encode(message),
   );
 
   return {
@@ -89,7 +87,7 @@ export async function decryptMessage(encrypted, iv, sharedKey) {
       iv: iv,
     },
     sharedKey,
-    encrypted
+    encrypted,
   );
 
   const decoder = new TextDecoder();
@@ -98,6 +96,9 @@ export async function decryptMessage(encrypted, iv, sharedKey) {
 }
 
 export async function getOrCreateKeyPair(userId) {
+  if (!userId) {
+    throw new Error("Cannot create crypto key pair: userId is missing");
+  }
   const existingKeyPair = await getKeyPair(userId);
 
   if (existingKeyPair) {
@@ -136,7 +137,6 @@ export function uint8ArrayToBase64(array) {
   return arrayBufferToBase64(array.buffer);
 }
 
-
 export function base64ToUint8Array(base64) {
   const binary = atob(base64);
 
@@ -146,14 +146,9 @@ export function base64ToUint8Array(base64) {
 export async function createSharedKey(userId, otherPublicKeyBase64) {
   const myKeyPair = await getOrCreateKeyPair(userId);
 
-  const otherPublicKey = await ImportPublicKey(
-    otherPublicKeyBase64
-  );
+  const otherPublicKey = await ImportPublicKey(otherPublicKeyBase64);
 
-  const sharedKey = await deriveSharedKey(
-    myKeyPair.privateKey,
-    otherPublicKey
-  );
+  const sharedKey = await deriveSharedKey(myKeyPair.privateKey, otherPublicKey);
 
   return sharedKey;
 }

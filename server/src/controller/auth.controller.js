@@ -1,6 +1,10 @@
 import { User } from "../model/auth.model.js";
 import { Session } from "../model/session.model.js";
 import bcrypt from "bcrypt";
+import {
+  getBrowserName,
+  getOSName,
+} from "../utils/device.js";
 import jwt from "jsonwebtoken";
 import cookies from "cookie-parser";
 // import {uploadToImageKit } from "../config/imgkit/image.service.js"
@@ -119,32 +123,120 @@ export const register = async (req, res) => {
   }
 };
 
+// export const login = async (req, res) => {
+//   const { email, password } = req.body;
+
+//   try {
+//     if (!email || !password) {
+//       return res.status(400).json({
+//         success: false,
+//         message: "all Field is required",
+//       });
+//     }
+
+//     // * check user exist or not
+//     const existUser = await User.findOne({
+//       email,
+//     }).select("+password");
+
+//     // * if user not exists
+//     // User not found
+//     if (!existUser) {
+//       return res.status(404).json({
+//         success: false,
+//         message: "Account not found. Please sign up.",
+//       });
+//     }
+//     console.log(existUser);
+//     const isRightPassword = await bcrypt.compare(password, existUser.password);
+
+//     if (!isRightPassword) {
+//       return res.status(401).json({
+//         success: false,
+//         message: "Wrong Credentials",
+//       });
+//     }
+
+//     const payload = {
+//       id: existUser._id,
+//       username: existUser.username,
+//       name: existUser.name,
+//       email: existUser.email,
+//       profileimg: existUser.profileimg,
+//     };
+
+//     const refreshToken = signRefreshToken(payload);
+
+//     await Session.deleteOne({ userId: existUser._id });
+
+//     const session = await Session.create({
+//       userId: existUser._id,
+//       refreshToken: hashToken(refreshToken),
+//       verify: true,
+//       expiryDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
+//     });
+
+//     // * accessToken generated
+//     const accessToken = signAccessToken(payload);
+
+//     setAuthCookies(res, accessToken, refreshToken);
+
+//     return res.status(200).json({
+//       success: true,
+//       message: "User Logged In",
+//       payloadtofrontend: payload,
+//     });
+//   } catch (err) {
+//     console.log(err);
+//     return res.status(500).json({
+//       success: false,
+//       message: "internal server error",
+//     });
+//   }
+// };
 export const login = async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, deviceId } = req.body;
 
   try {
+    // -----------------------------
+    // 1. Validate input
+    // -----------------------------
+
     if (!email || !password) {
       return res.status(400).json({
         success: false,
-        message: "all Field is required",
+        message: "All fields are required",
       });
     }
 
-    // * check user exist or not
-    const existUser = await User.findOne({
-      email,
-    }).select("+password");
+    if (!deviceId) {
+      return res.status(400).json({
+        success: false,
+        message: "Device ID is required",
+      });
+    }
 
-    // * if user not exists
-    // User not found
+    // -----------------------------
+    // 2. Find user
+    // -----------------------------
+
+    const existUser = await User.findOne({ email }).select("+password");
+
     if (!existUser) {
       return res.status(404).json({
         success: false,
         message: "Account not found. Please sign up.",
       });
     }
-    console.log(existUser);
-    const isRightPassword = await bcrypt.compare(password, existUser.password);
+
+    // -----------------------------
+    // 3. Check password
+    // -----------------------------
+
+    const isRightPassword = await bcrypt.compare(
+      password,
+      existUser.password
+    );
 
     if (!isRightPassword) {
       return res.status(401).json({
@@ -152,6 +244,10 @@ export const login = async (req, res) => {
         message: "Wrong Credentials",
       });
     }
+
+    // -----------------------------
+    // 4. JWT payload
+    // -----------------------------
 
     const payload = {
       id: existUser._id,
@@ -161,44 +257,160 @@ export const login = async (req, res) => {
       profileimg: existUser.profileimg,
     };
 
+    // -----------------------------
+    // 5. Create tokens
+    // -----------------------------
+
     const refreshToken = signRefreshToken(payload);
-
-    await Session.deleteOne({ userId: existUser._id });
-
-    const session = await Session.create({
-      userId: existUser._id,
-      refreshToken: hashToken(refreshToken),
-      verify: true,
-      expiryDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
-    });
-
-    // * accessToken generated
     const accessToken = signAccessToken(payload);
 
-    setAuthCookies(res, accessToken, refreshToken);
+    // -----------------------------
+    // 6. Get device information
+    // -----------------------------
+
+    const userAgent =
+      req.headers["user-agent"] || "Unknown";
+
+    const browser = getBrowserName(userAgent);
+
+    const os = getOSName(userAgent);
+
+    const ipAddress =
+      req.headers["x-forwarded-for"]
+        ?.split(",")[0]
+        ?.trim() ||
+      req.socket.remoteAddress ||
+      req.ip ||
+      null;
+
+    // -----------------------------
+    // 7. Session expiry
+    // -----------------------------
+
+    const expiryDate = new Date(
+      Date.now() + 7 * 24 * 60 * 60 * 1000
+    );
+
+    // -----------------------------
+    // 8. Check existing device
+    // -----------------------------
+
+    const existingSession = await Session.findOne({
+      userId: existUser._id,
+      deviceId,
+    });
+
+    // -----------------------------
+    // 9. Existing device
+    // -----------------------------
+
+    if (existingSession) {
+      existingSession.refreshToken =
+        hashToken(refreshToken);
+
+      existingSession.verify = true;
+
+      existingSession.expiryDate = expiryDate;
+
+      existingSession.browser = browser;
+
+      existingSession.os = os;
+
+      existingSession.ipAddress = ipAddress;
+
+      existingSession.userAgent = userAgent;
+
+      existingSession.lastActiveAt = new Date();
+
+      await existingSession.save();
+    }
+
+    // -----------------------------
+    // 10. New device
+    // -----------------------------
+
+    else {
+      await Session.create({
+        userId: existUser._id,
+
+        deviceId,
+
+        refreshToken: hashToken(refreshToken),
+
+        verify: true,
+
+        expiryDate,
+
+        browser,
+
+        os,
+
+        ipAddress,
+
+        userAgent,
+
+        lastActiveAt: new Date(),
+      });
+    }
+
+    // -----------------------------
+    // 11. Set authentication cookies
+    // -----------------------------
+
+    setAuthCookies(
+      res,
+      accessToken,
+      refreshToken
+    );
+
+    // -----------------------------
+    // 12. Response
+    // -----------------------------
 
     return res.status(200).json({
       success: true,
       message: "User Logged In",
+
       payloadtofrontend: payload,
     });
   } catch (err) {
-    console.log(err);
+    console.error("Login Error:", err);
+
     return res.status(500).json({
       success: false,
-      message: "internal server error",
+      message: "Internal server error",
     });
   }
 };
-
 export const logout = async (req, res) => {
-  await Session.deleteOne({ userId: req.user.id });
-  clearAuthCookies(res);
+  try {
+    const refreshToken = req.cookies?.refreshToken;
 
-  return res.status(200).json({
-    success: true,
-    message: "Logged Out Successfully.",
-  });
+    if (refreshToken) {
+      const hashedRefreshToken = hashToken(refreshToken);
+
+      await Session.deleteOne({
+        userId: req.user.id,
+        refreshToken: hashedRefreshToken,
+      });
+    }
+
+    clearAuthCookies(res);
+
+    return res.status(200).json({
+      success: true,
+      message: "Logged Out Successfully.",
+    });
+  } catch (error) {
+    console.error("Logout Error:", error);
+
+    clearAuthCookies(res);
+
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
 };
 
 export const refresh = async (req, res) => {
