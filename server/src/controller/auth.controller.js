@@ -605,3 +605,28 @@ export const getPublicKey = async (req, res) => {
     });
   }
 };
+
+export const getAllLoginDevices = async (req, res) => {
+  try {
+    const sessions = await Session.find({
+      userId: req.user.id,
+    })
+      .select("-refreshToken")
+      .sort({ createdAt: -1 })
+      .lean();
+
+    return res.status(200).json({
+      success: true,
+      count: sessions.length,
+      devices: sessions,
+    });
+  } catch (error) {
+    console.error("Get Login Devices Error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
+

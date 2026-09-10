@@ -22,3 +22,8 @@ export const refreshtoken = () =>
 
 export const checkUsername = (username) =>
     api.get(`auth/checkUsername/${username}`);
+
+
+export const getLoginDevices = () =>
+    api.get("auth/login-devices");
+

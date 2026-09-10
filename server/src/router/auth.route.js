@@ -7,6 +7,7 @@ import {
   checkUsername,
   savePublicKey,
   getPublicKey,
+  getAllLoginDevices,
 } from "../controller/auth.controller.js";
 import {
   verifyJwt,
@@ -20,6 +21,7 @@ authRoute.post("/register", upload.single("profileimg"), register);
 authRoute.post("/login", login);
 authRoute.post("/logout", verifyJwt, logout);
 authRoute.post("/public-key", verifyJwt, savePublicKey);
+authRoute.get( "/login-devices", verifyJwt, getAllLoginDevices );
 authRoute.get("/public-key/:userId", verifyJwt, getPublicKey);
 //All the get
 authRoute.get("/refresh", refresh);

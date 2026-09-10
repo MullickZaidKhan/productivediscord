@@ -30,6 +30,7 @@ import EditModal from "./EditModal";
 import { useLogout } from "../../hooks/useAuth.js";
 import Backgroundpicker from "../../pages/Backgroundpicker.jsx"
 import { setLoggedOut } from "../../redux/authSlice.js";
+import LoginDevices from "./LoginDevices.jsx"
 import {
   createSocket,
   getSocket,
@@ -275,7 +276,7 @@ const onLogout = () => {
             {/* Profile header */}
             <div
               className="flex items-center gap-2.5 px-2.5 mb-4"
-              onClick={() => {
+              onClick={() => { 
                 dispatch(closeAccountSettings());
                 dispatch(openProfilePageSettings());
               }}
@@ -469,7 +470,13 @@ const onLogout = () => {
                 < Backgroundpicker />
                 </div>
               )}
-              {activeKey !== "account" && activeKey !== "theme" && (
+         {activeKey === "privacy" && (
+  <div className="h-full w-full">
+    <LoginDevices />
+  </div>
+)}
+              {activeKey !== "account" && activeKey !== "privacy" &&
+  activeKey !== "theme" && (
                 <div className="flex flex-col items-center justify-center h-[60vh] text-[#949ba4] text-center">
                   <div className="text-white text-xl font-semibold mb-2">
                     {activeLabel}

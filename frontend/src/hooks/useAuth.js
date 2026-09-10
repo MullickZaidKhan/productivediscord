@@ -7,6 +7,7 @@ import {
   refreshtoken,
   checkUsername,
   logout,
+  getLoginDevices,
 } from "../api/Auth.api.js";
 // import { AuthContext } from "../context/auth.context.jsx";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -132,4 +133,8 @@ export const useAuthStatus = () => {
   if (isLoading) return "loading";
   if (isError || !data) return "unauthenticated";
   return "authenticated";
+};
+
+export const useLoginDevices = () => {
+  return useQuery({ queryKey: ["loginDevices"], queryFn: getLoginDevices });
 };
