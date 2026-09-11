@@ -33,7 +33,7 @@
 <br/>
 
 <div align="center">
-<img src="https://capsule-render.vercel.app/api?type=venom&color=0:5865F2,100:23272A&height=100&section=header&text=Tech%20Stack&fontSize=32&fontColor=ffffff&animation=twinkling&fontAlignY=55" width="100%"/>
+<img src="https://capsule-render.vercel.app/api?type=rect&color=0:5865F2,100:23272A&height=100&section=header&text=Tech%20Stack&fontSize=32&fontColor=ffffff&animation=twinkling&fontAlignY=55" width="100%"/>
 </div>
 
 ## 🛠️ Tech Stack
@@ -86,7 +86,7 @@ Image hosting and on-the-fly optimization for uploads.
 <br/>
 
 <div align="center">
-<img src="https://capsule-render.vercel.app/api?type=venom&color=0:23272A,100:5865F2&height=100&section=header&text=End-to-End%20Encryption&fontSize=28&fontColor=ffffff&animation=twinkling&fontAlignY=55" width="100%"/>
+<img src="https://capsule-render.vercel.app/api?type=rect&color=0:23272A,100:5865F2&height=100&section=header&text=End-to-End%20Encryption&fontSize=28&fontColor=ffffff&animation=twinkling&fontAlignY=55" width="100%"/>
 </div>
 
 ## 🔐 End-to-End Encryption
@@ -142,7 +142,7 @@ sequenceDiagram
 <br/>
 
 <div align="center">
-<img src="https://capsule-render.vercel.app/api?type=venom&color=0:5865F2,100:23272A&height=100&section=header&text=Real-Time%20Communication&fontSize=28&fontColor=ffffff&animation=twinkling&fontAlignY=55" width="100%"/>
+<img src="https://capsule-render.vercel.app/api?type=rect&color=0:5865F2,100:23272A&height=100&section=header&text=Real-Time%20Communication&fontSize=28&fontColor=ffffff&animation=twinkling&fontAlignY=55" width="100%"/>
 </div>
 
 ## ⚡ Real-Time Communication
@@ -188,7 +188,7 @@ A single user can stay online across multiple tabs/devices simultaneously.
 <br/>
 
 <div align="center">
-<img src="https://capsule-render.vercel.app/api?type=venom&color=0:23272A,100:5865F2&height=100&section=header&text=Features&fontSize=32&fontColor=ffffff&animation=twinkling&fontAlignY=55" width="100%"/>
+<img src="https://capsule-render.vercel.app/api?type=rect&color=0:23272A,100:5865F2&height=100&section=header&text=Features&fontSize=32&fontColor=ffffff&animation=twinkling&fontAlignY=55" width="100%"/>
 </div>
 
 ## ✨ Features
@@ -211,7 +211,7 @@ A single user can stay online across multiple tabs/devices simultaneously.
 <br/>
 
 <div align="center">
-<img src="https://capsule-render.vercel.app/api?type=venom&color=0:5865F2,100:23272A&height=100&section=header&text=Architecture&fontSize=32&fontColor=ffffff&animation=twinkling&fontAlignY=55" width="100%"/>
+<img src="https://capsule-render.vercel.app/api?type=rect&color=0:5865F2,100:23272A&height=100&section=header&text=Architecture&fontSize=32&fontColor=ffffff&animation=twinkling&fontAlignY=55" width="100%"/>
 </div>
 
 ## 🏗️ Architecture
@@ -245,7 +245,7 @@ flowchart TD
 <br/>
 
 <div align="center">
-<img src="https://capsule-render.vercel.app/api?type=venom&color=0:23272A,100:5865F2&height=100&section=header&text=Screenshots&fontSize=32&fontColor=ffffff&animation=twinkling&fontAlignY=55" width="100%"/>
+<img src="https://capsule-render.vercel.app/api?type=rect&color=0:23272A,100:5865F2&height=100&section=header&text=Screenshots&fontSize=32&fontColor=ffffff&animation=twinkling&fontAlignY=55" width="100%"/>
 </div>
 
 ## 📸 Screenshots
@@ -259,7 +259,7 @@ flowchart TD
 <br/>
 
 <div align="center">
-<img src="https://capsule-render.vercel.app/api?type=venom&color=0:5865F2,100:23272A&height=100&section=header&text=Getting%20Started&fontSize=32&fontColor=ffffff&animation=twinkling&fontAlignY=55" width="100%"/>
+<img src="https://capsule-render.vercel.app/api?type=rect&color=0:5865F2,100:23272A&height=100&section=header&text=Getting%20Started&fontSize=32&fontColor=ffffff&animation=twinkling&fontAlignY=55" width="100%"/>
 </div>
 
 ## 🚀 Getting Started
@@ -306,7 +306,7 @@ npm run dev
 <br/>
 
 <div align="center">
-<img src="https://capsule-render.vercel.app/api?type=venom&color=0:23272A,100:5865F2&height=100&section=header&text=What%20I%20Learned&fontSize=28&fontColor=ffffff&animation=twinkling&fontAlignY=55" width="100%"/>
+<img src="https://capsule-render.vercel.app/api?type=rect&color=0:23272A,100:5865F2&height=100&section=header&text=What%20I%20Learned&fontSize=28&fontColor=ffffff&animation=twinkling&fontAlignY=55" width="100%"/>
 </div>
 
 ## 🧠 What I Learned
