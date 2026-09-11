@@ -1,41 +1,40 @@
 <div align="center">
 
-<img src="https://readme-typing-svg.demolab.com?font=Fira+Code&size=32&pause=1000&color=5865F2&center=true&vCenter=true&width=600&lines=Discord+Clone+%F0%9F%92%AC;Real-Time+Chat+Application;Built+with+the+MERN+Stack;End-to-End+Encrypted+%F0%9F%94%90" alt="Typing SVG" />
+<img src="https://capsule-render.vercel.app/api?type=waving&color=0:5865F2,100:23272A&height=220&section=header&text=Discord%20Clone&fontSize=60&fontColor=ffffff&animation=fadeIn&fontAlignY=35&desc=Real-Time%20%E2%80%A2%20Encrypted%20%E2%80%A2%20MERN-Powered&descAlignY=55&descSize=18" width="100%"/>
+
+<img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=600&size=26&duration=2500&pause=800&color=99AAB5&center=true&vCenter=true&width=650&lines=%2400+Server+Never+Sees+Plaintext;%2400+End-to-End+Encrypted+with+ECDH+%2B+AES-GCM;%2400+Powered+by+Socket.IO+%E2%9A%A1;%2400+Built+with+the+MERN+Stack" alt="Typing SVG" />
+
+<br/><br/>
+
+![Status](https://img.shields.io/badge/🟢_Status-Online-43B581?style=for-the-badge&labelColor=23272A)
+![License](https://img.shields.io/badge/License-MIT-5865F2?style=for-the-badge&labelColor=23272A)
+![Stars](https://img.shields.io/github/stars/Zaid/discord-clone?style=for-the-badge&color=5865F2&labelColor=23272A)
+![Last Commit](https://img.shields.io/github/last-commit/Zaid/discord-clone?style=for-the-badge&color=5865F2&labelColor=23272A)
 
 <br/>
 
-![MongoDB](https://img.shields.io/badge/MongoDB-47A248?style=for-the-badge&logo=mongodb&logoColor=white)
-![Express.js](https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white)
-![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
-![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=node.js&logoColor=white)
-![Socket.IO](https://img.shields.io/badge/Socket.IO-010101?style=for-the-badge&logo=socket.io&logoColor=white)
-![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)
-![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
+<img src="https://skillicons.dev/icons?i=react,vite,nodejs,express,mongodb,socketio,redux,tailwind,js&theme=dark" />
 
-<br/>
+<br/><br/>
 
-![Stars](https://img.shields.io/github/stars/Zaid/discord-clone?style=social)
-![Forks](https://img.shields.io/github/forks/Zaid/discord-clone?style=social)
-![Last Commit](https://img.shields.io/github/last-commit/Zaid/discord-clone?color=5865F2)
-![License](https://img.shields.io/badge/license-MIT-5865F2)
+**A real-time, Discord-inspired chat application** — built with the MERN stack, Socket.IO, and client-side end-to-end encryption.
 
-**A real-time, Discord-inspired chat application built with the MERN stack, Socket.IO, and client-side end-to-end encryption.**
-
-[Features](#-features) • [Tech Stack](#️-tech-stack) • [Encryption](#-end-to-end-encryption) • [Architecture](#️-architecture) • [Getting Started](#-getting-started)
+[✨ Features](#-features) • [🛠️ Tech Stack](#️-tech-stack) • [🔐 Encryption](#-end-to-end-encryption) • [🏗️ Architecture](#️-architecture) • [🚀 Getting Started](#-getting-started)
 
 </div>
 
-<br/>
-
----
+<img src="https://capsule-render.vercel.app/api?type=rect&color=0:23272A,100:23272A&height=2&section=header" width="100%"/>
 
 ## 📖 Overview
 
-This project is a learning-driven recreation of Discord's core chat experience — real-time messaging, presence tracking, and a modern responsive UI — with one twist: **messages are encrypted client-side** before they ever touch the server, using the same cryptographic primitives (ECDH + AES-GCM) that power production-grade secure messengers.
-
-> 💡 **Why this matters:** most "Discord clone" tutorials stop at Socket.IO events. This one goes further by making sure the server — and anyone who might compromise it — never sees plaintext messages.
+> 🟦 **This isn't just another Discord clone tutorial.**
+> Most stop at Socket.IO events. This one goes further — messages are encrypted **client-side** with ECDH + AES-GCM before they ever leave the browser, so the server (and anyone who compromises it) never sees plaintext.
 
 <br/>
+
+<div align="center">
+<img src="https://capsule-render.vercel.app/api?type=venom&color=0:5865F2,100:23272A&height=100&section=header&text=Tech%20Stack&fontSize=32&fontColor=ffffff&animation=twinkling&fontAlignY=55" width="100%"/>
+</div>
 
 ## 🛠️ Tech Stack
 
@@ -60,7 +59,7 @@ Manages global state — authentication, active conversation, online users.
 Handles API requests, caching, background refetching, and invalidation.
 
 **Framer Motion**
-Powers the UI's micro-interactions and transitions.
+Powers the UI's micro-interactions — hover states, message pop-ins, sidebar transitions.
 
 </td>
 <td>
@@ -86,6 +85,10 @@ Image hosting and on-the-fly optimization for uploads.
 
 <br/>
 
+<div align="center">
+<img src="https://capsule-render.vercel.app/api?type=venom&color=0:23272A,100:5865F2&height=100&section=header&text=End-to-End%20Encryption&fontSize=28&fontColor=ffffff&animation=twinkling&fontAlignY=55" width="100%"/>
+</div>
+
 ## 🔐 End-to-End Encryption
 
 <table width="100%">
@@ -93,7 +96,7 @@ Image hosting and on-the-fly optimization for uploads.
 <td width="33%" align="center">
 
 ### 🔑 ECDH
-Each client generates a public/private key pair locally — private keys never leave the device.
+Each client generates a public/private key pair locally — private keys **never** leave the device.
 
 </td>
 <td width="33%" align="center">
@@ -105,16 +108,17 @@ Messages are symmetrically encrypted *before* leaving the browser, using an auth
 <td width="33%" align="center">
 
 ### 🌐 Web Crypto API
-All key generation and encryption uses the browser's native, audited cryptographic APIs — no external crypto libraries.
+All key generation and encryption uses the browser's native, audited cryptographic APIs.
 
 </td>
 </tr>
 </table>
 
-### How a message travels
+### 🔄 How a message travels
 
 ```mermaid
 sequenceDiagram
+    autonumber
     participant A as 👤 User A
     participant S as 🖥️ Server / Socket.IO
     participant B as 👤 User B
@@ -122,8 +126,10 @@ sequenceDiagram
     Note over A: Private Key + User B Public Key
     A->>A: Derive ECDH Shared Secret
     A->>A: AES-GCM Encrypt message
-    A->>S: Send encrypted payload
+    A->>S: Emit encrypted payload
+    rect rgb(35, 39, 42)
     Note over S: 🚫 Server never sees plaintext
+    end
     S->>B: Forward encrypted payload
     Note over B: Private Key + User A Public Key
     B->>B: Derive same ECDH Shared Secret
@@ -135,6 +141,10 @@ sequenceDiagram
 
 <br/>
 
+<div align="center">
+<img src="https://capsule-render.vercel.app/api?type=venom&color=0:5865F2,100:23272A&height=100&section=header&text=Real-Time%20Communication&fontSize=28&fontColor=ffffff&animation=twinkling&fontAlignY=55" width="100%"/>
+</div>
+
 ## ⚡ Real-Time Communication
 
 <table width="100%">
@@ -142,7 +152,7 @@ sequenceDiagram
 <td width="33%" align="center">
 
 **🟢 Online Presence**
-Tracks connected users and broadcasts live status to their contacts.
+Tracks connected users and broadcasts live status to their contacts, Discord-style.
 
 </td>
 <td width="33%" align="center">
@@ -160,7 +170,26 @@ A single user can stay online across multiple tabs/devices simultaneously.
 </tr>
 </table>
 
+### 💬 What it looks like
+
+<div align="center">
+
+| | |
+|---|---|
+| **Zaid** &nbsp; <sub>Today at 10:41 AM</sub> | 🟢 |
+| hey, check out the new encryption flow 👀 | |
+| **Maya** &nbsp; <sub>Today at 10:42 AM</sub> | 🟢 |
+| whoa this is actually E2EE?? that's sick 🔥 | |
+| **Zaid** &nbsp; <sub>Today at 10:42 AM</sub> &nbsp; <sub>✓ seen</sub> | 🟢 |
+| yep — ECDH + AES-GCM, server never sees it | |
+
+</div>
+
 <br/>
+
+<div align="center">
+<img src="https://capsule-render.vercel.app/api?type=venom&color=0:23272A,100:5865F2&height=100&section=header&text=Features&fontSize=32&fontColor=ffffff&animation=twinkling&fontAlignY=55" width="100%"/>
+</div>
 
 ## ✨ Features
 
@@ -181,34 +210,23 @@ A single user can stay online across multiple tabs/devices simultaneously.
 
 <br/>
 
+<div align="center">
+<img src="https://capsule-render.vercel.app/api?type=venom&color=0:5865F2,100:23272A&height=100&section=header&text=Architecture&fontSize=32&fontColor=ffffff&animation=twinkling&fontAlignY=55" width="100%"/>
+</div>
+
 ## 🏗️ Architecture
 
-```
-                    ┌──────────────────┐
-                    │   React / Vite    │
-                    │     Frontend      │
-                    │  (🔐 E2EE happens  │
-                    │   here — Web      │
-                    │   Crypto API)     │
-                    └─────────┬─────────┘
-                              │
-               ┌──────────────┴──────────────┐
-               │                              │
-          REST API                      Socket.IO
-               │                              │
-               ▼                              ▼
-        ┌─────────────┐              ┌─────────────────┐
-        │   Express   │              │   Real-Time      │
-        │   Backend   │              │   Communication  │
-        └──────┬──────┘              └─────────────────┘
-               │
-               ▼
-        ┌─────────────┐
-        │   MongoDB   │
-        │   Database  │
-        │ (stores only│
-        │  ciphertext)│
-        └─────────────┘
+```mermaid
+flowchart TD
+    A["🎨 React / Vite Frontend<br/>🔐 E2EE happens here — Web Crypto API"] -->|REST API| B["🚂 Express Backend"]
+    A -->|Socket.IO| C["⚡ Real-Time Communication Layer"]
+    B --> D[("🍃 MongoDB<br/>stores ciphertext only")]
+    C -.->|presence + message relay| B
+
+    style A fill:#5865F2,stroke:#23272A,color:#fff
+    style B fill:#23272A,stroke:#5865F2,color:#fff
+    style C fill:#23272A,stroke:#5865F2,color:#fff
+    style D fill:#43B581,stroke:#23272A,color:#fff
 ```
 
 <details>
@@ -226,15 +244,23 @@ A single user can stay online across multiple tabs/devices simultaneously.
 
 <br/>
 
+<div align="center">
+<img src="https://capsule-render.vercel.app/api?type=venom&color=0:23272A,100:5865F2&height=100&section=header&text=Screenshots&fontSize=32&fontColor=ffffff&animation=twinkling&fontAlignY=55" width="100%"/>
+</div>
+
 ## 📸 Screenshots
 
 <div align="center">
-<img src="https://via.placeholder.com/800x450/2B2D31/5865F2?text=Add+Your+App+Screenshot+Here" alt="App screenshot placeholder" width="80%"/>
+<img src="https://via.placeholder.com/800x450/2B2D31/5865F2?text=Add+Your+App+Screenshot+or+GIF+Here" alt="App screenshot placeholder" width="80%"/>
 
-<sub>Replace this with an actual screenshot or a GIF of the app in action — animated demos convert much better than static images.</sub>
+<sub>Swap this for a real screenshot or, better, a short screen-recording GIF — a live demo sells "real-time" far better than a still image.</sub>
 </div>
 
 <br/>
+
+<div align="center">
+<img src="https://capsule-render.vercel.app/api?type=venom&color=0:5865F2,100:23272A&height=100&section=header&text=Getting%20Started&fontSize=32&fontColor=ffffff&animation=twinkling&fontAlignY=55" width="100%"/>
+</div>
 
 ## 🚀 Getting Started
 
@@ -258,7 +284,7 @@ npm install
 <details open>
 <summary><b>3️⃣ Configure environment variables</b></summary>
 
-Create a `.env` file in the root directory and add your configuration:
+Create a `.env` file in the root directory:
 
 ```env
 MONGO_URI=your_mongodb_connection_string
@@ -279,6 +305,10 @@ npm run dev
 
 <br/>
 
+<div align="center">
+<img src="https://capsule-render.vercel.app/api?type=venom&color=0:23272A,100:5865F2&height=100&section=header&text=What%20I%20Learned&fontSize=28&fontColor=ffffff&animation=twinkling&fontAlignY=55" width="100%"/>
+</div>
+
 ## 🧠 What I Learned
 
 Building this project involved working through:
@@ -290,49 +320,28 @@ Building this project involved working through:
 - Global state management with Redux Toolkit
 - Server-state caching with TanStack Query
 - MongoDB data modelling for chat applications
-- Client-side cryptography fundamentals
-- ECDH key exchange
-- AES-GCM authenticated encryption
+- Client-side cryptography fundamentals — ECDH key exchange, AES-GCM encryption
 - Responsive, Discord-style UI development
 - Real-time online presence systems
 
 <br/>
 
-## 📦 Built With
-
 <div align="center">
 
-| | | | |
-|:---:|:---:|:---:|:---:|
-| ⚛️ **React** | ⚡ **Vite** | 🟢 **Node.js** | 🚂 **Express** |
-| 🍃 **MongoDB** | 🔌 **Socket.IO** | 🔄 **Redux Toolkit** | 📡 **TanStack Query** |
-| 🎨 **Tailwind CSS** | ✨ **Framer Motion** | 🖼️ **ImageKit** | 🔐 **Web Crypto API** |
+<img src="https://capsule-render.vercel.app/api?type=waving&color=0:23272A,100:5865F2&height=200&section=footer"/>
 
-</div>
-
-<br/>
-
-## 👨‍💻 Developer
-
-<div align="center">
+### 👨‍💻 Developer
 
 **Zaid**
-
 Built as a learning project to understand how a modern real-time communication platform works from frontend to backend.
 
 [![GitHub](https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white)](#)
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](#)
 
-</div>
-
 <br/>
-
----
-
-<div align="center">
 
 ### ⭐ If you like this project, consider giving it a star!
 
-<img src="https://readme-typing-svg.demolab.com?font=Fira+Code&size=16&pause=1500&color=888888&center=true&vCenter=true&width=500&lines=Thanks+for+checking+out+the+project!+%F0%9F%92%9C" alt="Footer Typing SVG" />
+<img src="https://readme-typing-svg.demolab.com?font=Fira+Code&size=15&duration=3000&pause=1000&color=99AAB5&center=true&vCenter=true&width=500&lines=Thanks+for+checking+out+the+project!+%F0%9F%92%9C" alt="Footer Typing SVG" />
 
 </div>
