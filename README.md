@@ -251,7 +251,7 @@ flowchart TD
 ## 📸 Screenshots
 
 <div align="center">
-<img src="https://via.placeholder.com/800x450/2B2D31/5865F2?text=Add+Your+App+Screenshot+or+GIF+Here" alt="App screenshot placeholder" width="80%"/>
+<img src="https://ik.imagekit.io/w5wx4gdmoj/hth.png" width="80%"/>
 
 <sub>Swap this for a real screenshot or, better, a short screen-recording GIF — a live demo sells "real-time" far better than a still image.</sub>
 </div>
