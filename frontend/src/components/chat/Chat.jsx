@@ -1,18 +1,19 @@
-import React, { useState } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
-import Sidebar from './Sidebar';
-import FriendsList from './FriendsList';
-import ActiveNow from './ActiveNow';
-import { EASE } from '../ui/motion.js';
-import ChatPage from './Chat-page/Chatpage.jsx';
-import { useSelector, useDispatch } from 'react-redux'
-import { openChat, closeChat } from '../../redux/chat/Chatslice.js'
+import React, { useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import Sidebar from "./Sidebar";
+import FriendsList from "./FriendsList";
+import ActiveNow from "./ActiveNow";
+import { EASE } from "../ui/motion.js";
+import ChatPage from "./Chat-page/Chatpage.jsx";
+import { useSelector, useDispatch } from "react-redux";
+import { openChat, closeChat } from "../../redux/chat/Chatslice.js";
 
 function Chat() {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const dispatch = useDispatch();
   const Chatopen = useSelector((state) => state.chat?.chatopen ?? false);
-
+   let deviceId = localStorage.getItem("deviceId");
+  console.log("id deviceId",deviceId)
   const setChatopen = (value) => {
     if (value) dispatch(openChat());
     else dispatch(closeChat());
@@ -20,7 +21,6 @@ function Chat() {
 
   return (
     <div className="flex h-full min-h-0 bg-[#313338bb] font-sans relative overflow-hidden">
-
       {/* Mobile channel-list drawer */}
       <AnimatePresence>
         {mobileNavOpen && (
@@ -37,9 +37,9 @@ function Chat() {
             <motion.div
               key="drawer"
               className="fixed left-0 top-0 h-full z-50 md:hidden"
-              initial={{ x: '-100%' }}
+              initial={{ x: "-100%" }}
               animate={{ x: 0 }}
-              exit={{ x: '-100%' }}
+              exit={{ x: "-100%" }}
               transition={{ duration: 0.28, ease: EASE }}
             >
               <Sidebar onClose={() => setMobileNavOpen(false)} />
@@ -58,8 +58,13 @@ function Chat() {
 
       {/* Main Friends Area */}
 
-      {!Chatopen && (<FriendsList onOpenMenu={() => setMobileNavOpen(true)} setChatopen={setChatopen} />)}
-      {Chatopen && (<ChatPage setChatopen={setChatopen} />)}
+      {!Chatopen && (
+        <FriendsList
+          onOpenMenu={() => setMobileNavOpen(true)}
+          setChatopen={setChatopen}
+        />
+      )}
+      {Chatopen && <ChatPage setChatopen={setChatopen} />}
 
       {/* Vertical Divider */}
       <div className="w-px bg-[#232428] hidden lg:block"></div>

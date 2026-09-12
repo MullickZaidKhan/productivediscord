@@ -12,7 +12,8 @@ export default function UserPanel({ userinfo, setIsOpen }) {
   const dispatch = useDispatch();
   const displayName = userinfo?.name || "User";
   const handle = userinfo?.username || "User";
-  const profileImg =userinfo?.profileimg||
+  const profileImg =
+    userinfo?.profileimg ||
     "https://ik.imagekit.io/w5wx4gdmoj/discord_products/Frame%206.png?updatedAt=1786460933931";
   const statusText = "hi";
 
@@ -29,7 +30,7 @@ export default function UserPanel({ userinfo, setIsOpen }) {
             <div className="relative w-[72px] h-[72px]">
               {/* Animated Frame */}
               <img
-                src="https://cdn.discordapp.com/media/v1/collectibles-shop/1252404745977462836/animated"
+                src="https://cdn.discordapp.com/media/v1/collectibles-shop/1432550258126229565/animated"
                 alt=""
                 className="absolute -inset-3 top-[-17px] left-[-6px] w-[96px] h-[96px] object-contain pointer-events-none z-20"
               />
@@ -59,11 +60,10 @@ export default function UserPanel({ userinfo, setIsOpen }) {
 
           <div className="mt-4 space-y-0.5">
             <motion.button
-                 onClick={() => {
-                     setIsOpen(false);
-            dispatch(openProfilePageSettings());
-         
-          }}
+              onClick={() => {
+                setIsOpen(false);
+                dispatch(openProfilePageSettings());
+              }}
               whileHover={{ x: 2 }}
               whileTap={{ scale: 0.98 }}
               className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#232428] text-[#b5bac1] hover:text-white transition-colors text-sm"
