@@ -95,14 +95,14 @@ export async function decryptMessage(encrypted, iv, sharedKey) {
   return decoder.decode(decrypted);
 }
 
-export async function getOrCreateKeyPair(userId) {
-  if (!userId) {
-    throw new Error("Cannot create crypto key pair: userId is missing");
+export async function getOrCreateKeyPair(deviceId) {
+  if (!deviceId) {
+    throw new Error("Cannot create crypto key pair: deviceId is missing");
   }
-  const existingKeyPair = await getKeyPair(userId);
+  const existingKeyPair = await getKeyPair(deviceId);
 
   if (existingKeyPair) {
-    console.log(`${userId} Existing Key Pair Retrieved`);
+    console.log(`${deviceId} Existing Key Pair Retrieved`);
     return existingKeyPair;
   }
 
@@ -115,9 +115,9 @@ export async function getOrCreateKeyPair(userId) {
     ["deriveKey", "deriveBits"],
   );
 
-  await saveKeyPair(userId, keyPair);
+  await saveKeyPair(deviceId, keyPair);
 
-  console.log(`${userId} New Key Pair Generated and Saved`);
+  console.log(`${deviceId} New Key Pair Generated and Saved`);
 
   return keyPair;
 }
@@ -143,8 +143,8 @@ export function base64ToUint8Array(base64) {
   return Uint8Array.from(binary, (char) => char.charCodeAt(0));
 }
 
-export async function createSharedKey(userId, otherPublicKeyBase64) {
-  const myKeyPair = await getOrCreateKeyPair(userId);
+export async function createSharedKey(deviceId, otherPublicKeyBase64) {
+  const myKeyPair = await getOrCreateKeyPair(deviceId);
 
   const otherPublicKey = await ImportPublicKey(otherPublicKeyBase64);
 

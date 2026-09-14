@@ -579,8 +579,9 @@ export default function ChatPage() {
 
     const setupSharedKey = async () => {
       try {
+        let deviceId = localStorage.getItem("deviceId");
         const sharedKey = await createSharedKey(
-          currentUser.id,
+          deviceId,
           userBPublicKey.publicKey,
         );
 

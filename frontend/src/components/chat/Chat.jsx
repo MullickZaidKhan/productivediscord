@@ -12,8 +12,8 @@ function Chat() {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const dispatch = useDispatch();
   const Chatopen = useSelector((state) => state.chat?.chatopen ?? false);
-   let deviceId = localStorage.getItem("deviceId");
-  console.log("id deviceId",deviceId)
+  //  let deviceId = localStorage.getItem("deviceId");
+  // console.log("id deviceId",deviceId)
   const setChatopen = (value) => {
     if (value) dispatch(openChat());
     else dispatch(closeChat());

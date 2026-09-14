@@ -61,7 +61,9 @@ function Home() {
     async function setupE2EE() {
       try {
         // 1. Current logged-in user's key pair
-        const keyPair = await getOrCreateKeyPair(userinfo.id);
+         let deviceId = localStorage.getItem("deviceId");
+           console.log("id deviceId from home",deviceId)
+        const keyPair = await getOrCreateKeyPair(deviceId);
 
         // 2. Public key ko export karo
         const publicKeyBuffer = await crypto.subtle.exportKey(
