@@ -6,7 +6,7 @@ import {
   refresh,
   checkUsername,
   savePublicKey,
-  getPublicKey,
+  getPublicKeys,
   getAllLoginDevices,
 } from "../controller/auth.controller.js";
 import {
@@ -22,7 +22,7 @@ authRoute.post("/login", login);
 authRoute.post("/logout", verifyJwt, logout);
 authRoute.post("/public-key", verifyJwt, savePublicKey);
 authRoute.get( "/login-devices", verifyJwt, getAllLoginDevices );
-authRoute.get("/public-key/:userId", verifyJwt, getPublicKey);
+authRoute.get("/public-key/:userId", verifyJwt, getPublicKeys);
 //All the get
 authRoute.get("/refresh", refresh);
 authRoute.get("/accesstoken", accessTokenverifyJwt);

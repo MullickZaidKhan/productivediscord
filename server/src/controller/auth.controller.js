@@ -6,6 +6,7 @@ import {
   getOSName,
 } from "../utils/device.js";
 import jwt from "jsonwebtoken";
+import { UserDevice } from "../model/userDevice.model.js";
 import cookies from "cookie-parser";
 // import {uploadToImageKit } from "../config/imgkit/image.service.js"
 
@@ -544,64 +545,64 @@ export const checkUsername = async (req, res) => {
 
 export const savePublicKey = async (req, res) => {
   try {
-    const { publicKey } = req.body;
+    const { publicKey, deviceId, browser, os } = req.body;
 
-    if (!publicKey) {
+    if (!publicKey || !deviceId) {
       return res.status(400).json({
-        message: "Public key is required",
+        success: false,
+        message: "Public key and device ID are required.",
       });
     }
-
-    const user = await User.findByIdAndUpdate(
-      req.user.id,
-      { publicKey },
-      { new: true }
+    console.log("id deviceId from home", deviceId);
+    const userDevice = await UserDevice.findOneAndUpdate(
+      {
+        userId: req.user.id,
+        deviceId,
+      },
+      {
+        publicKey,
+        browser: browser || "Unknown",
+        os: os || "Unknown",
+        lastActiveAt: new Date(),
+      },
+      {
+        new: true,
+        upsert: true,
+      }
     );
 
-    if (!user) {
-      return res.status(404).json({
-        message: "User not found",
-      });
-    }
-
     return res.status(200).json({
-      message: "Public key saved successfully",
+      success: true,
+      message: "Public key saved successfully.",
+      device: userDevice,
     });
   } catch (error) {
     console.error("Save Public Key Error:", error);
 
     return res.status(500).json({
-      message: "Failed to save public key",
+      success: false,
+      message: "Internal server error",
     });
   }
 };
 
-export const getPublicKey = async (req, res) => {
+export const getPublicKeys = async (req, res) => {
   try {
     const { userId } = req.params;
 
-    const user = await User.findById(userId).select("publicKey");
-
-    if (!user) {
-      return res.status(404).json({
-        message: "User not found",
-      });
-    }
-
-    if (!user.publicKey) {
-      return res.status(404).json({
-        message: "Public key not found",
-      });
-    }
+    const devices = await UserDevice.find({ userId })
+      .select("deviceId publicKey browser os lastActiveAt");
 
     return res.status(200).json({
-      publicKey: user.publicKey,
+      success: true,
+      devices,
     });
   } catch (error) {
-    console.error("Get Public Key Error:", error);
+    console.error("Get Public Keys Error:", error);
 
     return res.status(500).json({
-      message: "Failed to get public key",
+      success: false,
+      message: "Internal server error",
     });
   }
 };

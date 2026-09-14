@@ -13,7 +13,7 @@ import Avatarpicker from "../components/popup/Avatarpicker.jsx";
 import PopupBackgroundpicker from "../components/popup/PopupBackgroundpicker.jsx";
 // import { SocketProvider } from "../context/SocketContext.jsx";
 import { ImageOff } from "lucide-react";
-
+import { getDeviceId } from "../lib/device";
 import { Socket_usePresence } from "../socket.io-client/socketusePresence.js";
 
 import {
@@ -61,8 +61,10 @@ function Home() {
     async function setupE2EE() {
       try {
         // 1. Current logged-in user's key pair
-         let deviceId = localStorage.getItem("deviceId");
-           console.log("id deviceId from home",deviceId)
+        // 1. Get this browser/device ID
+        const deviceId = getDeviceId();
+
+        console.log("Device ID type:", typeof deviceId);
         const keyPair = await getOrCreateKeyPair(deviceId);
 
         // 2. Public key ko export karo
@@ -77,7 +79,11 @@ function Home() {
         console.log("My Public Key:", publicKeyBase64);
 
         // 4. Server par public key save karo
-        const response = await savePublicKey(publicKeyBase64);
+        console.log("id deviceId from home", deviceId);
+        const response = await savePublicKey({
+          publicKey: publicKeyBase64,
+          deviceId,
+        });
 
         console.log("Public Key Save Response:", response);
       } catch (error) {

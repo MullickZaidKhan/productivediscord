@@ -10,10 +10,9 @@ export const useSavePublicKey = () => {
   });
 };
 
-export const useGetPublicKey = (userId) => {
-  return useQuery({
-    queryKey: ["publicKey", userId],
-    queryFn: () => getPublicKey(userId),
-    enabled: !!userId,
+export const useGetPublicKey = (userId, deviceId) =>
+  useQuery({
+    queryKey: ["publicKey", userId, deviceId],
+    queryFn: () => getPublicKey(userId, deviceId),
+    enabled: !!userId && !!deviceId,
   });
-};

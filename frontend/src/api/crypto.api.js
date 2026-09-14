@@ -1,8 +1,10 @@
 import { api } from "../api/axios";
 
-export const savePublicKey = async (publicKey) => {
+export const savePublicKey = async ({ publicKey, deviceId }) => {
+
   const response = await api.post("auth/public-key", {
     publicKey,
+    deviceId,
   });
 
   return response.data;
