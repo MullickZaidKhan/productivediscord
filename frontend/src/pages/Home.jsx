@@ -21,7 +21,7 @@ import {
   arrayBufferToBase64,
 } from "../crypto/cryptoUtils.js";
 
-import { useSavePublicKey, useGetPublicKey } from "../hooks/useCrypto.js";
+import { useSavePublicKey, useGetPublicKeys } from "../hooks/useCrypto.js";
 
 function Home() {
   const userinfo = useSelector((state) => state.authinfoSlice.userinfo);
