@@ -64,7 +64,7 @@ function Home() {
         // 1. Get this browser/device ID
         const deviceId = getDeviceId();
 
-        console.log("Device ID type:", typeof deviceId);
+       
         const keyPair = await getOrCreateKeyPair(deviceId);
 
         // 2. Public key ko export karo

@@ -6,7 +6,8 @@ import { getIO } from "../../Socket.IO/socket.js";
 export const SenddirectMessage = async (req, res) => {
   const io = getIO();
   try {
-    const { receiver, encryptedText, iv, replyTo } = req.body;
+    // const { receiver, encryptedText, iv, replyTo } = req.body;
+    const { receiver, encryptedText, iv, replyTo, deviceId } = req.body;
     console.log(req.body);
     // Validation
     if (!receiver) {
@@ -32,6 +33,7 @@ export const SenddirectMessage = async (req, res) => {
       receiver,
       encryptedText,
       iv,
+      deviceId,
       image,
       replyTo: replyTo || null,
       edited: false,
@@ -81,7 +83,7 @@ export const getdirectMessage = async (req, res) => {
         .find(query)
 
         .select(
-          "_id sender receiver encryptedText iv text image seen createdAt replyTo editedAt edited",
+          "_id sender receiver encryptedText iv text image seen createdAt replyTo editedAt edited deviceId",
         )
         .populate({
           path: "replyTo",

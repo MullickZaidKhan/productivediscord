@@ -23,7 +23,10 @@ const directMessageSchema = new mongoose.Schema(
       type: String,
       default: null,
     },
-
+      deviceId: {
+    type: String,
+    required: true,
+  },
     image: {
       type: String,
       default: "",

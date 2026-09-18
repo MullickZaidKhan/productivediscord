@@ -57,95 +57,56 @@ export default function ChatPage() {
     ? backgrounds.imageUrl
     : "https://i.pinimg.com/1200x/62/7e/3a/627e3aa8f4209d6cbcfcd831a30f935e.jpg";
   const deviceId = getDeviceId();
-  const { data: userBPublicKeys } = useGetPublicKeys(
-    contact?._id,
-
-  );
-    console.log("from api find userBPublicKeys:",userBPublicKeys)
+  console.log("🫠 My device ID: ", deviceId);
+  const { data: userBPublicKeys } = useGetPublicKeys(contact?._id);
+  // console.log("from api find userBPublicKeys:",userBPublicKeys)
   useEffect(() => {
     if (userBPublicKeys) {
       console.log("User B Public Key:", userBPublicKeys);
     }
   }, [userBPublicKeys]);
 
-  // useEffect(() => {
-  //   if (!currentUser?.id || !contact?._id || !userBPublicKeys?.publicKey) {
-  //     return;
-  //   }
+  useEffect(() => {
+    console.log("🔐 Shared key effect running");
+    console.log("Full public key response:", userBPublicKeys);
+    console.log("User B devices:", userBPublicKeys?.devices);
 
-  //   const setupSharedKey = async () => {
-  //     try {
-
-  //       const sharedKey = await createSharedKey(
-  //         deviceId,
-  //         userBPublicKeys.publicKey,
-  //       );
-
-  //       sharedKeysRef .current = sharedKey;
-  //       setIsSharedKeyReady(true);
-
-  //       console.log("🔐 Shared Key Ready:", sharedKey);
-  //     } catch (error) {
-  //       console.error("❌ Failed to create shared key:", error);
-  //       sharedKeysRef .current = null;
-  //       setIsSharedKeyReady(false);
-  //     }
-  //   };
-
-  //   setupSharedKey();
-  // }, [currentUser?.id, contact?._id, userBPublicKeys,deviceId,]);
- useEffect(() => {
-  console.log("🔐 Shared key effect running");
-  console.log("Full public key response:", userBPublicKeys);
-  console.log("User B devices:", userBPublicKeys?.devices);
-
-  if (
-    !currentUser?.id ||
-    !contact?._id ||
-    !userBPublicKeys?.devices?.length
-  ) {
-    console.log("⏳ Shared keys not ready yet");
-    return;
-  }
-
-  const setupSharedKeys = async () => {
-    try {
-      const keys = new Map();
-
-      for (const device of userBPublicKeys.devices) {
-        console.log("🔐 Creating key for:", device.deviceId);
-
-        const sharedKey = await createSharedKey(
-          deviceId,
-          device.publicKey
-        );
-
-        keys.set(device.deviceId, sharedKey);
-      }
-
-      sharedKeysRef.current = keys;
-
-      console.log(
-        "✅ Shared keys ready:",
-        sharedKeysRef.current.size
-      );
-
-      setIsSharedKeyReady(true);
-    } catch (error) {
-      console.error("❌ Failed to create shared keys:", error);
-
-      sharedKeysRef.current = new Map();
-      setIsSharedKeyReady(false);
+    if (
+      !currentUser?.id ||
+      !contact?._id ||
+      !userBPublicKeys?.devices?.length
+    ) {
+      console.log("⏳ Shared keys not ready yet");
+      return;
     }
-  };
 
-  setupSharedKeys();
-}, [
-  currentUser?.id,
-  contact?._id,
-  userBPublicKeys,
-  deviceId,
-]);
+    const setupSharedKeys = async () => {
+      try {
+        const keys = new Map();
+
+        for (const device of userBPublicKeys.devices) {
+          console.log("🔐 Creating key for:", device.deviceId);
+
+          const sharedKey = await createSharedKey(deviceId, device.publicKey);
+
+          keys.set(device.deviceId, sharedKey);
+        }
+
+        sharedKeysRef.current = keys;
+
+        console.log("✅ Shared keys ready:", sharedKeysRef.current.size);
+
+        setIsSharedKeyReady(true);
+      } catch (error) {
+        console.error("❌ Failed to create shared keys:", error);
+
+        sharedKeysRef.current = new Map();
+        setIsSharedKeyReady(false);
+      }
+    };
+
+    setupSharedKeys();
+  }, [currentUser?.id, contact?._id, userBPublicKeys, deviceId]);
   const socket = useMemo(() => createSocket(), []);
 
   useEffect(() => {
@@ -254,8 +215,83 @@ export default function ChatPage() {
     return [];
   }, [messagesResponse]);
 
+  // useEffect(() => {
+  //   if (!messages.length || !sharedKeysRef.current || sharedKeysRef.current.size === 0) {
+  //     console.log("a  problem ")
+  //     return;
+  //   }
+
+  //   const decryptMessages = async () => {
+  //     try {
+  //       const decrypted = await Promise.all(
+  //         messages.map(async (message) => {
+  //           if (!message.encryptedText || !message.iv) {
+  //             return {
+  //               ...message,
+  //               text: message.text || "",
+  //             };
+  //           }
+  //           console.log("📩 Message from backend:", message);
+  //           const encryptedBytes = base64ToUint8Array(message.encryptedText);
+  //           const ivBytes = base64ToUint8Array(message.iv);
+  //           const sharedKey = sharedKeysRef.current.get(
+  //             message.deviceId
+  //           );
+
+  //           if (!sharedKey) {
+  //             console.error(
+  //               "❌ Shared key not found for device:",
+  //               message.deviceId
+  //             );
+
+  //             return {
+  //               ...message,
+  //               text: "Something Went Wrong",
+  //             };
+  //           }
+  //           const text = await decryptMessage(
+  //             encryptedBytes.buffer,
+  //             ivBytes,
+  //             sharedKey,
+  //           );
+
+  //           return {
+  //             ...message,
+  //             text: text,
+  //           };
+  //         }),
+  //       );
+
+  //       setDecryptedMessages(decrypted);
+
+  //       console.log("🔓 Decrypted Messages:", decrypted);
+  //     } catch (error) {
+  //       console.error("❌ Message Decryption Error:", error);
+  //     }
+  //   };
+
+  //   decryptMessages();
+  // }, [messages, isSharedKeyReady]);
   useEffect(() => {
-    if (!messages.length || !sharedKeysRef.current) {
+    console.log("🟡 Decrypt effect fired", {
+      messagesLength: messages.length,
+      isSharedKeyReady,
+      sharedKeysSize: sharedKeysRef.current?.size,
+      sharedKeysContents: sharedKeysRef.current
+        ? Array.from(sharedKeysRef.current.keys())
+        : null,
+    });
+
+    if (
+      !messages.length ||
+      !sharedKeysRef.current ||
+      sharedKeysRef.current.size === 0
+    ) {
+      console.log("⏭️ Skipping decrypt — no messages or no shared keys yet", {
+        hasMessages: !!messages.length,
+        hasSharedKeysMap: !!sharedKeysRef.current,
+        sharedKeysSize: sharedKeysRef.current?.size,
+      });
       return;
     }
 
@@ -264,53 +300,85 @@ export default function ChatPage() {
         const decrypted = await Promise.all(
           messages.map(async (message) => {
             if (!message.encryptedText || !message.iv) {
+              console.log(
+                "ℹ️ Message has no encryptedText/iv, using plain text:",
+                message._id,
+              );
               return {
                 ...message,
                 text: message.text || "",
               };
             }
 
+            console.log("📩 Attempting decrypt for message:", {
+              id: message._id,
+              deviceId: message.deviceId,
+              encryptedTextPreview: message.encryptedText?.slice(0, 12),
+              ivPreview: message.iv?.slice(0, 12),
+            });
+
             const encryptedBytes = base64ToUint8Array(message.encryptedText);
             const ivBytes = base64ToUint8Array(message.iv);
-            const sharedKey = sharedKeysRef.current.get(
-              message.deviceId
+            const sharedKey = sharedKeysRef.current.get(message.deviceId);
+
+            console.log(
+              "🔑 Looked up shared key for deviceId:",
+              message.deviceId,
+              "->",
+              sharedKey ? "FOUND" : "MISSING",
             );
 
             if (!sharedKey) {
               console.error(
                 "❌ Shared key not found for device:",
-                message.deviceId
+                message.deviceId,
+                "Available keys:",
+                Array.from(sharedKeysRef.current.keys()),
               );
 
               return {
                 ...message,
-                text: "[Unable to decrypt]",
+                text: "Something Went Wrong",
               };
             }
-            const text = await decryptMessage(
-              encryptedBytes.buffer,
-              ivBytes,
-              sharedKey,
-            );
 
-            return {
-              ...message,
-              text: text,
-            };
+            try {
+              const text = await decryptMessage(
+                encryptedBytes.buffer,
+                ivBytes,
+                sharedKey,
+              );
+
+              console.log("✅ Decrypted message", message._id, "->", text);
+
+              return {
+                ...message,
+                text: text,
+              };
+            } catch (decryptErr) {
+              console.error(
+                "❌ decryptMessage() threw for message:",
+                message._id,
+                decryptErr,
+              );
+              return {
+                ...message,
+                text: "Something Went Wrong",
+              };
+            }
           }),
         );
 
         setDecryptedMessages(decrypted);
 
-        console.log("🔓 Decrypted Messages:", decrypted);
+        console.log("🔓 Final decrypted messages:", decrypted);
       } catch (error) {
-        console.error("❌ Message Decryption Error:", error);
+        console.error("❌ Message Decryption Error (outer catch):", error);
       }
     };
 
     decryptMessages();
   }, [messages, isSharedKeyReady]);
-
   const sortedMessages = useMemo(
     () =>
       [...decryptedMessages].sort(
@@ -349,48 +417,6 @@ export default function ChatPage() {
     );
   }
 
-  // const handleSend = async () => {
-  //   const text = draft.trim();
-
-  //   if (!text || isSending) return;
-
-  //   if (!sharedKeysRef .current) {
-  //     console.error("❌ Shared key is not ready");
-  //     return;
-  //   }
-
-  //   try {
-  //     const { encrypted, iv } = await encryptMessage(
-  //       text,
-  //       sharedKeysRef .current,
-  //     );
-  //     const encryptedBase64 = arrayBufferToBase64(encrypted);
-  //     const ivBase64 = uint8ArrayToBase64(iv);
-  //     sendDirectMessage(
-  //       {
-  //         receiver: contact._id,
-  //         encryptedText: encryptedBase64,
-  //         iv: ivBase64,
-  //       },
-  //       {
-  //         onSuccess: () => {
-  //           setDraft("");
-
-  //           queryClient.invalidateQueries({
-  //             queryKey: ["directMessages", contact._id],
-  //           });
-  //         },
-  //       },
-  //     );
-  //     console.log("🔐 Ciphertext Base64:", encryptedBase64);
-  //     console.log("🔑 IV Base64:", ivBase64);
-  //     console.log("🔐 Encrypted Message:", encrypted);
-  //     console.log("🔑 IV:", iv);
-  //   } catch (error) {
-  //     console.error("❌ Message Encryption Error:", error);
-  //   }
-  // };
-
   const handleSend = async () => {
     const text = draft.trim();
 
@@ -405,10 +431,7 @@ export default function ChatPage() {
       const encryptedMessages = [];
 
       for (const [deviceId, sharedKey] of sharedKeysRef.current) {
-        const { encrypted, iv } = await encryptMessage(
-          text,
-          sharedKey
-        );
+        const { encrypted, iv } = await encryptMessage(text, sharedKey);
 
         encryptedMessages.push({
           deviceId,
@@ -437,7 +460,7 @@ export default function ChatPage() {
               queryKey: ["directMessages", contact._id],
             });
           },
-        }
+        },
       );
     } catch (error) {
       console.error("❌ Message Encryption Error:", error);
@@ -538,8 +561,9 @@ export default function ChatPage() {
               </div>
 
               <span
-                className={`absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-[3px] border-[#313338] ${findtheuserisonline ? "bg-[#23a559]" : "bg-[#80848e]"
-                  }`}
+                className={`absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-[3px] border-[#313338] ${
+                  findtheuserisonline ? "bg-[#23a559]" : "bg-[#80848e]"
+                }`}
               />
             </div>
 
@@ -599,9 +623,9 @@ export default function ChatPage() {
                   const isOwn = message.sender === currentUser?.id;
                   const author = isOwn
                     ? {
-                      name: currentUser?.name + " ( you )" || "You",
-                      profileimg: currentUser?.profileimg,
-                    }
+                        name: currentUser?.name + " ( you )" || "You",
+                        profileimg: currentUser?.profileimg,
+                      }
                     : { name: contact.name, profileimg: contact?.profileimg };
                   return (
                     <MessageRow

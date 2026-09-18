@@ -18,16 +18,16 @@ export const useSavePublicKey = () => {
 //   });
 
 export const useGetPublicKeys = (userId) => {
-  console.log("🔎 useGetPublicKeys form Hook called with userId:", userId);
+
 
   return useQuery({
     queryKey: ["publicKeys", userId],
     queryFn: async () => {
-      console.log("🌐 Fetching public keys for:", userId);
+
 
       const data = await getPublicKey(userId);
-
-      console.log("📦 Public keys API response:", data);
+      
+      
 
       return data;
     },
