@@ -69,12 +69,12 @@
 
 //           if (!copy?.encryptedText || !copy?.iv) {
 //             console.error("❌ No encrypted copy found for this device:", message._id);
-//             return { ...message, text: "Unable to decrypt this message" };
+//             return { ...message, text: "⚠️ something went wrong" };
 //           }
 
 //           if (!sharedKey) {
 //             console.error("❌ Shared key not found for message:", message._id);
-//             return { ...message, text: "Unable to decrypt this message" };
+//             return { ...message, text: "⚠️ something went wrong" };
 //           }
 
 //           try {
@@ -89,7 +89,7 @@
 //             return { ...message, text };
 //           } catch (error) {
 //             console.error("❌ Message decryption failed:", message._id, error);
-//             return { ...message, text: "Unable to decrypt this message" };
+//             return { ...message, text: "⚠️ something went wrong" };
 //           }
 //         }),
 //       );
@@ -239,7 +239,7 @@ export default function useChatMessages({
 
               return {
                 ...message,
-                text: "Unable to decrypt this message",
+                text: "⚠️ something went wrong",
               };
             }
 
@@ -251,7 +251,7 @@ export default function useChatMessages({
 
               return {
                 ...message,
-                text: "Unable to decrypt this message",
+                text: "⚠️ something went wrong",
               };
             }
 
@@ -295,7 +295,7 @@ export default function useChatMessages({
 
                 return {
                   ...message,
-                  text: "Unable to decrypt this message",
+                  text: "⚠️ something went wrong",
                 };
               }
 
@@ -351,7 +351,7 @@ export default function useChatMessages({
 
               return {
                 ...message,
-                text: "Unable to decrypt this message",
+                text: "⚠️ something went wrong",
               };
             }
 
@@ -375,7 +375,7 @@ export default function useChatMessages({
 
               return {
                 ...message,
-                text: "Unable to decrypt this message",
+                text: "⚠️ something went wrong",
               };
             }
 
@@ -409,7 +409,7 @@ export default function useChatMessages({
 
             return {
               ...message,
-              text: "Unable to decrypt this message",
+              text: "⚠️ something went wrong",
             };
           }
         }),
