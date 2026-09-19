@@ -49,7 +49,7 @@ export default function ChatPage() {
   const contact = useSelector((state) => state.chat.userinfo);
   const currentUser = useSelector((state) => state.authinfoSlice.userinfo);
   const sharedKeysRef = useRef(new Map());
-
+  const senderSharedKeysRef = useRef(new Map());
   // 🖼️ Background wallpaper
   const { data: backgroundData } = useGetUserBackground();
   const backgrounds = backgroundData?.data || [];
@@ -59,6 +59,7 @@ export default function ChatPage() {
   const deviceId = getDeviceId();
   console.log("🫠 My device ID: ", deviceId);
   const { data: userBPublicKeys } = useGetPublicKeys(contact?._id);
+  const { data: myPublicKeys } = useGetPublicKeys(currentUser?._id);
   // console.log("from api find userBPublicKeys:",userBPublicKeys)
   useEffect(() => {
     if (userBPublicKeys) {
@@ -417,48 +418,172 @@ export default function ChatPage() {
     );
   }
 
+  // const handleSend = async () => {
+  //   const text = draft.trim();
+
+  //   if (!text || isSending) return;
+
+  //   if (!sharedKeysRef.current.size) {
+  //     console.error("❌ Shared keys are not ready");
+  //     return;
+  //   }
+
+  //   try {
+  //     const encryptedMessages = [];
+
+  //     for (const [deviceId, sharedKey] of sharedKeysRef.current) {
+  //       const { encrypted, iv } = await encryptMessage(text, sharedKey);
+
+  //       encryptedMessages.push({
+  //         deviceId,
+  //         encryptedText: arrayBufferToBase64(encrypted),
+  //         iv: uint8ArrayToBase64(iv),
+  //       });
+  //     }
+
+  //     console.log("🔐 Encrypted for devices:", encryptedMessages);
+
+  //     // Temporary: send the first device's encrypted message
+  //     const firstMessage = encryptedMessages[0];
+
+  //     sendDirectMessage(
+  //       {
+  //         receiver: contact._id,
+  //         encryptedText: firstMessage.encryptedText,
+  //         iv: firstMessage.iv,
+  //         deviceId: firstMessage.deviceId,
+  //       },
+  //       {
+  //         onSuccess: () => {
+  //           setDraft("");
+
+  //           queryClient.invalidateQueries({
+  //             queryKey: ["directMessages", contact._id],
+  //           });
+  //         },
+  //       },
+  //     );
+  //   } catch (error) {
+  //     console.error("❌ Message Encryption Error:", error);
+  //   }
+  // };
+
   const handleSend = async () => {
     const text = draft.trim();
 
+    // ============================================
+    // BASIC VALIDATION
+    // ============================================
+
     if (!text || isSending) return;
 
-    if (!sharedKeysRef.current.size) {
+    if (!sharedKeysRef.current || sharedKeysRef.current.size === 0) {
       console.error("❌ Shared keys are not ready");
       return;
     }
 
-    try {
-      const encryptedMessages = [];
+    if (!deviceId) {
+      console.error("❌ Current device ID is missing");
+      return;
+    }
 
-      for (const [deviceId, sharedKey] of sharedKeysRef.current) {
+    if (!contact?._id) {
+      console.error("❌ Receiver user ID is missing");
+      return;
+    }
+
+    try {
+      // ============================================
+      // RECEIVER DEVICE COPIES
+      // ============================================
+
+      const deviceMessagesreceiver = [];
+
+      /*
+      sharedKeysRef.current:
+
+      key   = receiverDeviceId
+      value = sharedKey
+
+      Example:
+
+      B-Mobile  -> sharedKey
+      B-Laptop  -> sharedKey
+    */
+
+      for (const [
+        receiverDeviceId,
+        sharedKey,
+      ] of sharedKeysRef.current.entries()) {
+        if (!sharedKey) {
+          console.warn("⚠️ Shared key missing for device:", receiverDeviceId);
+          continue;
+        }
+
+        if (!receiverDeviceId) {
+          console.warn("⚠️ Receiver device ID is missing");
+          continue;
+        }
+
+        // ==========================================
+        // ENCRYPT MESSAGE FOR THIS RECEIVER DEVICE
+        // ==========================================
+
         const { encrypted, iv } = await encryptMessage(text, sharedKey);
 
-        encryptedMessages.push({
-          deviceId,
+        // ==========================================
+        // STORE ENCRYPTED COPY
+        // ==========================================
+
+        deviceMessagesreceiver.push({
+          receiverDeviceId,
+
           encryptedText: arrayBufferToBase64(encrypted),
+
           iv: uint8ArrayToBase64(iv),
         });
       }
 
-      console.log("🔐 Encrypted for devices:", encryptedMessages);
+      // ============================================
+      // CHECK ENCRYPTED COPIES
+      // ============================================
 
-      // Temporary: send the first device's encrypted message
-      const firstMessage = encryptedMessages[0];
+      console.log("🔐 Receiver encrypted copies:", deviceMessagesreceiver);
+
+      if (deviceMessagesreceiver.length === 0) {
+        console.error("❌ No receiver encrypted messages created");
+        return;
+      }
+
+      // ============================================
+      // SEND TO BACKEND
+      // ============================================
 
       sendDirectMessage(
         {
           receiver: contact._id,
-          encryptedText: firstMessage.encryptedText,
-          iv: firstMessage.iv,
-          deviceId: firstMessage.deviceId,
+
+          // B's devices
+          deviceMessagesreceiver,
+
+          // A's other devices
+          // We will add this when sender-device
+          // shared keys are implemented.
+          deviceMessagessender: [],
         },
         {
-          onSuccess: () => {
+          onSuccess: (response) => {
+            console.log("✅ Message sent successfully:", response);
+
             setDraft("");
 
             queryClient.invalidateQueries({
               queryKey: ["directMessages", contact._id],
             });
+          },
+
+          onError: (error) => {
+            console.error("❌ Failed to send message:", error);
           },
         },
       );
