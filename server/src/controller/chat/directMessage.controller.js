@@ -109,6 +109,7 @@
 import { directMessage } from "../../model/chat/directMessage.model.js";
 import { mainchat } from "../../Socket.IO/chat/mainsocket.js";
 import { getIO } from "../../Socket.IO/socket.js";
+// import { uploadToImageKit } from "..."; // keep your existing import
 
 
 // ======================================================
@@ -122,6 +123,9 @@ export const SenddirectMessage = async (req, res) => {
     const {
       receiver,
 
+      // Device from which message was sent
+      senderDeviceId,
+
       // Receiver device encrypted copies
       deviceMessagesreceiver,
 
@@ -134,6 +138,12 @@ export const SenddirectMessage = async (req, res) => {
     console.log("📩 Request body:", req.body);
 
     // ==================================================
+    // CURRENT USER
+    // ==================================================
+
+    const userId = req.user.id;
+
+    // ==================================================
     // VALIDATION
     // ==================================================
 
@@ -143,11 +153,11 @@ export const SenddirectMessage = async (req, res) => {
       });
     }
 
-    // ==================================================
-    // CURRENT USER
-    // ==================================================
-
-    const userId = req.user.id;
+    if (!senderDeviceId) {
+      return res.status(400).json({
+        message: "senderDeviceId is required",
+      });
+    }
 
     // ==================================================
     // VALIDATE RECEIVER DEVICE COPIES
@@ -155,6 +165,11 @@ export const SenddirectMessage = async (req, res) => {
 
     if (Array.isArray(deviceMessagesreceiver)) {
       for (const deviceMessage of deviceMessagesreceiver) {
+        if (!deviceMessage.senderDeviceId) {
+          return res.status(400).json({
+            message: "senderDeviceId is required in receiver device copy",
+          });
+        }
 
         if (!deviceMessage.receiverDeviceId) {
           return res.status(400).json({
@@ -182,10 +197,9 @@ export const SenddirectMessage = async (req, res) => {
 
     if (Array.isArray(deviceMessagessender)) {
       for (const deviceMessage of deviceMessagessender) {
-
         if (!deviceMessage.senderDeviceId) {
           return res.status(400).json({
-            message: "senderDeviceId is required",
+            message: "senderDeviceId is required in sender device copy",
           });
         }
 
@@ -228,7 +242,7 @@ export const SenddirectMessage = async (req, res) => {
     if (req.file) {
       const imageUrl = await uploadToImageKit(
         req.file.buffer,
-        req.file.originalname
+        req.file.originalname,
       );
 
       image = imageUrl;
@@ -238,50 +252,44 @@ export const SenddirectMessage = async (req, res) => {
     // DEBUG BEFORE SAVE
     // ==================================================
 
+    console.log("🔐 Sender device:", senderDeviceId);
+
     console.log(
       "🔐 Receiver copies:",
-      JSON.stringify(
-        deviceMessagesreceiver,
-        null,
-        2
-      )
+      JSON.stringify(deviceMessagesreceiver, null, 2),
     );
 
     console.log(
       "🔐 Sender copies:",
-      JSON.stringify(
-        deviceMessagessender,
-        null,
-        2
-      )
+      JSON.stringify(deviceMessagessender, null, 2),
     );
 
     // ==================================================
     // CREATE MESSAGE
     // ==================================================
 
-    const directMessageinchat =
-      await directMessage.create({
-        sender: userId,
+    const directMessageinchat = await directMessage.create({
+      sender: userId,
 
-        receiver,
+      receiver,
 
-        // Receiver's devices
-        deviceMessagesreceiver:
-          deviceMessagesreceiver || [],
+      // Device from which the message originated
+      senderDeviceId,
 
-        // Sender's other devices
-        deviceMessagessender:
-          deviceMessagessender || [],
+      // Receiver's devices
+      deviceMessagesreceiver: deviceMessagesreceiver || [],
 
-        image,
+      // Sender's other devices
+      deviceMessagessender: deviceMessagessender || [],
 
-        replyTo: replyTo || null,
+      image,
 
-        edited: false,
+      replyTo: replyTo || null,
 
-        editedAt: null,
-      });
+      edited: false,
+
+      editedAt: null,
+    });
 
     // ==================================================
     // DEBUG AFTER SAVE
@@ -289,19 +297,17 @@ export const SenddirectMessage = async (req, res) => {
 
     console.log(
       "✅ Message created:",
-      directMessageinchat._id
+      directMessageinchat._id,
     );
 
     console.log(
       "📱 Receiver copies:",
-      directMessageinchat
-        .deviceMessagesreceiver?.length || 0
+      directMessageinchat.deviceMessagesreceiver?.length || 0,
     );
 
     console.log(
       "💻 Sender copies:",
-      directMessageinchat
-        .deviceMessagessender?.length || 0
+      directMessageinchat.deviceMessagessender?.length || 0,
     );
 
     // ==================================================
@@ -311,7 +317,7 @@ export const SenddirectMessage = async (req, res) => {
     mainchat(
       io,
       receiver,
-      directMessageinchat
+      directMessageinchat,
     );
 
     // ==================================================
@@ -323,12 +329,10 @@ export const SenddirectMessage = async (req, res) => {
 
       data: directMessageinchat,
     });
-
   } catch (error) {
-
     console.error(
       "❌ Send Message Error:",
-      error
+      error,
     );
 
     return res.status(500).json({
@@ -344,7 +348,6 @@ export const SenddirectMessage = async (req, res) => {
 
 export const getdirectMessage = async (req, res) => {
   try {
-
     const { userId } = req.params;
 
     const loginuserId = req.user.id;
@@ -387,15 +390,13 @@ export const getdirectMessage = async (req, res) => {
       directmessageschat,
       totaldirectmessageschat,
     ] = await Promise.all([
-
       directMessage
         .find(query)
-
-        .select(
-          `
+        .select(`
           _id
           sender
           receiver
+          senderDeviceId
           deviceMessagesreceiver
           deviceMessagessender
           image
@@ -404,16 +405,14 @@ export const getdirectMessage = async (req, res) => {
           replyTo
           editedAt
           edited
-          `
-        )
-
+        `)
         .populate({
           path: "replyTo",
-
           select: `
             _id
             sender
             receiver
+            senderDeviceId
             deviceMessagesreceiver
             deviceMessagessender
             image
@@ -428,8 +427,7 @@ export const getdirectMessage = async (req, res) => {
     // ORDER
     // ==================================================
 
-    const orderedMessages =
-      directmessageschat.reverse();
+    const orderedMessages = directmessageschat.reverse();
 
     // ==================================================
     // RESPONSE
@@ -442,12 +440,10 @@ export const getdirectMessage = async (req, res) => {
 
       total: totaldirectmessageschat,
     });
-
   } catch (error) {
-
     console.error(
       "❌ Get Messages Error:",
-      error
+      error,
     );
 
     return res.status(500).json({

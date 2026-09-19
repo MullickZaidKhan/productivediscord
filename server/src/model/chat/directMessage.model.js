@@ -82,10 +82,21 @@ const directMessageSchema = new mongoose.Schema(
       required: true,
     },
 
+    // Device from which the message was sent
+    senderDeviceId: {
+      type: String,
+      required: true,
+    },
+
     // Copies encrypted for receiver's devices
     deviceMessagesreceiver: {
       type: [
         {
+          senderDeviceId: {
+            type: String,
+            required: true,
+          },
+
           receiverDeviceId: {
             type: String,
             required: true,
@@ -121,17 +132,21 @@ const directMessageSchema = new mongoose.Schema(
             type: String,
             required: true,
           },
+
           encryptedText: {
             type: String,
             required: true,
           },
+
           iv: {
             type: String,
             required: true,
           },
         },
       ],
+
       required: true,
+
       validate: {
         validator: function (value) {
           return value.length > 0;
