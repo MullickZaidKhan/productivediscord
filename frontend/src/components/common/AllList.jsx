@@ -98,9 +98,9 @@ const isFriendOnline = (userId) => {
                             whileHover={{
                               backgroundColor: "rgba(255,255,255,0.03)",
                             }}
-                            className="rounded-md"
+                            className="rounded-2xl"
                           >
-                            <div className="flex items-center gap-5 px-2 py-2.5">
+                            <div className="flex items-center gap-5 px-3 py-2.5">
                               {/* <div className="relative shrink-0">
                                 <div
                                   className="w-9 h-9 rounded-full flex items-center justify-center text-white text-xs font-medium"

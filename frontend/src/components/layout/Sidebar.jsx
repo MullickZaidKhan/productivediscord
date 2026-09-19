@@ -91,7 +91,7 @@ export default function Sidebar() {
           variants={fadeInUp}
           whileHover={{ scale: 1.05 }}
           whileTap={tapScale}
-          className="w-9 h-9 sm:w-10 sm:h-10 rounded-[10px] bg-[#313338] hover:bg-[#23a55a] transition-colors flex items-center justify-center text-white"
+          className="w-9 h-9 sm:w-10 sm:h-10 rounded-[10px] bg-[#313338] hover:bg-[#4954c7] transition-colors flex items-center justify-center text-white"
         >
           <FaPlus size={16} />
         </motion.button>
@@ -100,7 +100,7 @@ export default function Sidebar() {
           variants={fadeInUp}
           whileHover={{ scale: 1.05 }}
           whileTap={tapScale}
-          className="w-9 h-9 sm:w-10 sm:h-10 rounded-[10px] bg-[#313338] hover:bg-[#23a55a] transition-colors flex items-center justify-center text-white"
+          className="w-9 h-9 sm:w-10 sm:h-10 rounded-[10px] bg-[#313338] hover:bg-[#4954c7] transition-colors flex items-center justify-center text-white"
         >
           <FaCompass size={17} />
         </motion.button>
@@ -109,7 +109,7 @@ export default function Sidebar() {
           variants={fadeInUp}
           whileHover={{ scale: 1.05 }}
           whileTap={tapScale}
-          className="w-9 h-9 sm:w-10 sm:h-10 rounded-[10px] bg-[#313338] hover:bg-[#23a55a] transition-colors flex items-center justify-center text-white"
+          className="w-9 h-9 sm:w-10 sm:h-10 rounded-[10px] bg-[#313338] hover:bg-[#4954c7] transition-colors flex items-center justify-center text-white"
         >
           <HiArrowDownTray size={19} />
         </motion.button>

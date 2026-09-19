@@ -65,7 +65,7 @@ const Onlinepage = ({ setChatopen }) => {
               key={friend._id ?? friend.id}
               variants={fadeInUp}
               onClick={() => handleFriendClick(friend)}
-              className="flex items-center gap-3 px-3 py-2 my-2 rounded-md hover:bg-[#3e3f4576] hover:bg-opacity-50 group cursor-pointer transition-colors"
+              className="flex items-center gap-3 px-3 py-2 my-2 rounded-2xl hover:bg-[#3e3f4576] hover:bg-opacity-50 group cursor-pointer transition-colors"
             >
               <div className="relative shrink-0">
                 {friend.profileimg ? (
