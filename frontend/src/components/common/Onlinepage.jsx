@@ -1,23 +1,25 @@
 import { motion } from "framer-motion";
-import { useState, useEffect } from "react";
 import { staggerContainer, fadeInUp } from "../ui/motion.js";
-import { useFriends } from "../../hooks/useFriend.js";
-// import { usePresence } from "../../hooks/useSocket.js";
 import { useSelector, useDispatch } from "react-redux";
 import { setUserInfo } from "../../redux/chat/Chatslice.js";
-import { createSocket } from "../../socket.io-client/socket.io-client.js";
+
 const Onlinepage = ({ setChatopen }) => {
   const onlineFriends = useSelector(
-    (state) => state.onlineFriendsslice?.ONLINE_USERS || "no user is online",
+    (state) => state.onlineFriendsslice?.ONLINE_USERS || [],
   );
   // const onlineFriends = friends.filter((friend) =>
   //   onlineFriendIds.some((id) => String(id) === String(friend._id)),
   // );
-
+  const dispatch = useDispatch();
   const onlineCount = onlineFriends.length;
 
   const handleFriendClick = (friend) => {
-    dispatch(setUserInfo(friend));
+    dispatch(
+      setUserInfo({
+        ...friend,
+        _id: friend._id ?? friend.id,
+      }),
+    );
     setChatopen?.(true);
   };
 
@@ -50,7 +52,7 @@ const Onlinepage = ({ setChatopen }) => {
         initial="hidden"
         animate="show"
         variants={staggerContainer(0.06)}
-        className="px-2 flex-1 overflow-y-auto"
+        className="px-2  flex-1 overflow-y-auto"
       >
         {onlineFriends.length === 0 ? (
           <div className="px-4 py-6 text-sm text-[#949ba4]">
@@ -60,10 +62,10 @@ const Onlinepage = ({ setChatopen }) => {
         ) : (
           onlineFriends.map((friend) => (
             <motion.div
-              key={friend._id}
+              key={friend._id ?? friend.id}
               variants={fadeInUp}
-              onClick={() =>{ handleFriendClick(friend),console.log(friend)}}
-              className="flex items-center gap-3 px-3 py-1 rounded-md hover:bg-[#3e3f45] hover:bg-opacity-50 group cursor-pointer transition-colors"
+              onClick={() => handleFriendClick(friend)}
+              className="flex items-center gap-3 px-3 py-2 my-2 rounded-md hover:bg-[#3e3f4576] hover:bg-opacity-50 group cursor-pointer transition-colors"
             >
               <div className="relative shrink-0">
                 {friend.profileimg ? (
@@ -92,7 +94,7 @@ const Onlinepage = ({ setChatopen }) => {
               </div>
 
               <div className="flex items-center gap-2 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
-                <button className="w-9 h-9 rounded-full bg-[#2b2d31] hover:bg-[#232428] flex items-center justify-center transition-colors active:scale-95">
+                <button className="w-9 h-9 rounded-full hover:bg-[#23242879] flex items-center justify-center transition-colors active:scale-95">
                   <svg
                     className="w-5 h-5 text-[#b5bac1]"
                     fill="currentColor"

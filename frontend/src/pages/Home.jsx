@@ -85,7 +85,7 @@ function Home() {
           deviceId,
         });
 
-        console.log("Public Key Save Response:", response);
+        // console.log("Public Key Save Response:", response);
       } catch (error) {
         console.error("E2EE Setup Error:", error);
       }

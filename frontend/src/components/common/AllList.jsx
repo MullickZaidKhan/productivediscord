@@ -13,7 +13,7 @@ import { useFriends } from "../../hooks/useFriend.js";
 // import { usePresence } from "../../hooks/useSocket.js";
 import { useSelector, useDispatch } from "react-redux";
 import { setUserInfo } from "../../redux/chat/Chatslice.js";
-
+import { openChat, closeChat } from "../../redux/chat/Chatslice.js";
 export const AllList = ({ setChatopen }) => {
   const dispatch = useDispatch();
   const { data: friends = [], isLoading, isError } = useFriends();

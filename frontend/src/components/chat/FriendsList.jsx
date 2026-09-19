@@ -189,7 +189,7 @@ const FriendsList = ({ onOpenMenu, setChatopen }) => {
               transition={{ duration: 0.18, ease: "easeOut" }}
               className="h-full"
             >
-              <Onlinepage />
+              <Onlinepage setChatopen={setChatopen} />
             </motion.div>
           )}
           {tabcontext === "Add Friend" && (
