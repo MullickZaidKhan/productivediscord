@@ -15,7 +15,7 @@ import PopupBackgroundpicker from "../components/popup/PopupBackgroundpicker.jsx
 import { ImageOff } from "lucide-react";
 import { getDeviceId } from "../lib/device";
 import { Socket_usePresence } from "../socket.io-client/socketusePresence.js";
-
+import{useGetTalkedUsers} from "../hooks/chat/directMessage.hook.js"
 import {
   getOrCreateKeyPair,
   arrayBufferToBase64,
@@ -30,7 +30,13 @@ function Home() {
   const showAccountSettings = useSelector(
     (state) => state.AccountSettings.showAccountSettings,
   );
+ const {
+  data:TalkedUsers,
+  isLoading,
+  isError,
+} = useGetTalkedUsers();
 
+console.log("Talked users:", TalkedUsers?.data?.data);
   const showProfilePageSettings = useSelector(
     (state) => state.ProfilePageSettings.showProfilePageSettings,
   );

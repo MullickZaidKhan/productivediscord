@@ -7,6 +7,7 @@ import {
 import {
   SenddirectMessage,
   getdirectMessage,
+  getTalkedUsers,
 } from "../../controller/chat/directMessage.controller.js";
 const router = express.Router();
 router.post(
@@ -16,5 +17,6 @@ router.post(
   SenddirectMessage,
 );
 router.get("/direct-message/:userId", verifyJwt, getdirectMessage);
+router.get("/direct-messagechatUsers", verifyJwt, getTalkedUsers);
 //export
 export default router;
