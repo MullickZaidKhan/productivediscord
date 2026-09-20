@@ -12,6 +12,7 @@ function Chat() {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const dispatch = useDispatch();
   const Chatopen = useSelector((state) => state.chat?.chatopen ?? false);
+  const selectedChatId = useSelector((state) => state.chat?.userinfo?._id);
   //  let deviceId = localStorage.getItem("deviceId");
   // console.log("id deviceId",deviceId)
   const setChatopen = (value) => {
@@ -64,7 +65,9 @@ function Chat() {
           setChatopen={setChatopen}
         />
       )}
-      {Chatopen && <ChatPage setChatopen={setChatopen} />}
+      {Chatopen && (
+        <ChatPage key={String(selectedChatId || "")} setChatopen={setChatopen} />
+      )}
 
       {/* Vertical Divider */}
       <div className="w-px bg-[#232428] hidden lg:block"></div>

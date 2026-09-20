@@ -3,10 +3,11 @@ import { MessageCirclePlus, UsersRound, X } from "lucide-react";
 import { motion } from "framer-motion";
 import { staggerContainer, fadeInUp } from "../ui/motion.js";
 import { useSelector, useDispatch } from "react-redux";
-import { openChat, closeChat } from "../../redux/chat/Chatslice.js";
+import { openChat, closeChat, setUserInfo } from "../../redux/chat/Chatslice.js";
 import{useGetTalkedUsers} from "../../hooks/chat/directMessage.hook.js"
 const Sidebar = ({ onClose }) => {
   const dispatch = useDispatch();
+  const selectedUser = useSelector((state) => state.chat?.userinfo);
   const {
   data,
   isLoading,
@@ -16,11 +17,22 @@ const onlineFriends = useSelector(
   (state) => state.onlineFriendsslice?.ONLINE_USERS || []
 );
 
-const talkedUsers = data?.data?.data || [];
+const talkedUsers = Array.isArray(data?.data?.data)
+  ? data.data.data
+  : Array.isArray(data?.data)
+    ? data.data
+    : [];
 const isUserOnline = (userId) => {
   return onlineFriends.some(
-    (onlineUser) => onlineUser.id === userId
+    (onlineUser) =>
+      String(onlineUser.id ?? onlineUser._id) === String(userId)
   );
+};
+const handleOpenChat = (user) => {
+  if (!user?._id) return;
+
+  dispatch(setUserInfo(user));
+  dispatch(openChat());
 };
   return (
     <motion.div
@@ -146,7 +158,8 @@ const isUserOnline = (userId) => {
     talkedUsers.map((user) => (
       <div
         key={user._id}
-        className="
+        onClick={() => handleOpenChat(user)}
+        className={`
           flex items-center gap-3
           px-2 py-1
           rounded-[12px]
@@ -154,7 +167,8 @@ const isUserOnline = (userId) => {
           cursor-pointer
           hover:bg-[#3e3f45]
           transition-colors
-        "
+          ${selectedUser?._id === user._id ? "bg-[#3e3f45]" : ""}
+        `}
       >
         {/* Avatar */}
         <div className="relative shrink-0">
