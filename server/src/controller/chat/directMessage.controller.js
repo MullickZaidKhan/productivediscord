@@ -441,7 +441,7 @@ export const getTalkedUsers = async (req, res) => {
       {
         $project: {
           _id: "$user._id",
-          email: "$user.email",
+          // email: "$user.email",
           name: "$user.name",
           profileimg: "$user.profileimg",
           username: "$user.username",
