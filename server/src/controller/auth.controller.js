@@ -25,16 +25,17 @@ import { clearAuthCookies, setAuthCookies } from "../lib/cookies.js";
 import upload from "../config/multer.js";
 
 export const register = async (req, res) => {
-  const { username, name, email, password } = req.body;
+  const { username, name, email, password, deviceId } = req.body;
 
   try {
     // * check all field
-    if (!username || !email || !name || !password) {
+    if (!username || !email || !name || !password || !deviceId) {
       return res.status(400).json({
         success: false,
-        message: "all Field is required",
+        message: "All fields are required",
       });
     }
+    console.log("deviceId 💻 : ",deviceId)
     let UPLOADEDPROFILEIMG = "";
     // * check user exist or not
     const existUser = await User.findOne({
@@ -58,24 +59,6 @@ export const register = async (req, res) => {
       "length:",
       config.IMAGEKIT_PRIVATE_KEY?.length,
     );
-    // ✅ Upload avatar if exists
-    // if (req.file) {
-    //   console.log("working")
-    //   console.log(req.file)
-    //   // const fileToUpload = await toFile(req.file.buffer, req.file.originalname, {
-    //   //   type: req.file.mimetype,
-    //   //   lastModified: Date.now(),
-    //   // });
-    //   // const uploadedImage = await imagekit.files.upload({
-    //   //   file: fileToUpload,
-    //   //   fileName: `${Date.now()}-${req.file.originalname}`,
-    //   //   folder: "/avatarsTelegramClone",
-    //   // });
-    //   // UPLOADEDPROFILEIMG = uploadedImage.url;
-    //   // console.log("ImageKit response:", UPLOADEDPROFILEIMG);
-    //   console.log(req.file.buffer, req.file.originalname)
-    //   const uploadedUrl  = await uploadToImageKit(req.file.buffer, req.file.fieldname);
-    //   console.log(uploadedUrl)
     UPLOADEDPROFILEIMG =
       "https://ik.imagekit.io/w5wx4gdmoj/discord_products/Frame%206.png";
     // }
@@ -100,6 +83,7 @@ export const register = async (req, res) => {
 
     const session = await Session.create({
       userId: user._id,
+       deviceId,
       refreshToken: hashToken(refreshToken),
       verify: true,
       expiryDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days

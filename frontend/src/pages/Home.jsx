@@ -26,10 +26,19 @@ import { useSavePublicKey, useGetPublicKeys } from "../hooks/useCrypto.js";
 function Home() {
   const userinfo = useSelector((state) => state.authinfoSlice.userinfo);
   const [isOpen, setIsOpen] = useState(false);
+  const [showAvatarPicker, setShowAvatarPicker] = useState(false);
   // const [showAccountSettings, setShowAccountSettings] = useState(false); // control visibility
   const showAccountSettings = useSelector(
     (state) => state.AccountSettings.showAccountSettings,
   );
+  useEffect(() => {
+  const isNewUser = sessionStorage.getItem("newUser");
+
+  if (isNewUser === "true") {
+    setShowAvatarPicker(true);
+    sessionStorage.removeItem("newUser");
+  }
+}, []);
  const {
   data:TalkedUsers,
   isLoading,
@@ -40,7 +49,11 @@ console.log("Talked users:", TalkedUsers?.data?.data);
   const showProfilePageSettings = useSelector(
     (state) => state.ProfilePageSettings.showProfilePageSettings,
   );
-  // console.log(showProfilePageSettings);
+ const showProfilePagechange = useSelector(
+  (state) => state.ProfilePagechangeslice.showProfilePagechange
+);
+
+console.log(showProfilePagechange); 
   const op = true;
   const bg = true;
   const { data } = useGetUserBackground();
@@ -205,7 +218,7 @@ console.log("Talked users:", TalkedUsers?.data?.data);
         )}
       </AnimatePresence>
       <AnimatePresence>
-        {!op && (
+        {showAvatarPicker  && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -219,7 +232,7 @@ console.log("Talked users:", TalkedUsers?.data?.data);
               onClick={(e) => e.stopPropagation()}
             >
               {/* <DiscordAccountSettings /> */}
-              <Avatarpicker />
+              <Avatarpicker  onClose={() => setShowAvatarPicker(false)} />
             </div>
           </motion.div>
         )}

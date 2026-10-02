@@ -15,6 +15,7 @@ import { useSendFriendRequest } from "../../hooks/useFriend.js";
 
 const AddFriendpage = () => {
   const [sent, setSent] = useState(false);
+  const [requestError, setRequestError] = useState(false);
   const [shake, setShake] = useState(false);
   const [username, setUsername] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
@@ -24,42 +25,64 @@ const AddFriendpage = () => {
   console.log("Current User Info ->", currentUser);
   const handleSend = () => {
     if (!username.trim()) {
+      setRequestError(true);
+      setSent(false);
+
       setShake(true);
       setTimeout(() => setShake(false), 400);
       return;
     }
 
     if (!currentUserId) {
+      setRequestError(true);
+      setSent(false);
+
       setShake(true);
       setTimeout(() => setShake(false), 400);
       return;
     }
 
+    setRequestError(false);
+
     sendFriendRequest.mutate(
       {
         senderId: currentUserId,
-        receiverId: username,
+        receiverId: username.trim(),
       },
       {
         onSuccess: (response) => {
           setSent(true);
-          setSuccessMessage(response?.data?.message || "Friend request sent");
+          setRequestError(false);
+          setSuccessMessage(
+            response?.data?.message || "Friend request sent"
+          );
         },
-        onError: () => {
+
+        onError: (error) => {
+          setSent(false);
+          setRequestError(true);
+
+          setSuccessMessage(
+            error?.response?.data?.message ||
+            "User not found or friend request could not be sent."
+          );
+
           setShake(true);
           setTimeout(() => setShake(false), 400);
         },
-      },
+      }
     );
   };
 
-  const handleInputChange = (value) => {
-    setUsername(value);
-    if (sent) {
-      setSent(false);
-      setSuccessMessage("");
-    }
-  };
+ const handleInputChange = (value) => {
+  setUsername(value);
+
+  if (sent || requestError) {
+    setSent(false);
+    setRequestError(false);
+    setSuccessMessage("");
+  }
+};
   return (
     <div>
       <div className=" w-full bg-[#31333813] flex items-start justify-center p-10">
@@ -111,7 +134,7 @@ const AddFriendpage = () => {
           </motion.div>
 
           {/* Input row */}
-          <motion.div
+          {/* <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, delay: 0.2 }}
@@ -130,9 +153,12 @@ const AddFriendpage = () => {
               whileTap={{ scale: 0.95 }}
               animate={sent ? { scale: [1, 1.06, 1] } : { scale: 1 }}
               transition={{ duration: 0.3 }}
-              className={`shrink-0 text-white text-sm font-medium px-4 py-2 rounded-md transition-colors duration-150 flex items-center gap-1.5 ${
-                sent ? "bg-[#23a55a]" : "bg-[#5865F2] hover:bg-[#4752c4]"
-              }`}
+              className={`shrink-0 text-white text-sm font-medium px-4 py-2 rounded-md transition-colors duration-150 flex items-center gap-1.5 ${sent
+                  ? "bg-[#23a55a]"
+                  : requestError
+                    ? "bg-[#ed4245] hover:bg-[#c73538]"
+                    : "bg-[#5865F2] hover:bg-[#4752c4]"
+                }`}
             >
               <AnimatePresence mode="wait" initial={false}>
                 {sent ? (
@@ -160,8 +186,102 @@ const AddFriendpage = () => {
                 )}
               </AnimatePresence>
             </motion.button>
-          </motion.div>
+          </motion.div> */}
+{/* Input row */}
+<motion.div
+  initial={{ opacity: 0, y: 10 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ duration: 0.3, delay: 0.2 }}
+>
+  <div
+    className={`flex items-center gap-3 bg-[#1e1f228e] rounded-2xl px-4 py-1.5 border ${
+      sent
+        ? "border-[#23a55a]"
+        : requestError
+          ? "border-[#ed4245]"
+          : "border-[#5865f25d]"
+    } focus-within:border-[#5865F2] transition-colors ${
+      shake ? "animate-[shake_0.4s_ease-in-out]" : ""
+    }`}
+  >
+    <input
+      value={username}
+      onChange={(e) => handleInputChange(e.target.value)}
+      onKeyDown={(e) => e.key === "Enter" && handleSend()}
+      placeholder="Enter a username"
+      className="flex-1 bg-transparent text-white placeholder-[#6d6f78] text-sm py-3 outline-none"
+    />
 
+    <motion.button
+      onClick={handleSend}
+      whileHover={{ scale: sent ? 1 : 1.03 }}
+      whileTap={{ scale: 0.95 }}
+      animate={sent ? { scale: [1, 1.06, 1] } : { scale: 1 }}
+      transition={{ duration: 0.3 }}
+      className={`shrink-0 text-white text-sm font-medium px-4 py-2 rounded-md transition-colors duration-150 flex items-center gap-1.5 ${
+        sent
+          ? "bg-[#23a55a]"
+          : requestError
+            ? "bg-[#ed4245] hover:bg-[#c73538]"
+            : "bg-[#5865F2] hover:bg-[#4752c4]"
+      }`}
+    >
+      <AnimatePresence mode="wait" initial={false}>
+        {sent ? (
+          <motion.span
+            key="sent"
+            initial={{ opacity: 0, y: -6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 6 }}
+            transition={{ duration: 0.15 }}
+            className="flex items-center gap-1.5"
+          >
+            <Check size={14} />
+            Friend Request Sent
+          </motion.span>
+        ) : requestError ? (
+          <motion.span
+            key="error"
+            initial={{ opacity: 0, y: -6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 6 }}
+            transition={{ duration: 0.15 }}
+          >
+            Try Again
+          </motion.span>
+        ) : (
+          <motion.span
+            key="send"
+            initial={{ opacity: 0, y: -6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 6 }}
+            transition={{ duration: 0.15 }}
+          >
+            Send Friend Request
+          </motion.span>
+        )}
+      </AnimatePresence>
+    </motion.button>
+  </div>
+
+  {/* Success / Error message */}
+  <AnimatePresence>
+    {successMessage && (
+      <motion.p
+        initial={{ opacity: 0, y: -5 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -5 }}
+        className={`mt-2 text-sm ${
+          requestError
+            ? "text-[#ed4245]"
+            : "text-[#23a55a]"
+        }`}
+      >
+        {successMessage}
+      </motion.p>
+    )}
+  </AnimatePresence>
+</motion.div>
           <div className="h-px bg-[#3f4147] my-6" />
 
           {/* Other places section */}

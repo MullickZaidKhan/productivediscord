@@ -5,6 +5,7 @@ import { useRegister, checkUsernamehook } from "../hooks/useAuth.js";
 import { motion, AnimatePresence } from "framer-motion";
 import { staggerContainer, fadeInUp } from "../components/ui/motion.js";
 import { useNavigate } from "react-router-dom";
+import { getDeviceId } from "../lib/device.js";
 
 // Calculates a simple password strength score based on length and character variety
 const getPasswordStrength = (password) => {
@@ -147,13 +148,18 @@ const RegisterPage = () => {
   const onSubmit = (data) => {
     // Guard against submitting a username we already know is taken/invalid
     if (usernameStatus === "taken" || usernameStatus === "invalid") return;
-
-    registerMutation.mutate(data, {
+    const deviceId = getDeviceId();
+      const registrationData = {
+    ...data,
+    deviceId,
+  };
+    registerMutation.mutate(registrationData, {
       onSuccess: ({ data }) => {
         reset();
         setUsernameChecked("");
         setStep(1);
-        window.location.href = "/background";
+        sessionStorage.setItem("newUser", "true");
+        window.location.href = "/";
       },
     });
   };

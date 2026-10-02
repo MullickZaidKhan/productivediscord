@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useSetUserProfile } from "../../hooks/background.hook";
-import {setLoggedIn} from "../../redux/authSlice.js"
+import { setLoggedIn } from "../../redux/authSlice.js"
 import { useSelector, useDispatch } from 'react-redux'
 import {
   Ghost,
@@ -95,7 +95,7 @@ const BLURPLE = "#5865F2";
 const CARD = "#2b2d31";
 const CARD_HOVER = "#34363c";
 
-export default function AvatarPicker() {
+export default function AvatarPicker({ onClose }) {
   const [selected, setSelected] = useState("featured");
   const [customAvatar, setCustomAvatar] = useState(null); // data URL for preview
   const [customFile, setCustomFile] = useState(null); // actual File for upload
@@ -115,13 +115,13 @@ export default function AvatarPicker() {
   const allAvatars = [
     ...(customAvatar
       ? [
-          {
-            id: "custom",
-            label: "Your photo",
-            type: "image",
-            src: customAvatar,
-          },
-        ]
+        {
+          id: "custom",
+          label: "Your photo",
+          type: "image",
+          src: customAvatar,
+        },
+      ]
       : []),
     ...GALLERY,
     ...STYLES,
@@ -154,13 +154,13 @@ export default function AvatarPicker() {
     onError: (error) => {
       setToast(
         error?.response?.data?.message ||
-          error?.message ||
-          "Something went wrong. Please try again."
+        error?.message ||
+        "Something went wrong. Please try again."
       );
     },
   });
 
-const saveProfileImage = () => {
+  const saveProfileImage = () => {
   if (isPending) return;
 
   if (selected === "custom" && customFile) {
@@ -169,21 +169,45 @@ const saveProfileImage = () => {
 
     mutate(formData, {
       onSuccess: (data) => {
-         dispatch(setLoggedIn(data.data));
-        // console.log("Profile image uploaded successfully:", data);
+        // Update logged-in user in Redux
+        dispatch(setLoggedIn(data.data));
+
+        setToast("Your profile picture has been updated.");
+
+        // Close picker after successful save
+        setTimeout(() => {
+          onClose?.();
+        }, 500);
       },
+
       onError: (error) => {
-        // console.error("Profile image upload failed:", error);
+        setToast(
+          error?.response?.data?.message ||
+            error?.message ||
+            "Something went wrong. Please try again."
+        );
       },
     });
   } else {
     mutate(current.src, {
       onSuccess: (data) => {
-         dispatch(setLoggedIn(data.data));
-        console.log("Profile image selected successfully:", data);
+        // Update logged-in user in Redux
+        dispatch(setLoggedIn(data.data));
+
+        setToast("Your profile picture has been updated.");
+
+        // Close picker after successful save
+        setTimeout(() => {
+          onClose?.();
+        }, 500);
       },
+
       onError: (error) => {
-        console.error("Profile image selection failed:", error);
+        setToast(
+          error?.response?.data?.message ||
+            error?.message ||
+            "Something went wrong. Please try again."
+        );
       },
     });
   }
@@ -367,9 +391,13 @@ const saveProfileImage = () => {
               )}
             </button>
             <button
-              onClick={() =>
-                setToast("Skipped — you can set an avatar anytime in Settings.")
-              }
+              onClick={() => {
+                setToast("Skipped — you can set an avatar anytime in Settings.");
+
+                setTimeout(() => {
+                  onClose?.();
+                }, 500);
+              }}
               disabled={isPending}
               className="flex-1 py-3 rounded-xl font-bold transition-all duration-200 active:scale-95 flex items-center justify-center gap-2 disabled:opacity-70"
               style={{
