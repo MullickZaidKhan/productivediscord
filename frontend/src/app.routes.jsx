@@ -7,6 +7,7 @@ import Register from "./pages/RegisterPage.jsx";
 import RootLayout from "./components/layout/RootLayout.jsx";
 import ErrorPage from "./components/ErrorPage.jsx";
 import Chat from "./components/chat/Chat.jsx";
+import ServerPage from "./components/server_discord/serverpage.jsx";
 export const router = createBrowserRouter([
   {
     element: <RootLayout />,
@@ -42,6 +43,10 @@ export const router = createBrowserRouter([
           {
             path: "channels/@me/:userId",
             element: <Chat />,
+          },
+          {
+            path: "servers/:serverId",
+            element: <ServerPage />,
           },
         ],
       },

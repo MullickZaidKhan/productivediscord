@@ -7,6 +7,7 @@ import {
 import { Volume2 } from "lucide-react";
 import { HiArrowDownTray } from "react-icons/hi2";
 import { motion } from "framer-motion";
+import { useLocation, useNavigate } from "react-router-dom";
 import { staggerContainer, fadeInUp, tapScale } from "../ui/motion.js";
 
 const servers = [
@@ -35,6 +36,9 @@ const servers = [
 ];
 
 export default function Sidebar() {
+  const navigate = useNavigate();
+  const location = useLocation();
+
   return (
     <motion.div
       initial="hidden"
@@ -45,6 +49,9 @@ export default function Sidebar() {
       {/* Discord Logo */}
       <motion.button
         variants={fadeInUp}
+        type="button"
+        onClick={() => navigate("/")}
+        aria-label="Go to home"
         whileHover={{ scale: 1.05 }}
         whileTap={tapScale}
         className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-[#313338] hover:bg-[#4650be] transition-colors duration-200 flex items-center justify-center text-white"
@@ -68,9 +75,17 @@ export default function Sidebar() {
           <motion.div key={server.id} variants={fadeInUp} className="relative group">
 
             {/* Green Indicator */}
-            <span className="absolute -left-2.5 top-1/2 -translate-y-1/2 h-6 w-1 rounded-[1vw] bg-[#fcfcfca9] scale-y-0 group-hover:scale-y-100 transition-transform duration-200 origin-center"></span>
+            <span className={`absolute -left-2.5 top-1/2 -translate-y-1/2 h-6 w-1 rounded-[1vw] bg-[#fcfcfca9] transition-transform duration-200 origin-center ${
+              location.pathname === `/servers/${server.id}`
+                ? "scale-y-100"
+                : "scale-y-0 group-hover:scale-y-100"
+            }`}></span>
 
             <motion.button
+              type="button"
+              onClick={() => navigate(`/servers/${server.id}`)}
+              aria-label={`Open server ${server.id}`}
+              aria-current={location.pathname === `/servers/${server.id}` ? "page" : undefined}
               whileHover={{ scale: 1.05, borderRadius: "10px" }}
               whileTap={tapScale}
               className="w-9 h-9 sm:w-10 sm:h-10 rounded-[15px] overflow-hidden bg-[#313338] transition-colors duration-200"

@@ -153,7 +153,7 @@ const isFriendOnline = (userId) => {
                                   {f.name}
                                 </div>
                                 <div className={`text-xs ${isFriendOnline(f._id) ? "text-[#23a55a]" : "text-[#949ba4]"}`}>
-                                  {isFriendOnline(f._id) ? "Online" : "Offline"}
+                                  {isFriendOnline(f._id) ? "Online" : ""}
                                 </div>
                               </div>
 

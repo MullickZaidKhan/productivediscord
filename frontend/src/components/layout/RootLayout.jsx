@@ -8,7 +8,8 @@ export default function RootLayout() {
     ["/Online", "/All", "/Add_Friend", "/Pending"].includes(
       location.pathname,
     ) ||
-    location.pathname.startsWith("/channels/@me/")
+    location.pathname.startsWith("/channels/@me/") ||
+    location.pathname.startsWith("/servers/")
       ? "/"
       : location.pathname;
 
