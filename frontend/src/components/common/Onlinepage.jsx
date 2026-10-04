@@ -1,26 +1,16 @@
 import { motion } from "framer-motion";
 import { staggerContainer, fadeInUp } from "../ui/motion.js";
-import { useSelector, useDispatch } from "react-redux";
-import { setUserInfo } from "../../redux/chat/Chatslice.js";
+import { useSelector } from "react-redux";
 
-const Onlinepage = ({ setChatopen }) => {
+const Onlinepage = ({ onOpenChat }) => {
   const onlineFriends = useSelector(
     (state) => state.onlineFriendsslice?.ONLINE_USERS || [],
   );
   // const onlineFriends = friends.filter((friend) =>
   //   onlineFriendIds.some((id) => String(id) === String(friend._id)),
   // );
-  const dispatch = useDispatch();
-  const onlineCount = onlineFriends.length;
-
   const handleFriendClick = (friend) => {
-    dispatch(
-      setUserInfo({
-        ...friend,
-        _id: friend._id ?? friend.id,
-      }),
-    );
-    setChatopen?.(true);
+    onOpenChat?.(friend);
   };
 
   return (

@@ -49,7 +49,14 @@ export default function Sidebar() {
         whileTap={tapScale}
         className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-[#313338] hover:bg-[#4650be] transition-colors duration-200 flex items-center justify-center text-white"
       >
-        <img src="./Frame 12 (2).png" alt="" className="w-9 h-9 sm:w-10 sm:h-10 object-contain" />
+       <img
+  src="https://ik.imagekit.io/pfuw6dfa6/avatarsTelegramClone/logotp.png"
+  alt="Logo"
+  className="w-9 h-9 sm:w-10 sm:h-10 object-contain"
+  onError={(e) => {
+    e.currentTarget.src = "./logotp.png";
+  }}
+/>
       </motion.button>
 
       {/* Divider */}

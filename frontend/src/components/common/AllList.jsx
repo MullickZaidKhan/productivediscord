@@ -11,11 +11,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { staggerContainer, fadeInUp } from "../ui/motion.js";
 import { useFriends } from "../../hooks/useFriend.js";
 // import { usePresence } from "../../hooks/useSocket.js";
-import { useSelector, useDispatch } from "react-redux";
-import { setUserInfo } from "../../redux/chat/Chatslice.js";
-import { openChat, closeChat } from "../../redux/chat/Chatslice.js";
-export const AllList = ({ setChatopen }) => {
-  const dispatch = useDispatch();
+import { useSelector } from "react-redux";
+export const AllList = ({ onOpenChat }) => {
   const { data: friends = [], isLoading, isError } = useFriends();
  const onlineFriends = useSelector(
   (state) => state.onlineFriendsslice?.ONLINE_USERS || []
@@ -32,8 +29,7 @@ const isFriendOnline = (userId) => {
   const onlineCount = FRIENDS.filter((f) => isFriendOnline(f._id)).length;
 
   const handleFriendClick = (friend) => {
-    dispatch(setUserInfo(friend));
-    setChatopen?.(true);
+    onOpenChat?.(friend);
   };
 
   return (

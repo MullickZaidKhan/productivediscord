@@ -12,8 +12,7 @@ import {
   Image as ImageIcon,
   Plus,
 } from "lucide-react";
-import { useSelector, useDispatch } from "react-redux";
-import { closeChat } from "../../../redux/chat/Chatslice.js";
+import { useSelector } from "react-redux";
 import TypingIndicator from "./TypingIndicator.jsx";
 import MessageRow from "./MessageRow.jsx";
 import InputIcon from "./InputIcon.jsx";
@@ -26,8 +25,7 @@ import useChatScroll from "./hooks/useChatScroll.js";
 import useChatBackground from "./hooks/useChatBackground.js";
 import useContactOnline from "./hooks/useContactOnline.js";
 
-export default function ChatPage() {
-  const dispatch = useDispatch();
+export default function ChatPage({ onCloseChat }) {
   const [headerIn, setHeaderIn] = useState(false);
   const contact = useSelector((state) => state.chat.userinfo);
   const currentUser = useSelector((state) => state.authinfoSlice.userinfo);
@@ -117,7 +115,7 @@ export default function ChatPage() {
         >
           <div className="flex items-center gap-2.5 min-w-0">
             <button
-              onClick={() => dispatch(closeChat())}
+              onClick={onCloseChat}
               className="rounded-full p-1 hover:bg-white/10 transition-colors"
               aria-label="Close chat"
             >

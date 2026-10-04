@@ -6,19 +6,44 @@ import Login from "./pages/LoginPage.jsx";
 import Register from "./pages/RegisterPage.jsx";
 import RootLayout from "./components/layout/RootLayout.jsx";
 import ErrorPage from "./components/ErrorPage.jsx";
-import Background from "./pages/Backgroundpicker.jsx";
+import Chat from "./components/chat/Chat.jsx";
 export const router = createBrowserRouter([
   {
     element: <RootLayout />,
     errorElement: <ErrorPage />,
     children: [
       {
-        path: "/",
         element: (
           <ProtectedRoute>
             <Home />
           </ProtectedRoute>
         ),
+        children: [
+          {
+            index: true,
+            element: <Chat />,
+          },
+          {
+            path: "Online",
+            element: <Chat />,
+          },
+          {
+            path: "All",
+            element: <Chat />,
+          },
+          {
+            path: "Add_Friend",
+            element: <Chat />,
+          },
+          {
+            path: "Pending",
+            element: <Chat />,
+          },
+          {
+            path: "channels/@me/:userId",
+            element: <Chat />,
+          },
+        ],
       },
 
       {

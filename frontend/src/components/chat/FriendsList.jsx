@@ -75,7 +75,6 @@
 // };
 
 // export default FriendsList;
-import React, { useState, useEffect } from "react";
 import {
   MessageCirclePlus,
   UsersRound,
@@ -92,18 +91,25 @@ import AddFriendpage from "../common/AddFriendpage.jsx";
 import { AllList } from "../common/AllList.jsx";
 import SentRequests from "../common/SentRequests.jsx";
 import { useSelector, useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import { setTab as setFriendTab } from "../../redux/FriendsList/Friendslice.js";
 
-const FriendsList = ({ onOpenMenu, setChatopen }) => {
+const FriendsList = ({ onOpenMenu, onOpenChat }) => {
   const tabcontext = useSelector((state) => state.Friendlist.Tab);
-  const [activeTab, setActiveTab] = useState("Online");
   const tabs = ["Online", "All", "Add Friend", "Pending"];
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const setTab = (tab) => {
     dispatch(setFriendTab(tab));
-
-    setActiveTab(tabcontext);
+    navigate(
+      {
+        Online: "/Online",
+        All: "/All",
+        "Add Friend": "/Add_Friend",
+        Pending: "/Pending",
+      }[tab],
+    );
   };
 
   // console.log(tabcontext);
@@ -189,7 +195,7 @@ const FriendsList = ({ onOpenMenu, setChatopen }) => {
               transition={{ duration: 0.18, ease: "easeOut" }}
               className="h-full"
             >
-              <Onlinepage setChatopen={setChatopen} />
+              <Onlinepage onOpenChat={onOpenChat} />
             </motion.div>
           )}
           {tabcontext === "Add Friend" && (
@@ -213,7 +219,7 @@ const FriendsList = ({ onOpenMenu, setChatopen }) => {
               transition={{ duration: 0.18, ease: "easeOut" }}
               className="h-full"
             >
-              <AllList setChatopen={setChatopen} />
+              <AllList onOpenChat={onOpenChat} />
             </motion.div>
           )}
           {tabcontext === "Pending" && (

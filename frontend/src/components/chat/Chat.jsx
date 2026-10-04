@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import Sidebar from "./Sidebar";
 import FriendsList from "./FriendsList";
@@ -6,18 +6,94 @@ import ActiveNow from "./ActiveNow";
 import { EASE } from "../ui/motion.js";
 import ChatPage from "./Chat-page/Chatpage.jsx";
 import { useSelector, useDispatch } from "react-redux";
-import { openChat, closeChat } from "../../redux/chat/Chatslice.js";
+import {
+  clearUserInfo,
+  closeChat,
+  openChat,
+  setUserInfo,
+} from "../../redux/chat/Chatslice.js";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useGetTalkedUsers } from "../../hooks/chat/directMessage.hook.js";
+import { setTab } from "../../redux/FriendsList/Friendslice.js";
+
+const EMPTY_USERS = [];
 
 function Chat() {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const dispatch = useDispatch();
-  const Chatopen = useSelector((state) => state.chat?.chatopen ?? false);
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { userId } = useParams();
   const selectedChatId = useSelector((state) => state.chat?.userinfo?._id);
-  //  let deviceId = localStorage.getItem("deviceId");
-  // console.log("id deviceId",deviceId)
-  const setChatopen = (value) => {
-    if (value) dispatch(openChat());
-    else dispatch(closeChat());
+  const {
+    data,
+    isLoading: isTalkedUsersLoading,
+    isError: isTalkedUsersError,
+  } = useGetTalkedUsers();
+  const talkedUsers = Array.isArray(data?.data?.data)
+    ? data.data.data
+    : Array.isArray(data?.data)
+      ? data.data
+      : EMPTY_USERS;
+  const hasSelectedRouteUser = String(selectedChatId ?? "") === userId;
+
+  useEffect(() => {
+    const pathToTab = {
+      "/": "Online",
+      "/Online": "Online",
+      "/All": "All",
+      "/Add_Friend": "Add Friend",
+      "/Pending": "Pending",
+    };
+    const selectedTab = pathToTab[location.pathname];
+    if (selectedTab) {
+      dispatch(setTab(selectedTab));
+    }
+  }, [dispatch, location.pathname]);
+
+  useEffect(() => {
+    if (!userId) {
+      dispatch(closeChat());
+      return;
+    }
+
+    const selectedUser = talkedUsers.find(
+      (user) => String(user._id ?? user.id) === userId,
+    );
+    if (selectedUser) {
+      dispatch(
+        setUserInfo({
+          ...selectedUser,
+          _id: selectedUser._id ?? selectedUser.id,
+        }),
+      );
+      dispatch(openChat());
+    } else if (
+      String(selectedChatId ?? "") !== userId &&
+      !isTalkedUsersLoading
+    ) {
+      dispatch(clearUserInfo());
+    }
+  }, [
+    dispatch,
+    isTalkedUsersLoading,
+    selectedChatId,
+    talkedUsers,
+    userId,
+  ]);
+
+  const openUserChat = (user) => {
+    const id = user?._id ?? user?.id;
+    if (!id) return;
+
+    dispatch(setUserInfo({ ...user, _id: id }));
+    dispatch(openChat());
+    navigate(`/channels/@me/${encodeURIComponent(id)}`);
+  };
+
+  const openFriends = () => {
+    dispatch(closeChat());
+    navigate("/");
   };
 
   return (
@@ -43,7 +119,11 @@ function Chat() {
               exit={{ x: "-100%" }}
               transition={{ duration: 0.28, ease: EASE }}
             >
-              <Sidebar onClose={() => setMobileNavOpen(false)} />
+              <Sidebar
+                onClose={() => setMobileNavOpen(false)}
+                onOpenChat={openUserChat}
+                onOpenFriends={openFriends}
+              />
             </motion.div>
           </React.Fragment>
         )}
@@ -51,7 +131,7 @@ function Chat() {
 
       {/* Channel sidebar: inline from md breakpoint up */}
       <div className="hidden md:block h-full">
-        <Sidebar />
+        <Sidebar onOpenChat={openUserChat} onOpenFriends={openFriends} />
       </div>
 
       {/* Vertical Divider */}
@@ -59,14 +139,26 @@ function Chat() {
 
       {/* Main Friends Area */}
 
-      {!Chatopen && (
+      {!userId && (
         <FriendsList
           onOpenMenu={() => setMobileNavOpen(true)}
-          setChatopen={setChatopen}
+          onOpenChat={openUserChat}
         />
       )}
-      {Chatopen && (
-        <ChatPage key={String(selectedChatId || "")} setChatopen={setChatopen} />
+      {userId && hasSelectedRouteUser && (
+        <ChatPage
+          key={String(userId)}
+          onCloseChat={openFriends}
+        />
+      )}
+      {userId && !hasSelectedRouteUser && (
+        <div className="flex-1 min-w-0 min-h-0 h-full flex items-center justify-center bg-[#0000008e] text-sm text-[#949ba4]">
+          {isTalkedUsersLoading
+            ? "Loading conversation..."
+            : isTalkedUsersError
+              ? "Unable to load this conversation."
+              : "Conversation not found."}
+        </div>
       )}
 
       {/* Vertical Divider */}

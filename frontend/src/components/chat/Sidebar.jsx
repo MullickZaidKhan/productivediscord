@@ -1,13 +1,11 @@
-import React from "react";
-import { MessageCirclePlus, UsersRound, X } from "lucide-react";
+import { UsersRound, X } from "lucide-react";
 import { motion } from "framer-motion";
 import { staggerContainer, fadeInUp } from "../ui/motion.js";
-import { useSelector, useDispatch } from "react-redux";
-import { openChat, closeChat, setUserInfo } from "../../redux/chat/Chatslice.js";
+import { useSelector } from "react-redux";
+import { useParams } from "react-router-dom";
 import{useGetTalkedUsers} from "../../hooks/chat/directMessage.hook.js"
-const Sidebar = ({ onClose }) => {
-  const dispatch = useDispatch();
-  const selectedUser = useSelector((state) => state.chat?.userinfo);
+const Sidebar = ({ onClose, onOpenChat, onOpenFriends }) => {
+  const { userId } = useParams();
   const {
   data,
   isLoading,
@@ -22,17 +20,11 @@ const talkedUsers = Array.isArray(data?.data?.data)
   : Array.isArray(data?.data)
     ? data.data
     : [];
-const isUserOnline = (userId) => {
+const isUserOnline = (contactId) => {
   return onlineFriends.some(
     (onlineUser) =>
-      String(onlineUser.id ?? onlineUser._id) === String(userId)
+      String(onlineUser.id ?? onlineUser._id) === String(contactId)
   );
-};
-const handleOpenChat = (user) => {
-  if (!user?._id) return;
-
-  dispatch(setUserInfo(user));
-  dispatch(openChat());
 };
   return (
     <motion.div
@@ -70,9 +62,7 @@ const handleOpenChat = (user) => {
         >
           <UsersRound size={18} />
           <span
-            onClick={() => {
-              dispatch(closeChat());
-            }}
+            onClick={onOpenFriends}
             className="text-sm font-medium"
           >
             Friends
@@ -158,7 +148,7 @@ const handleOpenChat = (user) => {
     talkedUsers.map((user) => (
       <div
         key={user._id}
-        onClick={() => handleOpenChat(user)}
+        onClick={() => onOpenChat?.(user)}
         className={`
           flex items-center gap-3
           px-2 py-1
@@ -167,7 +157,7 @@ const handleOpenChat = (user) => {
           cursor-pointer
           hover:bg-[#3e3f45]
           transition-colors
-          ${selectedUser?._id === user._id ? "bg-[#3e3f45]" : ""}
+          ${userId === String(user._id ?? user.id) ? "bg-[#3e3f45]" : ""}
         `}
       >
         {/* Avatar */}
