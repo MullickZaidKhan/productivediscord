@@ -44,7 +44,7 @@ const Avatar = ({ size = "w-9 h-9" }) => (
 
 /* ============ SECTION 2: Sidebar ============ */
 const Sidebar = () => (
-  <aside className="hidden pt-8 h-screen md:flex w-56 shrink-0 flex-col bg-[#121316] border-r border-white/5">
+  <aside className="hidden pt-8 h-screen md:flex w-56 shrink-0 flex-col bg-[#121316ad] border-r border-white/5">
     <div className="flex items-center justify-between px-4 h-12 border-b border-white/5 text-white">
       <span className="flex items-center gap-1 text-sm font-bold">Zaid's <ChevronDown size={15} /></span>
       <UserPlus size={16} className="text-gray-400 hover:text-white transition-colors cursor-pointer" />
@@ -222,7 +222,7 @@ export default function App() {
     <div className="h-screen flex justify-center items-center  bg-[#16171ab5] text-sm">
       <Styles />
       <Sidebar />
-      <main className="flex-1 flex flex-col min-w-0 pt-3 h-screen bg-[#1d1e2244] ">
+      <main className="flex-1 flex flex-col min-w-0 pt-3 h-screen bg-[#1d1e22b2] ">
         <ChatHeader />
         <Messages sent={sent} />
         <MessageInput onSend={(m) => setSent((s) => [...s, m])} />
