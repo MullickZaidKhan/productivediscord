@@ -72,7 +72,7 @@ export const sendVerificationEmail = async (email, otp) => {
               height="72"
              alt="Wolvo Logo"
              style="display:block; margin:0 auto; width:72px; height:72px; border:0; object-fit:contain;"
-          />
+           />
               <div style="margin-top:16px; font-size:19px; font-weight:700; color:#FFFFFF; letter-spacing:7px; text-transform:uppercase;">Wolvo</div>
               <div style="margin-top:8px; font-family:'SF Mono','Courier New',monospace; font-size:10px; letter-spacing:2px; color:#6F72D8; text-transform:uppercase;">● Secure</div>
             </td>
