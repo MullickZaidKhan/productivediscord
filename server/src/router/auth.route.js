@@ -13,6 +13,13 @@ import {
   verifyJwt,
   accessTokenverifyJwt,
 } from "../middleware/auth.middleware.js";
+
+import {
+  sendVerificationOtp,
+  verifyEmailOtp,
+  resendVerificationOtp,
+} from "../controller/Secure/verifyEmail.controller.js";
+
 import upload from "../config/multer.js";
 const authRoute = Router();
 
@@ -27,6 +34,13 @@ authRoute.get("/public-key/:userId", verifyJwt, getPublicKeys);
 authRoute.get("/refresh", refresh);
 authRoute.get("/accesstoken", accessTokenverifyJwt);
 authRoute.get("/checkUsername/:username", checkUsername);
+// Send verification OTP
+authRoute.post("/send-verification", sendVerificationOtp);
 
+// Verify email using OTP
+authRoute.post("/verify-email", verifyEmailOtp);
+
+// Resend verification OTP
+authRoute.post("/resend-verification", resendVerificationOtp);
 //export
 export default authRoute;

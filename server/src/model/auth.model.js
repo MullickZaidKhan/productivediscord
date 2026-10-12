@@ -43,6 +43,30 @@ const userSchema = new mongoose.Schema(
     profileimg: {
       type: String,
     },
+    isEmailVerified: {
+      type: Boolean,
+      default: false,
+    },
+
+    emailVerificationOtpHash: {
+      type: String,
+      default: null,
+    },
+
+    emailVerificationOtpExpires: {
+      type: Date,
+      default: null,
+    },
+
+    emailVerificationAttempts: {
+      type: Number,
+      default: 0,
+    },
+
+    emailVerificationLastSentAt: {
+      type: Date,
+      default: null,
+    },
     // Friends List
     friends: [
       {
