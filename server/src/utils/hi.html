@@ -1,95 +1,94 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="color-scheme" content="dark" />
-  <meta name="supported-color-schemes" content="dark" />
-  <title>Verify your email</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Logo loader v2</title>
+<style>
+:root {
+  --bg: #14141a; --fg: #fff; --muted: #9a9aa8; --btn: #26262f;
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+html { height: 100%; }
+body {
+  margin: 0; min-height: 100%; background: var(--bg); color: var(--fg);
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 28px; padding: 24px;
+}
+.logo { width: min(260px, 70vw); height: auto; animation: bob 2.6s ease-in-out infinite; }
+@keyframes bob {
+  0%, 100% { transform: translateY(0) rotate(-1.5deg); }
+  50%      { transform: translateY(-8px) rotate(1.5deg); }
+}
+.body { animation: glow 2.6s ease-in-out infinite; }
+@keyframes glow {
+  0%, 100% { opacity: .75; filter: drop-shadow(0 0 0 rgba(255,255,255,0)); }
+  50%      { opacity: 1;   filter: drop-shadow(0 0 22px rgba(255,255,255,.5)); }
+}
+
+/* variant visibility */
+g.waves, g.rays { display: none; }
+body.mode-waves g.waves, body.mode-rays g.rays { display: inline; }
+
+/* waves: arcs radiate outward one after another */
+.waves path { opacity: 0; animation: wave 1.8s ease-out infinite; }
+.waves path:nth-child(2) { animation-delay: 0s; }
+.waves path:nth-child(1) { animation-delay: .25s; }
+.waves path:nth-child(3) { animation-delay: .5s; }
+.waves path:nth-child(4) { animation-delay: .75s; }
+@keyframes wave {
+  0%   { opacity: 0; transform: translateX(-40px); }
+  25%  { opacity: 1; }
+  70%  { opacity: 0; transform: translateX(30px); }
+  100% { opacity: 0; transform: translateX(30px); }
+}
+
+/* rays: spikes burst out from the head */
+.rays path { opacity: 0; transform-origin: 2040px 1010px; animation: ray 1.6s ease-out infinite; }
+.rays path:nth-child(2) { animation-delay: 0s; }
+.rays path:nth-child(1) { animation-delay: .2s; }
+.rays path:nth-child(3) { animation-delay: .4s; }
+@keyframes ray {
+  0%   { opacity: 0; transform: scale(.4); }
+  30%  { opacity: 1; transform: scale(1); }
+  70%  { opacity: 1; transform: scale(1.12); }
+  100% { opacity: 0; transform: scale(1.2); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .logo, .body, .waves path, .rays path { animation: none !important; }
+  .waves path, .rays path { opacity: 1; }
+}
+
+.controls { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+button {
+  background: var(--btn); color: var(--fg); border: 1px solid #3a3a46;
+  padding: 8px 16px; border-radius: 8px; font: inherit; cursor: pointer;
+}
+button[aria-pressed="true"] { background: #fff; color: #14141a; }
+button:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+p { margin: 0; color: var(--muted); font-size: 14px; }
+</style>
 </head>
-<body style="margin:0; padding:0; background-color:#05060D;">
-  <!-- Preheader (inbox preview text) -->
-  <div style="display:none; max-height:0; overflow:hidden; opacity:0;">
-    Your Wolvo verification code is inside. It expires in 10 minutes.
-  </div>
+<body class="mode-waves">
+<svg class="logo" viewBox="500 520 2060 1600" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Loading">
+  <path class="body" fill="white" d="M1932.75 621.196C1944.92 615.413 1946.45 615.413 1957.71 622.413C1979.62 635.501 1996.36 674.156 2000.01 719.202C2000.93 730.464 2004.58 753.901 2007.93 771.25C2013.1 797.121 2014.01 810.514 2012.8 842.776C2010.36 900.606 2000.01 936.522 1946.45 1074.4C1943.4 1082.01 1943.71 1085.66 1949.49 1098.14C1954.66 1109.71 1957.1 1112.45 1961.05 1110.62C1963.79 1109.4 1973.53 1105.75 1982.67 1102.4C1998.49 1096.32 1999.1 1096.32 2003.06 1101.49C2014.32 1117.32 2015.54 1158.71 2005.19 1190.06C1994.23 1223.84 1979.32 1238.15 1908.7 1281.67C1789.39 1355.64 1703.56 1450.9 1658.51 1558.95C1615.9 1661.83 1601.9 1762.88 1611.94 1896.5C1614.07 1921.76 1614.68 1946.11 1613.47 1950.37C1609.81 1964.98 1594.29 1978.37 1560.81 1995.72C1489.89 2032.55 1419.28 2056.29 1339.23 2070.29C1295.4 2077.9 1175.79 2077.9 1129.22 2070.29C1087.21 2063.29 1033.95 2050.2 998.339 2037.72C917.682 2009.42 802.022 1940.02 790.76 1913.54C785.586 1900.76 786.499 1897.11 808.413 1859.06C857.416 1773.53 909.463 1655.44 938.986 1561.69L942.639 1549.82L967.598 1551.95C1057.69 1559.26 1123.74 1556.82 1185.83 1544.34C1310.92 1519.39 1417.45 1450.6 1481.98 1352.9C1503.59 1320.63 1526.42 1274.37 1526.42 1263.41C1526.42 1261.89 1516.98 1270.72 1505.42 1283.2C1444.85 1348.94 1398.89 1386.68 1338.62 1420.47C1261.31 1463.69 1180.05 1486.82 1086.61 1491.69C1047.65 1493.82 976.121 1490.78 969.424 1486.82C962.728 1482.56 985.86 1348.03 1007.47 1267.67C1034.56 1166.62 1074.74 1082.31 1123.74 1022.96C1127.69 1018.09 1130.43 1013.53 1129.52 1012.92C1127.39 1010.48 1093.91 1034.53 1073.82 1053.09C1011.73 1109.71 963.336 1203.45 933.204 1323.98C929.856 1337.37 922.247 1369.33 916.464 1395.2C902.463 1455.77 888.157 1501.12 864.112 1560.48C841.285 1617.7 794.716 1710.23 766.714 1754.66C755.757 1772.32 742.974 1792.4 738.713 1799.41C726.843 1818.58 707.971 1824.36 692.753 1813.41C681.491 1805.49 645.272 1747.97 622.14 1701.4C592.312 1640.52 564.005 1551.35 559.439 1503.25C557.309 1478.6 561.571 1469.17 602.66 1412.25C620.922 1386.99 641.619 1358.38 648.619 1348.33C655.924 1338.29 678.447 1307.55 698.84 1279.85C719.232 1252.15 738.712 1225.37 741.756 1220.19L747.539 1210.45L721.363 1179.1C682.709 1131.93 664.446 1105.45 644.054 1066.79C600.834 984.003 581.05 917.042 592.007 889.04C595.355 880.213 609.356 871.995 620.922 871.995C625.487 871.995 670.23 879.605 720.755 889.04C851.328 913.085 943.856 925.564 963.336 922.216C977.033 919.477 987.077 914.303 1050.99 875.952C1193.44 790.425 1314.27 741.117 1393.71 735.942C1429.93 733.812 1463.41 738.073 1527.33 753.596C1605.25 772.467 1610.73 771.554 1696.86 731.377C1751.65 705.506 1858.18 655.894 1890.14 640.98C1908.7 632.457 1927.88 623.631 1932.75 621.196ZM1953.14 871.995C1946.45 871.995 1933.36 883.562 1883.75 934.087C1794.87 1023.88 1775.39 1047.01 1757.74 1083.53C1735.82 1128.27 1723.04 1170.28 1730.95 1170.28C1742.52 1169.97 1894.09 1135.27 1905.36 1130.1C1910.83 1127.66 1913.88 1122.79 1916.01 1114.27C1919.36 1099.97 1942.49 1019.31 1955.88 973.959C1966.23 939.261 1971.1 889.953 1965.01 878.691C1962.58 874.43 1958.62 871.995 1953.14 871.995ZM1553.81 844.298C1553.81 842.776 1551.98 841.863 1550.16 842.167C1548.03 842.167 1541.33 843.081 1535.55 843.69C1521.85 844.907 1473.46 852.821 1444.24 858.604C1407.71 865.908 1391.89 872.3 1349.88 897.258C1316.4 917.346 1240.62 976.998 1244.27 980.654C1246.7 982.785 1307.88 972.741 1350.8 963.001C1411.97 949 1434.19 940.783 1460.98 922.825C1487.76 904.563 1553.81 848.863 1553.81 844.298ZM980.688 677.503C992.559 670.503 1008.08 673.851 1037.91 689.678C1072.61 707.635 1149 754.203 1160.57 763.943L1168.48 770.944L1142.92 783.728C1108.52 801.077 1048.56 834.861 1015.69 855.254C1001.08 864.385 987.993 870.472 986.775 869.255C985.253 867.732 980.993 855.862 977.036 842.471C957.252 774.292 959.078 689.982 980.688 677.503Z"/>
 
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0"
-    style="background-color:#05060D; background-size:100% 100%, 32px 32px, 32px 32px; padding:40px 16px;">
-    <tr>
-      <td align="center">
-        <table role="presentation" width="100%" cellpadding="0" cellspacing="0"
-          style="max-width:480px; text-align:center; background-color:#0C0E1F; border:1px solid #20235A; border-radius:20px; overflow:hidden; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;">
+  <g class="waves" fill="white">
+    <path d="M2175.57 1116.41C2190.59 1032.13 2174.2 945.273 2129.51 872.262L2080.16 902.47C2117.47 963.411 2131.15 1035.91 2118.61 1106.26L2175.57 1116.41Z"/>
+    <path d="M2070.87 1089.85C2079.52 1041.34 2070.09 991.328 2044.35 949.295L2015.95 966.686C2037.42 1001.77 2045.3 1043.51 2038.08 1084.01L2070.87 1089.85Z"/>
+    <path d="M2299.8 1169.05C2325.25 1026.26 2297.48 879.091 2221.76 755.389L2152.14 798.009C2217.44 904.683 2241.38 1031.59 2219.44 1154.72L2299.8 1169.05Z"/>
+    <path d="M2510.08 1233.79C2551.36 1002.15 2506.32 763.407 2383.47 562.73L2256.57 640.417C2360.41 810.055 2398.49 1011.87 2363.59 1207.68L2510.08 1233.79Z"/>
+  </g>
 
-          <!-- Accent bar -->
-          <tr>
-            <td height="3" bgcolor="#3F42BE" style="height:3px; line-height:3px; font-size:0; background-image:linear-gradient(90deg,#3F42BE,#7C5CFF,#35D0FF);">&nbsp;</td>
-          </tr>
 
-          <!-- Header / Logo (centered) -->
-          <tr>
-            <td align="center" style="padding:34px 32px 0 32px;">
-              <!-- Logo -->
-              <img
-              src="https://ik.imagekit.io/w5wx4gdmoj/wolvo-logo.png"
-              width="72"
-              height="72"
-             alt="Wolvo Logo"
-             style="display:block; margin:0 auto; width:72px; height:72px; border:0; object-fit:contain;"
-           />
-              <div style="margin-top:16px; font-size:19px; font-weight:700; color:#FFFFFF; letter-spacing:7px; text-transform:uppercase;">Wolvo</div>
-              <div style="margin-top:8px; font-family:'SF Mono','Courier New',monospace; font-size:10px; letter-spacing:2px; color:#6F72D8; text-transform:uppercase;">● Secure</div>
-            </td>
-          </tr>
+</svg>
 
-          <!-- Body -->
-          <tr>
-            <td style="padding:32px 32px 0 32px;">
-              <div style="font-family:'SF Mono','Courier New',monospace; font-size:11px; letter-spacing:3px; color:#6F72D8; text-transform:uppercase; margin-bottom:10px;">
-                Identity check
-              </div>
-              <h2 style="margin:0 0 12px 0; font-size:26px; line-height:1.25; color:#FFFFFF; font-weight:700;">Verify your email</h2>
-              <p style="margin:0; font-size:15px; line-height:1.65; color:#9EA1C7;">
-                Enter the one-time code below to confirm your email address and activate your Wolvo account.
-              </p>
-            </td>
-          </tr>
+ <h1 className="text-white text-2xl font-semibold tracking-wide">Wolvo</h1>
 
-          <!-- Verification code -->
-          <tr>
-            <td align="center" style="padding:30px 32px 0 32px;">
-              <div style="border-radius:14px; background-color:#3F42BE; background-image:linear-gradient(135deg,#3F42BE,#7C5CFF 55%,#35D0FF); padding:1px;">
-                <div style="background-color:#0A0C1C; border-radius:13px; padding:22px 16px; font-size:36px; font-weight:700; letter-spacing:12px; text-indent:12px; color:#CFD0FF; text-align:center; font-family:'SF Mono','Courier New',monospace; text-shadow:0 0 18px rgba(124,92,255,0.55);">
-                  ${otp}
-                </div>
-              </div>
-            </td>
-          </tr>
 
-          <!-- Expiry chip -->
-          <tr>
-            <td align="center" style="padding:20px 32px 0 32px;">
-              <span style="display:inline-block; font-family:'SF Mono','Courier New',monospace; font-size:11px; letter-spacing:2px; text-transform:uppercase; color:#9EA1C7; border:1px solid #20235A; background-color:#0A0C1C; border-radius:999px; padding:8px 16px;">
-                Valid for <span style="color:#FFFFFF;">10 min</span>
-              </span>
-            </td>
-          </tr>
-
-          <!-- Footer note -->
-          <tr>
-            <td style="padding:28px 32px 32px 32px;">
-              <div style="height:1px; background-color:#1A1D48; line-height:1px; font-size:0; margin-bottom:18px;">&nbsp;</div>
-              <p style="margin:0; font-size:13px; line-height:1.6; color:#7C7FB0;">
-                Didn't request this? You can safely ignore this email — no changes will be made to your account.
-              </p>
-            </td>
-          </tr>
-        </table>
-
-        <p style="margin:18px 0 0 0; font-family:Arial,sans-serif; font-size:11px; letter-spacing:1px; color:#5B5E88;">
-          © ${new Date().getFullYear()} WOLVO · ALL RIGHTS RESERVED
-        </p>
-      </td>
-    </tr>
-  </table>
 </body>
 </html>
