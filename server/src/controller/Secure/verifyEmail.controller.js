@@ -1,4 +1,3 @@
-
 import { User } from "../../model/auth.model.js";
 
 import {
@@ -7,15 +6,46 @@ import {
   sendVerificationEmail,
 } from "../../utils/emailVerification.js";
 
-const OTP_COOLDOWN_MS =
-  process.env.NODE_ENV === "production" ? 60_000 : 10_000;
-
-const OTP_EXPIRY_MS = 10 * 60 * 1000;
-const MAX_OTP_ATTEMPTS = 5;
+const OTP_EXPIRY_MS = 60 * 1000; // 1 minute
+const OTP_COOLDOWN_MS = 30 * 1000; // 30 seconds between OTP requests
+const MAX_OTP_ATTEMPTS = 5; // max failed verification attempts
+const LOCKOUT_MS = 30 * 60 * 1000; // 30 minutes
+const MAX_OTP_GENERATIONS = 5; // OTPs allowed before generation is blocked
+const OTP_GENERATION_BLOCK_MS = 30 * 60 * 1000; // 30 minutes
 
 const normalizeEmail = (email) =>
   typeof email === "string" ? email.trim().toLowerCase() : "";
 
+const toMs = (date) => (date ? new Date(date).getTime() : 0);
+
+const secondsLeft = (untilMs, nowMs) =>
+  Math.max(1, Math.ceil((untilMs - nowMs) / 1000));
+
+// If a lockout has ended, clear it and reset the failed-attempt counter.
+// Returns true if the user document was modified.
+const clearExpiredLockout = (user, now) => {
+  const lockedUntil = toMs(user.emailVerificationLockedUntil);
+
+  if (lockedUntil && lockedUntil <= now) {
+    user.emailVerificationLockedUntil = null;
+    user.emailVerificationAttempts = 0;
+    return true;
+  }
+  return false;
+};
+
+// If the OTP-generation block has ended, clear it and reset the generation
+// count to 0. Returns true if the user document was modified.
+const clearExpiredGenerationBlock = (user, now) => {
+  const blockedUntil = toMs(user.emailVerificationOtpBlockedUntil);
+
+  if (blockedUntil && blockedUntil <= now) {
+    user.emailVerificationOtpBlockedUntil = null;
+    user.emailVerificationOtpGeneratedCount = 0;
+    return true;
+  }
+  return false;
+};
 
 // POST /api/v1/auth/send-verification
 export const sendVerificationOtp = async (req, res) => {
@@ -49,26 +79,50 @@ export const sendVerificationOtp = async (req, res) => {
 
     const now = Date.now();
 
-    const lastSent = user.emailVerificationLastSentAt
-      ? new Date(user.emailVerificationLastSentAt).getTime()
-      : 0;
+    // Lockout handling: a new OTP is pointless while verification is blocked.
+    let wasCleared = clearExpiredLockout(user, now);
+    wasCleared = clearExpiredGenerationBlock(user, now) || wasCleared;
 
-    const hasActiveOtp =
-      Boolean(user.emailVerificationOtpHash) &&
-      Boolean(user.emailVerificationOtpExpires) &&
-      new Date(user.emailVerificationOtpExpires).getTime() > now;
+    const lockedUntil = toMs(user.emailVerificationLockedUntil);
 
-    // Enforce cooldown for an active OTP.
-    if (
-      hasActiveOtp &&
-      Number.isFinite(lastSent) &&
-      lastSent > 0 &&
-      now - lastSent < OTP_COOLDOWN_MS
-    ) {
-      const retryAfterSeconds = Math.ceil(
-        (OTP_COOLDOWN_MS - (now - lastSent)) / 1000
-      );
+    if (lockedUntil > now) {
+      if (wasCleared) await user.save();
 
+      const retryAfterSeconds = secondsLeft(lockedUntil, now);
+      res.set("Retry-After", String(retryAfterSeconds));
+
+      return res.status(429).json({
+        success: false,
+        message:
+          "Too many failed attempts. Please try again after the lockout period.",
+        retryAfterSeconds,
+      });
+    }
+
+    // OTP generation block (generation limit previously exceeded).
+    const otpBlockedUntil = toMs(user.emailVerificationOtpBlockedUntil);
+
+    if (otpBlockedUntil > now) {
+      if (wasCleared) await user.save();
+
+      const retryAfterSeconds = secondsLeft(otpBlockedUntil, now);
+      res.set("Retry-After", String(retryAfterSeconds));
+
+      return res.status(429).json({
+        success: false,
+        message:
+          "Too many verification codes requested. Please try again later.",
+        retryAfterSeconds,
+      });
+    }
+
+    // Resend cooldown (30 seconds since the last OTP generation).
+    const lastSent = toMs(user.emailVerificationLastSentAt);
+
+    if (lastSent > 0 && now - lastSent < OTP_COOLDOWN_MS) {
+      if (wasCleared) await user.save();
+
+      const retryAfterSeconds = secondsLeft(lastSent + OTP_COOLDOWN_MS, now);
       res.set("Retry-After", String(retryAfterSeconds));
 
       return res.status(429).json({
@@ -78,15 +132,39 @@ export const sendVerificationOtp = async (req, res) => {
       });
     }
 
+    // Generation limit: 5 OTPs allowed. The next request would exceed the
+    // limit, so block generation for 30 minutes instead.
+    if ((user.emailVerificationOtpGeneratedCount ?? 0) >= MAX_OTP_GENERATIONS) {
+      user.emailVerificationOtpBlockedUntil = new Date(
+        now + OTP_GENERATION_BLOCK_MS
+      );
+
+      await user.save();
+
+      const retryAfterSeconds = Math.ceil(OTP_GENERATION_BLOCK_MS / 1000);
+      res.set("Retry-After", String(retryAfterSeconds));
+
+      return res.status(429).json({
+        success: false,
+        message:
+          "Too many verification codes requested. Please try again in 30 minutes.",
+        retryAfterSeconds,
+      });
+    }
+
+    // Remember previous values so we can roll back if email delivery fails.
+    const previousLastSentAt = user.emailVerificationLastSentAt;
+
     const otp = generateOtp();
 
-    // Store the hashed OTP, never the plain OTP.
+    // New OTP replaces any previous one and restarts the expiry timer.
+    // Note: failed-attempt count is NOT reset here, otherwise requesting
+    // new OTPs would bypass the attempt limit.
     user.emailVerificationOtpHash = hashOtp(otp);
-    user.emailVerificationOtpExpires = new Date(
-      now + OTP_EXPIRY_MS
-    );
-    user.emailVerificationAttempts = 0;
+    user.emailVerificationOtpExpires = new Date(now + OTP_EXPIRY_MS);
     user.emailVerificationLastSentAt = new Date(now);
+    user.emailVerificationOtpGeneratedCount =
+      (user.emailVerificationOtpGeneratedCount ?? 0) + 1;
 
     await user.save();
 
@@ -101,18 +179,20 @@ export const sendVerificationOtp = async (req, res) => {
         response: emailError.response,
       });
 
-      // Clear OTP and cooldown after failed delivery.
+      // Roll back: the user never received this OTP.
       user.emailVerificationOtpHash = null;
       user.emailVerificationOtpExpires = null;
-      user.emailVerificationAttempts = 0;
-      user.emailVerificationLastSentAt = null;
+      user.emailVerificationLastSentAt = previousLastSentAt;
+      user.emailVerificationOtpGeneratedCount = Math.max(
+        0,
+        (user.emailVerificationOtpGeneratedCount ?? 1) - 1
+      );
 
       await user.save();
 
       return res.status(503).json({
         success: false,
-        message:
-          "Email delivery failed. Please try again shortly.",
+        message: "Email delivery failed. Please try again shortly.",
       });
     }
 
@@ -137,7 +217,6 @@ export const sendVerificationOtp = async (req, res) => {
     });
   }
 };
-
 
 // POST /api/v1/auth/verify-email
 export const verifyEmailOtp = async (req, res) => {
@@ -168,43 +247,58 @@ export const verifyEmailOtp = async (req, res) => {
       });
     }
 
-    const expiresAt = user.emailVerificationOtpExpires
-      ? new Date(user.emailVerificationOtpExpires).getTime()
-      : 0;
+    const now = Date.now();
 
-    if (
-      !user.emailVerificationOtpHash ||
-      !Number.isFinite(expiresAt) ||
-      expiresAt <= Date.now()
-    ) {
+    // 1. Lockout check (also resets counter once the lockout has ended).
+    const wasCleared = clearExpiredLockout(user, now);
+    const lockedUntil = toMs(user.emailVerificationLockedUntil);
+
+    if (lockedUntil > now) {
+      const retryAfterSeconds = secondsLeft(lockedUntil, now);
+      res.set("Retry-After", String(retryAfterSeconds));
+
+      return res.status(429).json({
+        success: false,
+        message:
+          "Too many failed attempts. Please try again after the lockout period.",
+        retryAfterSeconds,
+      });
+    }
+
+    if (wasCleared) await user.save();
+
+    // 2. OTP existence / expiry check (does not count as a failed attempt).
+    const expiresAt = toMs(user.emailVerificationOtpExpires);
+
+    if (!user.emailVerificationOtpHash || expiresAt <= now) {
       return res.status(400).json({
         success: false,
         message: "Code expired. Please request a new one.",
       });
     }
 
-    if (
-      (user.emailVerificationAttempts ?? 0) >= MAX_OTP_ATTEMPTS
-    ) {
-      return res.status(429).json({
-        success: false,
-        message: "Too many attempts. Please request a new code.",
-      });
-    }
+    // 3. Compare OTP.
+    if (hashOtp(otp) !== user.emailVerificationOtpHash) {
+      user.emailVerificationAttempts =
+        (user.emailVerificationAttempts ?? 0) + 1;
 
-    const suppliedHash = hashOtp(otp);
-
-    // Count every verification attempt.
-    user.emailVerificationAttempts =
-      (user.emailVerificationAttempts ?? 0) + 1;
-
-    if (suppliedHash !== user.emailVerificationOtpHash) {
-      // Invalidate the OTP after the fifth incorrect attempt.
-      if (
-        user.emailVerificationAttempts >= MAX_OTP_ATTEMPTS
-      ) {
+      if (user.emailVerificationAttempts >= MAX_OTP_ATTEMPTS) {
+        // Lock verification for 30 minutes and invalidate the current OTP.
+        user.emailVerificationLockedUntil = new Date(now + LOCKOUT_MS);
         user.emailVerificationOtpHash = null;
         user.emailVerificationOtpExpires = null;
+
+        await user.save();
+
+        const retryAfterSeconds = Math.ceil(LOCKOUT_MS / 1000);
+        res.set("Retry-After", String(retryAfterSeconds));
+
+        return res.status(429).json({
+          success: false,
+          message:
+            "Too many failed attempts. Verification is locked for 30 minutes.",
+          retryAfterSeconds,
+        });
       }
 
       await user.save();
@@ -212,15 +306,18 @@ export const verifyEmailOtp = async (req, res) => {
       return res.status(400).json({
         success: false,
         message: "Invalid or expired verification code.",
+        attemptsRemaining: MAX_OTP_ATTEMPTS - user.emailVerificationAttempts,
       });
     }
 
-    // Successful verification.
+    // 4. Successful verification.
     user.isEmailVerified = true;
     user.emailVerificationOtpHash = null;
     user.emailVerificationOtpExpires = null;
     user.emailVerificationAttempts = 0;
-    user.emailVerificationLastSentAt = null;
+    user.emailVerificationLockedUntil = null;
+    // emailVerificationLastSentAt and emailVerificationOtpGeneratedCount are
+    // kept intentionally for tracking.
 
     await user.save();
 
@@ -242,9 +339,7 @@ export const verifyEmailOtp = async (req, res) => {
   }
 };
 
-
 // POST /api/v1/auth/resend-verification
 export const resendVerificationOtp = async (req, res) => {
   return sendVerificationOtp(req, res);
 };
-

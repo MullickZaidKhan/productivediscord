@@ -48,25 +48,53 @@ const userSchema = new mongoose.Schema(
       default: false,
     },
 
+    // ---- Email verification / OTP tracking ----
+
+    // Hashed OTP (plain OTP is never stored). A new OTP overwrites this.
     emailVerificationOtpHash: {
       type: String,
       default: null,
     },
 
+    // When the current OTP expires (1 minute after generation).
     emailVerificationOtpExpires: {
       type: Date,
       default: null,
     },
 
+    // Number of FAILED verification attempts (reset after lockout ends).
     emailVerificationAttempts: {
       type: Number,
       default: 0,
+      min: 0,
     },
 
+    // Timestamp of the last OTP generation.
     emailVerificationLastSentAt: {
       type: Date,
       default: null,
     },
+
+    // Total number of OTPs generated for this user.
+    emailVerificationOtpGeneratedCount: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+
+    // OTP generation is blocked until this time after the generation limit
+    // is exceeded (count is reset to 0 once this time has passed).
+    emailVerificationOtpBlockedUntil: {
+      type: Date,
+      default: null,
+    },
+
+    // Verification is blocked until this time after too many failed attempts.
+    emailVerificationLockedUntil: {
+      type: Date,
+      default: null,
+    },
+
     // Friends List
     friends: [
       {

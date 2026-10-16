@@ -32,7 +32,7 @@ const EmptyChat = ({ userId }) => {
           text-center
           animate-fadeIn
           backdrop-blur-xs
-          bg-[#1f1f1fc2]
+          bg-[#1f1f1f46]
           p-6
           rounded-2xl
         "
