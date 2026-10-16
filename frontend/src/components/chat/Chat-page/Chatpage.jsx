@@ -24,7 +24,7 @@ import useSendChatMessage from "./hooks/useSendChatMessage.js";
 import useChatScroll from "./hooks/useChatScroll.js";
 import useChatBackground from "./hooks/useChatBackground.js";
 import useContactOnline from "./hooks/useContactOnline.js";
-
+import EmptyChat from "./EmptyChat.jsx"
 export default function ChatPage({ onCloseChat }) {
   const [headerIn, setHeaderIn] = useState(false);
   const contact = useSelector((state) => state.chat.userinfo);
@@ -118,6 +118,7 @@ export default function ChatPage({ onCloseChat }) {
               onClick={onCloseChat}
               className="rounded-full p-1 hover:bg-white/10 transition-colors"
               aria-label="Close chat"
+              
             >
               <ChevronLeft className="text-white" />
             </button>
@@ -165,7 +166,7 @@ export default function ChatPage({ onCloseChat }) {
           </div>
         </div>
 
-        <div ref={scrollRef} className="flex-1 overflow-y-auto pb-2">
+        <div ref={scrollRef} className="flex-1 overflow-y-auto pb-2 ">
           {messagesLoading && (
             <p className="text-center text-[13px] text-[#6d6f78] mt-6">
               Loading messages…
@@ -177,9 +178,10 @@ export default function ChatPage({ onCloseChat }) {
             </p>
           )}
           {!messagesLoading && !messagesError && messages.length === 0 && (
-            <p className="text-center text-[13px] text-[#6d6f78] mt-6">
-              No messages yet. Say hello 👋
-            </p>
+            // <p className="text-center text-[13px] text-[#6d6f78] mt-6">
+            //   No messages yet. Say hello 👋
+            // </p>
+            <EmptyChat userId={1233} />
           )}
 
           {groupedMessages.map((group) => (
