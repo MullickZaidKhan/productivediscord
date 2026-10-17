@@ -84,11 +84,28 @@ p { margin: 0; color: var(--muted); font-size: 14px; }
     <path d="M2510.08 1233.79C2551.36 1002.15 2506.32 763.407 2383.47 562.73L2256.57 640.417C2360.41 810.055 2398.49 1011.87 2363.59 1207.68L2510.08 1233.79Z"/>
   </g>
 
-
+  <g class="rays" fill="white">
+    <path d="M2190 949L2392 869L2336 975L2026 1015L2190 949Z"/>
+    <path d="M2084.3 881.904L2160.15 774L2164.41 883.832L2023.04 970.51L2084.3 881.904Z"/>
+    <path d="M2111.14 1125L2216 1205L2186.93 1099L2026 1059L2111.14 1125Z"/>
+  </g>
 </svg>
 
- <h1 className="text-white text-2xl font-semibold tracking-wide">Wolvo</h1>
+<div class="controls" role="group" aria-label="Animation style">
+  <button data-mode="mode-waves" aria-pressed="true">Waves</button>
+  <button data-mode="mode-rays" aria-pressed="false">Rays</button>
+</div>
+<p>Loading...</p>
 
-
+<script>
+document.querySelectorAll('button').forEach(function (b) {
+  b.addEventListener('click', function () {
+    document.body.className = b.dataset.mode;
+    document.querySelectorAll('button').forEach(function (x) {
+      x.setAttribute('aria-pressed', x === b ? 'true' : 'false');
+    });
+  });
+});
+</script>
 </body>
 </html>
