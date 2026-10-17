@@ -340,11 +340,10 @@
 //     </div>
 //   );
 // }
-
 import { Skeleton, SkeletonCircle, SkeletonList } from "./Skeleton.jsx";
 
 // ---- Space background data (computed once at module load: no state/timers) ----
-const COLORS = { white: "#ffffff", silver: "#d9d9d9" };
+const COLORS = { white: "#FFFFFF", silver: "color-mix(in srgb, #FFFFFF 68%, #000000)" };
 const frac = (n) => n - Math.floor(n);
 
 // 36 falling stars in three depth tiers (far = slow/faint, mid, fast = bright).
@@ -395,10 +394,10 @@ const SHOOTERS = [
 const ORBITS = [
   { "--cx": "14%", "--cy": "24%", "--r": "22vmin", "--e": 0.45, "--tilt": "-18deg", "--d": "46s", "--dl": "-12s", "--dir": "normal",  "--s": "3px",   "--c": COLORS.silver,   "--o": 0.9,  "--g": "7s",  "--gl": "-2s" },
   { "--cx": "84%", "--cy": "20%", "--r": "17vmin", "--e": 0.55, "--tilt": "24deg",  "--d": "38s", "--dl": "-20s", "--dir": "reverse", "--s": "2.5px", "--c": COLORS.white, "--o": 0.85, "--g": "9s",  "--gl": "-5s" },
-  { "--cx": "22%", "--cy": "80%", "--r": "26vmin", "--e": 0.4,  "--tilt": "12deg",  "--d": "62s", "--dl": "-30s", "--dir": "reverse", "--s": "3.5px", "--c": COLORS.white,  "--o": 0.8,  "--g": "11s", "--gl": "-7s" },
+  { "--cx": "22%", "--cy": "80%", "--r": "26vmin", "--e": 0.4,  "--tilt": "12deg",  "--d": "62s", "--dl": "-30s", "--dir": "reverse", "--s": "3.5px", "--c": COLORS.silver,  "--o": 0.8,  "--g": "11s", "--gl": "-7s" },
   { "--cx": "80%", "--cy": "74%", "--r": "20vmin", "--e": 0.5,  "--tilt": "-30deg", "--d": "52s", "--dl": "-8s",  "--dir": "normal",  "--s": "2.5px", "--c": COLORS.silver,  "--o": 0.9,  "--g": "8s",  "--gl": "-1s" },
   { "--cx": "50%", "--cy": "9%",  "--r": "15vmin", "--e": 0.35, "--tilt": "6deg",   "--d": "34s", "--dl": "-15s", "--dir": "reverse", "--s": "2px",   "--c": COLORS.silver,   "--o": 0.8,  "--g": "6s",  "--gl": "-3s" },
-  { "--cx": "92%", "--cy": "52%", "--r": "13vmin", "--e": 0.6,  "--tilt": "70deg",  "--d": "30s", "--dl": "-5s",  "--dir": "normal",  "--s": "2px",   "--c": COLORS.white,  "--o": 0.75, "--g": "10s", "--gl": "-6s" },
+  { "--cx": "92%", "--cy": "52%", "--r": "13vmin", "--e": 0.6,  "--tilt": "70deg",  "--d": "30s", "--dl": "-5s",  "--dir": "normal",  "--s": "2px",   "--c": COLORS.silver,  "--o": 0.75, "--g": "10s", "--gl": "-6s" },
 ];
 
 // Irregular asteroid silhouettes.
@@ -471,7 +470,7 @@ export default function AppSkeleton() {
       {/* Main area */}
       <div aria-hidden="true" className="flex-1 flex flex-col p-4 gap-4">
         <Skeleton className="h-10 w-1/3 rounded-md" />
-        <div className="flex-1 rounded-2xl bg-[#000000] p-4">
+        <div className="flex-1 rounded-2xl bg-black/50 p-4">
           <SkeletonList rows={6} />
         </div>
       </div>
@@ -497,8 +496,42 @@ export default function AppSkeleton() {
       </div>
 
       {/* Center logo + name */}
-      <div className="wolvo-overlay absolute inset-0 z-10 flex bg-black/70 flex-col items-center justify-center pointer-events-none">
+      <div className="wolvo-overlay absolute inset-0 z-10 flex bg-black/50 flex-col items-center justify-center pointer-events-none">
         <style>{`
+          /* Black and white only. Every other colour in this scene is white, either with
+             transparency (rgba) or mixed into black. */
+          :root {
+            --wolvo-black: #000000;
+            --wolvo-white: #FFFFFF;
+
+            /* ---- Opacity controls: change any value (0 to 1) to tune the scene ---- */
+            --wolvo-planet-opacity: 0.2;                              /* master dial for every planet and the moon */
+            --wolvo-planet-a-opacity: var(--wolvo-planet-opacity);   /* large gas giant (bottom-left) */
+            --wolvo-planet-b-opacity: var(--wolvo-planet-opacity);   /* ringed planet (upper right) */
+            --wolvo-planet-c-opacity: var(--wolvo-planet-opacity);   /* small planet (upper left) */
+            --wolvo-moon-opacity: var(--wolvo-planet-opacity);       /* moon */
+            --wolvo-asteroid-opacity: 1;      /* multiplies each asteroid's own opacity */
+            --wolvo-star-opacity: 0.5;          /* multiplies each falling star's own opacity */
+            --wolvo-shooting-star-opacity: 1;
+            --wolvo-orbit-path-opacity: 1;    /* the faint orbit rings */
+            --wolvo-orbit-particle-opacity: 1;
+            --wolvo-satellite-opacity: .9;
+            --wolvo-rocket-opacity: .9;
+
+            /* soft white deepened into black (planetary shades) */
+            --wolvo-gray-05: color-mix(in srgb, var(--wolvo-white) 5%, var(--wolvo-black));
+            --wolvo-gray-08: color-mix(in srgb, var(--wolvo-white) 8%, var(--wolvo-black));
+            --wolvo-gray-13: color-mix(in srgb, var(--wolvo-white) 13%, var(--wolvo-black));
+            --wolvo-gray-19: color-mix(in srgb, var(--wolvo-white) 19%, var(--wolvo-black));
+            --wolvo-gray-26: color-mix(in srgb, var(--wolvo-white) 26%, var(--wolvo-black));
+            --wolvo-gray-35: color-mix(in srgb, var(--wolvo-white) 35%, var(--wolvo-black));
+            /* white deepened into black (moon, asteroids, satellite) */
+            --wolvo-white-08: color-mix(in srgb, var(--wolvo-white) 8%, var(--wolvo-black));
+            --wolvo-white-16: color-mix(in srgb, var(--wolvo-white) 16%, var(--wolvo-black));
+            --wolvo-white-30: color-mix(in srgb, var(--wolvo-white) 30%, var(--wolvo-black));
+            --wolvo-white-48: color-mix(in srgb, var(--wolvo-white) 48%, var(--wolvo-black));
+          }
+
           /* Soft fade-in so the overlay settles in instead of popping */
           .wolvo-overlay { animation: wolvo-fade-in .4s ease-out both; }
           @keyframes wolvo-fade-in {
@@ -506,21 +539,29 @@ export default function AppSkeleton() {
             to   { opacity: 1; }
           }
 
-          /* Pure black space layer (palette: black, white and neutral grays only) */
+          /* black space layer: #000000 dominates. A black vignette lets the edges recede
+             and soft white only appears as a whisper of light in two corners. Nothing
+             sits behind the logo, so it has no glow or halo. */
           .wolvo-space {
             position: absolute;
             inset: 0;
             z-index: -2;
             overflow: hidden;
             pointer-events: none;
-            background: rgba(0,0,0,.6);
+            background:
+              /* black vignette: depth without any visible blue */
+              radial-gradient(ellipse 100% 100% at 50% 50%, rgba(0,0,0,0) 55%, rgba(0,0,0,.55) 100%),
+              /* faint soft white haze hugging two outer corners (distant nebula light) */
+              radial-gradient(ellipse 42% 38% at 4% 98%, rgba(255,255,255,.05), rgba(255,255,255,0) 70%),
+              radial-gradient(ellipse 34% 30% at 98% 2%, rgba(255,255,255,.035), rgba(255,255,255,0) 70%),
+              rgba(0,0,0,.78);
           }
 
           /* ---- Planets (sizes in vmin so they scale on any screen) ----
              All bodies share one light source (upper right). Each sphere is built
              from three layers: a flat-lit surface texture (soft bands / mottling),
              a shading layer (smooth terminator + limb darkening) and a thin lit
-             rim on the sunward edge. Neutral grays only. */
+             rim on the sunward edge. Palette: black shadows, restrained soft white, white highlights. */
           @keyframes wolvo-float {
             from { transform: translate3d(0, 0, 0); }
             to   { transform: translate3d(1.2vmin, -1.4vmin, 0); }
@@ -536,6 +577,7 @@ export default function AppSkeleton() {
             height: 78vmin;
             left: -26vmin;
             bottom: -34vmin;
+            opacity: var(--wolvo-planet-a-opacity);
             border-radius: 50%;
             overflow: hidden;
             background:
@@ -543,11 +585,18 @@ export default function AppSkeleton() {
               repeating-linear-gradient(172deg,
                 rgba(255,255,255,0) 0 1.2%, rgba(255,255,255,.045) 1.8% 2.4%, rgba(255,255,255,0) 3% 4.2%,
                 rgba(0,0,0,0) 4.2% 5.6%, rgba(0,0,0,.07) 6.2% 6.9%, rgba(0,0,0,0) 7.5% 8.6%),
-              /* broad cloud bands (smooth transitions between stops) */
+              /* delicate white hairlines riding the brightest bands */
               linear-gradient(172deg,
-                #7a7a7a 0%, #8c8c8c 6%, #6c6c6c 11%, #959595 17%, #7e7e7e 23%,
-                #5f5f5f 29%, #888 36%, #6f6f6f 43%, #9c9c9c 50%, #767676 57%,
-                #626262 64%, #858585 71%, #696969 78%, #808080 86%, #656565 93%, #757575 100%);
+                rgba(255,255,255,0) 0 14%, rgba(255,255,255,.10) 15.4% 16%, rgba(255,255,255,0) 17.6% 38%,
+                rgba(255,255,255,.15) 40% 41%, rgba(255,255,255,.05) 42.5% 43.4%, rgba(255,255,255,0) 45% 74%,
+                rgba(255,255,255,.08) 75.5% 76.2%, rgba(255,255,255,0) 78% 100%),
+              /* restrained cloud bands: black into deep soft white, never brighter than 44% soft white */
+              linear-gradient(172deg,
+                var(--wolvo-black) 0%, var(--wolvo-gray-08) 5%, var(--wolvo-gray-13) 10%, var(--wolvo-gray-19) 15%,
+                var(--wolvo-gray-13) 20%, var(--wolvo-gray-08) 26%, var(--wolvo-gray-13) 32%, var(--wolvo-gray-19) 37%,
+                var(--wolvo-gray-26) 41%, var(--wolvo-gray-19) 46%, var(--wolvo-gray-13) 52%, var(--wolvo-gray-08) 58%,
+                var(--wolvo-gray-05) 64%, var(--wolvo-gray-13) 70%, var(--wolvo-gray-19) 76%, var(--wolvo-gray-08) 83%,
+                var(--wolvo-gray-05) 90%, var(--wolvo-black) 100%);
             animation: wolvo-float 70s ease-in-out infinite alternate;
           }
           .wolvo-planet-a::before {
@@ -573,13 +622,18 @@ export default function AppSkeleton() {
             inset: 0;
             border-radius: 50%;
             background:
+              /* soft sunlit sheen on the upper-right of the sphere */
+              radial-gradient(circle at 78% 22%, rgba(255,255,255,.12) 0, rgba(255,255,255,.05) 24%, rgba(255,255,255,0) 42%),
+              /* twilight scattering: a thin soft white band where day turns to night */
+              radial-gradient(circle at 80% 20%, rgba(255,255,255,0) 40%, rgba(255,255,255,.1) 54%, rgba(255,255,255,.035) 62%, rgba(255,255,255,0) 70%),
               /* terminator: light from the upper right fading smoothly into night */
-              radial-gradient(circle at 80% 20%, rgba(0,0,0,0) 26%, rgba(0,0,0,.28) 46%, rgba(0,0,0,.68) 66%, rgba(0,0,0,.93) 85%, #000 100%),
+              radial-gradient(circle at 80% 20%, rgba(0,0,0,0) 26%, rgba(0,0,0,.28) 46%, rgba(0,0,0,.68) 66%, rgba(0,0,0,.93) 85%, #000000 100%),
               /* limb darkening toward the edge of the disc */
               radial-gradient(circle at 50% 50%, rgba(0,0,0,0) 68%, rgba(0,0,0,.38) 100%);
             box-shadow:
-              inset -.35vmin .35vmin .6vmin rgba(255,255,255,.22),
-              inset -.9vmin .9vmin 2.4vmin rgba(255,255,255,.05);
+              inset -.3vmin .3vmin .5vmin rgba(255,255,255,.16),
+              inset -.5vmin .5vmin 1.6vmin rgba(255,255,255,.18),
+              inset -1.2vmin 1.2vmin 3vmin rgba(255,255,255,.07);
           }
           @keyframes wolvo-surface {
             from { transform: translate3d(0, 0, 0); }
@@ -596,6 +650,7 @@ export default function AppSkeleton() {
             height: 14vmin;
             right: 9%;
             top: 9%;
+            opacity: var(--wolvo-planet-b-opacity);
             animation: wolvo-float 55s ease-in-out -18s infinite alternate;
           }
           .wolvo-planet-b::before,
@@ -608,14 +663,14 @@ export default function AppSkeleton() {
             height: 250%;
             border-radius: 50%;
             background: radial-gradient(closest-side,
-              rgba(0,0,0,0) 0 59%,
-              rgba(180,180,180,.10) 59% 60.5%,
-              rgba(222,222,222,.40) 60.5% 69%,
-              rgba(0,0,0,0) 69% 70.5%,
-              rgba(204,204,204,.26) 70.5% 77%,
-              rgba(170,170,170,.10) 77% 78%,
-              rgba(0,0,0,0) 78% 100%);
-            transform: translate(-50%, -50%) rotate(-20deg) scaleY(.2);
+              rgba(0,0,0,0) 0 60%,
+              rgba(255,255,255,.05) 60% 61.2%,
+              rgba(255,255,255,.22) 61.2% 67.5%,
+              rgba(0,0,0,0) 67.5% 69%,
+              rgba(255,255,255,.17) 69% 74%,
+              rgba(255,255,255,.05) 74% 74.8%,
+              rgba(0,0,0,0) 74.8% 100%);
+            transform: translate(-50%, -50%) rotate(-20deg) scaleY(.17);
           }
           .wolvo-planet-b::before { z-index: 0; }
           .wolvo-planet-b::after  { z-index: 2; clip-path: inset(50% 0 0 0); }
@@ -628,9 +683,14 @@ export default function AppSkeleton() {
             background:
               /* soft bands parallel to the ring plane */
               repeating-linear-gradient(160deg,
-                rgba(0,0,0,0) 0 7%, rgba(255,255,255,.07) 9% 12%, rgba(0,0,0,0) 14% 21%,
+                rgba(0,0,0,0) 0 7%, rgba(255,255,255,.05) 9% 12%, rgba(0,0,0,0) 14% 21%,
                 rgba(0,0,0,.14) 23% 27%, rgba(0,0,0,0) 29% 36%),
-              linear-gradient(160deg, #b4b4b4 0%, #9a9a9a 30%, #858585 55%, #8f8f8f 78%, #777 100%);
+              /* a soft white reflection near the lit top edge */
+              linear-gradient(160deg, rgba(255,255,255,0) 5%, rgba(255,255,255,.14) 11%, rgba(255,255,255,0) 18%),
+              /* dark soft white body fading into black, bands parallel to the ring */
+              linear-gradient(160deg,
+                var(--wolvo-gray-35) 0%, var(--wolvo-gray-26) 16%, var(--wolvo-gray-19) 32%, var(--wolvo-gray-26) 46%,
+                var(--wolvo-gray-13) 62%, var(--wolvo-gray-08) 80%, var(--wolvo-black) 100%);
           }
           .wolvo-sphere::after {
             content: "";
@@ -638,10 +698,12 @@ export default function AppSkeleton() {
             inset: 0;
             border-radius: 50%;
             background:
-              radial-gradient(circle at 74% 24%, rgba(0,0,0,0) 30%, rgba(0,0,0,.34) 52%, rgba(0,0,0,.76) 76%, rgba(0,0,0,.96) 100%),
+              radial-gradient(circle at 74% 24%, rgba(0,0,0,0) 18%, rgba(0,0,0,.30) 42%, rgba(0,0,0,.72) 68%, rgba(0,0,0,.96) 100%),
               /* soft shadow the ring throws across the lower half */
               linear-gradient(-20deg, rgba(0,0,0,0) 55%, rgba(0,0,0,.30) 59% 64%, rgba(0,0,0,0) 69%);
-            box-shadow: inset -.25vmin .25vmin .4vmin rgba(255,255,255,.2);
+            box-shadow:
+              inset -.25vmin .25vmin .4vmin rgba(255,255,255,.18),
+              inset -.5vmin .5vmin 1vmin rgba(255,255,255,.13);
           }
 
           /* Small distant rocky planet (upper left) and a tiny cratered moon
@@ -656,11 +718,13 @@ export default function AppSkeleton() {
             height: 6.5vmin;
             left: 8%;
             top: 15%;
+            opacity: var(--wolvo-planet-c-opacity);
             background:
               radial-gradient(ellipse 34% 24% at 38% 62%, rgba(0,0,0,.26), transparent),
               radial-gradient(ellipse 22% 16% at 64% 38%, rgba(0,0,0,.20), transparent),
               radial-gradient(ellipse 26% 14% at 30% 30%, rgba(255,255,255,.10), transparent),
-              linear-gradient(200deg, #b0b0b0 0%, #8d8d8d 45%, #747474 100%);
+              /* dark soft white rocky world fading into black */
+              linear-gradient(200deg, var(--wolvo-gray-35) 0%, var(--wolvo-gray-26) 28%, var(--wolvo-gray-19) 52%, var(--wolvo-gray-08) 78%, var(--wolvo-black) 100%);
             animation: wolvo-float 48s ease-in-out -30s infinite alternate;
           }
           .wolvo-moon {
@@ -668,12 +732,13 @@ export default function AppSkeleton() {
             height: 3.4vmin;
             left: 40vmin;
             bottom: 42vmin;
+            opacity: var(--wolvo-moon-opacity);
             background:
               /* craters: dark floor, faint lit rim on the side away from the light */
               radial-gradient(circle at 36% 62%, rgba(0,0,0,.34) 0 7%, rgba(255,255,255,.12) 9%, rgba(0,0,0,0) 12%),
               radial-gradient(circle at 60% 44%, rgba(0,0,0,.28) 0 5%, rgba(255,255,255,.10) 6.5%, rgba(0,0,0,0) 8.5%),
               radial-gradient(circle at 46% 28%, rgba(0,0,0,.20) 0 3%, rgba(0,0,0,0) 5%),
-              linear-gradient(200deg, #cfcfcf 0%, #a2a2a2 50%, #858585 100%);
+              linear-gradient(200deg, var(--wolvo-white-48) 0%, var(--wolvo-white-30) 50%, var(--wolvo-white-16) 100%);
             animation: wolvo-float 40s ease-in-out -10s infinite alternate;
           }
           .wolvo-planet-c::after,
@@ -685,10 +750,16 @@ export default function AppSkeleton() {
             background:
               radial-gradient(circle at 74% 24%, rgba(0,0,0,0) 30%, rgba(0,0,0,.38) 54%, rgba(0,0,0,.78) 78%, rgba(0,0,0,.96) 100%),
               radial-gradient(circle at 50% 50%, rgba(0,0,0,0) 72%, rgba(0,0,0,.28) 100%);
-            box-shadow: inset -.2vmin .2vmin .3vmin rgba(255,255,255,.2);
+            box-shadow: inset -.2vmin .2vmin .3vmin rgba(255,255,255,.18);
+          }
+          /* gentle soft white atmosphere on the small planet only; the moon stays neutral */
+          .wolvo-planet-c::after {
+            box-shadow:
+              inset -.2vmin .2vmin .3vmin rgba(255,255,255,.22),
+              inset -.45vmin .45vmin .8vmin rgba(255,255,255,.15);
           }
 
-          /* ---- Asteroids: irregular clip-path shapes with a blue rim light,
+          /* ---- Asteroids: irregular clip-path shapes with a thin white rim light,
              travelling across the screen while they tumble ---- */
           .wolvo-rock {
             position: absolute;
@@ -696,7 +767,7 @@ export default function AppSkeleton() {
             left: 0;
             width: var(--s);
             height: var(--s);
-            opacity: var(--o);
+            opacity: calc(var(--o) * var(--wolvo-asteroid-opacity));
             animation: wolvo-rock var(--d) linear var(--dl) infinite;
             will-change: transform;
           }
@@ -708,10 +779,12 @@ export default function AppSkeleton() {
             background:
               radial-gradient(circle at 62% 58%, rgba(0,0,0,.55) 0 14%, transparent 16%),
               radial-gradient(circle at 34% 66%, rgba(0,0,0,.40) 0 9%, transparent 11%),
-              linear-gradient(135deg, rgba(186,186,186,.75) 0, rgba(92,92,92,.55) 12%, #212121 34%, #121212 62%, #070707 100%);
+              linear-gradient(135deg, var(--rim, rgba(255,255,255,.6)) 0, rgba(255,255,255,.16) 12%, var(--wolvo-white-08) 34%, var(--wolvo-black) 62%, var(--wolvo-black) 100%);
             animation: wolvo-tumble var(--r) linear infinite;
             animation-direction: var(--rd);
           }
+          /* roughly one asteroid in four catches a thin soft white rim light */
+          .wolvo-rock:nth-child(4n+2) { --rim: rgba(255,255,255,.45); }
           @keyframes wolvo-rock {
             from { transform: translate3d(var(--x0), var(--y0), 0); }
             to   { transform: translate3d(var(--x1), var(--y1), 0); }
@@ -755,8 +828,8 @@ export default function AppSkeleton() {
             width: calc(var(--u) * 1.6);
             height: calc(var(--u) * 1.6);
             border-radius: 15%;
-            background: linear-gradient(135deg, #f2f2f2 0, #9f9f9f 45%, #3a3a3a 100%);
-            opacity: .9;
+            background: linear-gradient(135deg, var(--wolvo-white) 0, var(--wolvo-white-48) 45%, var(--wolvo-white-16) 100%);
+            opacity: var(--wolvo-satellite-opacity);
             animation: wolvo-sat-tilt 14s ease-in-out infinite alternate;
           }
           .wolvo-sat::before,
@@ -767,10 +840,10 @@ export default function AppSkeleton() {
             width: calc(var(--u) * 2);
             height: calc(var(--u) * .9);
             margin-top: calc(var(--u) * -.45);
-            border: 1px solid rgba(196,196,196,.5);
+            border: 1px solid rgba(255,255,255,.30);
             background:
-              repeating-linear-gradient(90deg, rgba(242,242,242,.28) 0 1px, transparent 1px calc(var(--u) * .5)),
-              linear-gradient(90deg, #212121, #404040);
+              repeating-linear-gradient(90deg, rgba(255,255,255,.28) 0 1px, transparent 1px calc(var(--u) * .5)),
+              linear-gradient(90deg, var(--wolvo-gray-13), var(--wolvo-gray-35));
           }
           .wolvo-sat::before { right: calc(100% + var(--u) * .3); }
           .wolvo-sat::after  { left:  calc(100% + var(--u) * .3); }
@@ -787,7 +860,7 @@ export default function AppSkeleton() {
             left: 0;
             width: var(--w);
             height: calc(var(--w) * .34);
-            opacity: .9;
+            opacity: var(--wolvo-rocket-opacity);
             animation: wolvo-rocket 140s linear -45s infinite;
             will-change: transform;
           }
@@ -801,14 +874,14 @@ export default function AppSkeleton() {
             border-radius: 50%;
             transform-origin: 100% 50%;
             transform: translateY(-50%);
-            background: linear-gradient(270deg, rgba(242,242,242,.95), rgba(179,179,179,.55) 40%, rgba(179,179,179,0));
+            background: linear-gradient(270deg, rgba(255,255,255,.9), rgba(255,255,255,.4) 40%, rgba(255,255,255,0));
             animation: wolvo-flame .16s ease-in-out infinite alternate;
           }
           .wolvo-rocket-body {
             position: absolute;
             inset: 0;
             clip-path: polygon(0 0, 24% 32%, 74% 32%, 100% 50%, 74% 68%, 24% 68%, 0 100%, 12% 50%);
-            background: linear-gradient(180deg, rgba(242,242,242,.95), #b2b2b2 45%, #5c5c5c 100%);
+            background: linear-gradient(180deg, rgba(255,255,255,.95), var(--wolvo-white-48) 45%, var(--wolvo-white-16) 100%);
           }
           @keyframes wolvo-rocket {
             from { transform: translate3d(-8vw, 90vh, 0) rotate(-6deg); }
@@ -829,7 +902,7 @@ export default function AppSkeleton() {
             left: var(--x);
             width: var(--s);
             height: calc(var(--s) * var(--l));
-            opacity: var(--o);
+            opacity: calc(var(--o) * var(--wolvo-star-opacity));
             animation: wolvo-fall var(--d) linear var(--dl) infinite;
             will-change: transform, opacity;
           }
@@ -840,17 +913,17 @@ export default function AppSkeleton() {
             border-radius: 9999px;
             background: var(--c);
             box-shadow:
-              0 0 calc(var(--s) * 3) calc(var(--s) * .4) var(--c),
-              0 0 calc(var(--s) * 7) var(--c);
+              0 0 calc(var(--s) * 3) calc(var(--s) * .3) var(--c),
+              0 0 calc(var(--s) * 5) var(--c);
           }
           .wolvo-star-tw::before {
             animation: wolvo-tw var(--t) ease-in-out var(--tl) infinite;
           }
           @keyframes wolvo-fall {
             0%   { transform: translate3d(0, 0, 0); opacity: 0; }
-            12%  { opacity: calc(var(--o) * .6); }
-            45%  { opacity: var(--o); }
-            88%  { opacity: calc(var(--o) * .5); }
+            12%  { opacity: calc(var(--o) * var(--wolvo-star-opacity) * .6); }
+            45%  { opacity: calc(var(--o) * var(--wolvo-star-opacity)); }
+            88%  { opacity: calc(var(--o) * var(--wolvo-star-opacity) * .5); }
             100% { transform: translate3d(var(--dx), calc(100vh + 24px), 0); opacity: 0; }
           }
           @keyframes wolvo-tw {
@@ -867,14 +940,14 @@ export default function AppSkeleton() {
             height: 3px;
             opacity: 0;
             background:
-              radial-gradient(circle at 100% 50%, #f2f2f2 0, rgba(242,242,242,0) 4px),
-              linear-gradient(90deg, rgba(242,242,242,0), rgba(242,242,242,.85));
+              radial-gradient(circle at 100% 50%, #FFFFFF 0, rgba(255,255,255,0) 4px),
+              linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,.85));
             animation: wolvo-shoot var(--d) linear var(--dl) infinite;
             will-change: transform, opacity;
           }
           @keyframes wolvo-shoot {
             0%   { opacity: 0; transform: translate3d(0, 0, 0) rotate(var(--r)); }
-            1.5% { opacity: 1; }
+            1.5% { opacity: var(--wolvo-shooting-star-opacity); }
             7%   { opacity: 0; transform: translate3d(var(--tx), var(--ty), 0) rotate(var(--r)); }
             100% { opacity: 0; transform: translate3d(var(--tx), var(--ty), 0) rotate(var(--r)); }
           }
@@ -896,7 +969,8 @@ export default function AppSkeleton() {
             width: calc(var(--r) * 2);
             height: calc(var(--r) * 2);
             border-radius: 9999px;
-            border: 1px solid rgba(152,152,152,.08);
+            border: 1px solid rgba(255,255,255,.04);
+            opacity: var(--wolvo-orbit-path-opacity);
           }
           .wolvo-orbit-spin {
             position: absolute;
@@ -922,14 +996,14 @@ export default function AppSkeleton() {
             border-radius: 9999px;
             background: var(--c);
             box-shadow:
-              0 0 calc(var(--s) * 3) calc(var(--s) * .5) var(--c),
-              0 0 calc(var(--s) * 8) var(--c);
-            opacity: .15;
+              0 0 calc(var(--s) * 2.5) calc(var(--s) * .2) var(--c),
+              0 0 calc(var(--s) * 5) var(--c);
+            opacity: .12;
             animation: wolvo-orb var(--g) ease-in-out var(--gl) infinite;
           }
           @keyframes wolvo-orb {
-            0%, 100% { opacity: .15; }
-            50%      { opacity: var(--o); }
+            0%, 100% { opacity: .12; }
+            50%      { opacity: calc(var(--o) * .65 * var(--wolvo-orbit-particle-opacity)); }
           }
 
           .wolvo-logo { animation: wolvo-bob 2.6s ease-in-out infinite; }
