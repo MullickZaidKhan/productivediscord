@@ -13,7 +13,10 @@ import {
   verifyJwt,
   accessTokenverifyJwt,
 } from "../middleware/auth.middleware.js";
-
+import {
+  refreshRateLimiter,
+  accessTokenRateLimiter,
+} from "../middleware/rateLimit.js";
 import {
   sendVerificationOtp,
   verifyEmailOtp,
@@ -28,11 +31,14 @@ authRoute.post("/register", upload.single("profileimg"), register);
 authRoute.post("/login", login);
 authRoute.post("/logout", verifyJwt, logout);
 authRoute.post("/public-key", verifyJwt, savePublicKey);
-authRoute.get( "/login-devices", verifyJwt, getAllLoginDevices );
+authRoute.get("/login-devices", verifyJwt, getAllLoginDevices);
 authRoute.get("/public-key/:userId", verifyJwt, getPublicKeys);
 //All the get
-authRoute.get("/refresh", refresh);
-authRoute.get("/accesstoken", accessTokenverifyJwt);
+// authRoute.get("/refresh", refresh);
+// authRoute.get("/accesstoken", accessTokenverifyJwt);
+authRoute.get("/refresh", refreshRateLimiter, refresh);
+
+authRoute.get("/accesstoken", accessTokenRateLimiter, accessTokenverifyJwt);
 authRoute.get("/checkUsername/:username", checkUsername);
 // Send verification OTP
 authRoute.post("/send-verification", sendVerificationOtp);
