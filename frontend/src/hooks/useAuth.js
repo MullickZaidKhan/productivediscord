@@ -121,20 +121,42 @@ export const checkUsernamehook = (username) => {
   });
 };
 
+// export const useAuthStatus = () => {
+//   const dispatch = useDispatch();
+//   const { data, isLoading, isError, isSuccess } = useAccessToken();
+//   console.log(data, "from useAuthStatus hook");
+//   useEffect(() => {
+//     if (isSuccess) dispatch(setLoggedIn(data));
+//     if (isError) dispatch(setLoggedOut());
+//   }, [isSuccess, isError, data, dispatch]);
+
+//   if (isLoading) return "loading";
+//   if (isError || !data) return "unauthenticated";
+//   return "authenticated";
+// };
 export const useAuthStatus = () => {
   const dispatch = useDispatch();
   const { data, isLoading, isError, isSuccess } = useAccessToken();
-  console.log(data, "from useAuthStatus hook");
+  const userinfo = useSelector((state) => state.authinfoSlice.userinfo);
+
   useEffect(() => {
-    if (isSuccess) dispatch(setLoggedIn(data));
-    if (isError) dispatch(setLoggedOut());
+    if (isSuccess && data) {
+      dispatch(setLoggedIn(data));
+    } else if (isError || (isSuccess && !data)) {
+      dispatch(setLoggedOut());
+    }
   }, [isSuccess, isError, data, dispatch]);
 
   if (isLoading) return "loading";
   if (isError || !data) return "unauthenticated";
+
+  // Redux holds the latest value (updated right after OTP verification).
+  // Fall back to `data` for the first render, before the effect has dispatched.
+  const verified = userinfo?.isEmailVerified ?? data?.isEmailVerified;
+  if (verified === false) return "unverified";
+
   return "authenticated";
 };
-
 export const useLoginDevices = () => {
   return useQuery({ queryKey: ["loginDevices"], queryFn: getLoginDevices });
 };

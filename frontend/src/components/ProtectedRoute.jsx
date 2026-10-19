@@ -56,13 +56,19 @@ import AppSkeleton from './ui/AppSkeleton.jsx'
 
 
 import { Navigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 import { useAuthStatus } from "../hooks/useAuth";
+// import AppSkeleton from "./AppSkeleton.jsx";
 
 const ProtectedRoute = ({ children }) => {
   const status = useAuthStatus();
+  const userinfo = useSelector((state) => state.authinfoSlice.userinfo);
 
-  if (status === "loading") return <AppSkeleton/>;
+  if (status === "loading") return <AppSkeleton />;
   if (status === "unauthenticated") return <Navigate to="/login" replace />;
+  if (status === "unverified")
+    return <Navigate to="/verify-email" state={{ email: userinfo?.email }} replace />;
+
   return children;
 };
 

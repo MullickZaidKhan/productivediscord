@@ -41,7 +41,7 @@ export const accessTokenverifyJwt = async function (req, res) {
     const userId = payload.id || payload._id;
 
     const existUser = await User.findById(userId).select(
-      "username name email profileimg"
+      "username name email profileimg isEmailVerified"
     );
 
     if (!existUser) {
@@ -57,6 +57,7 @@ export const accessTokenverifyJwt = async function (req, res) {
       name: existUser.name,
       email: existUser.email,
       profileimg: existUser.profileimg,
+      isEmailVerified:existUser.isEmailVerified,
     };
 
     res.status(200).json({

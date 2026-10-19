@@ -1,5 +1,13 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { Check, Crown, Loader2, ImageOff, Search } from "lucide-react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import {
+  Check,
+  ChevronLeft,
+  ChevronRight,
+  Crown,
+  Loader2,
+  ImageOff,
+  Search,
+} from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import {
@@ -45,6 +53,9 @@ export default function BackgroundPicker() {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [brokenImgs, setBrokenImgs] = useState({});
+  const tabsRef = useRef(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
 
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -91,6 +102,38 @@ export default function BackgroundPicker() {
     return [ALL_TAB, ...Array.from(set)];
   }, [backgrounds]);
 
+  // Work out which arrows to show from the current scroll position and size.
+  //  - left : only once the user has moved away from the start
+  //  - right: only while more content remains to the right
+  //  - both hidden when everything already fits (no scrolling needed)
+  const updateArrows = () => {
+    const el = tabsRef.current;
+    if (!el) return;
+    const maxScroll = el.scrollWidth - el.clientWidth;
+    setCanScrollLeft(maxScroll > 1 && el.scrollLeft > 1);
+    setCanScrollRight(maxScroll > 1 && el.scrollLeft < maxScroll - 1);
+  };
+
+  useEffect(() => {
+    const el = tabsRef.current;
+    if (!el) return;
+    updateArrows();
+    window.addEventListener("resize", updateArrows);
+    const ro = typeof ResizeObserver !== "undefined" ? new ResizeObserver(updateArrows) : null;
+    ro?.observe(el);
+    return () => {
+      window.removeEventListener("resize", updateArrows);
+      ro?.disconnect();
+    };
+  }, [categories]);
+
+  // Smoothly scroll to the previous / next set of tabs.
+  const scrollTabs = (dir) => {
+    const el = tabsRef.current;
+    if (!el) return;
+    el.scrollBy({ left: dir * el.clientWidth * 0.8, behavior: "smooth" });
+  };
+
   const filtered = useMemo(() => {
     return backgrounds
       .filter((b) => activeTab === ALL_TAB || b.category === activeTab)
@@ -128,13 +171,13 @@ export default function BackgroundPicker() {
       {/* Header */}
       <header className="sticky -top-1 pt-2 z-9 border-black/20 bg-[#313338]/95 backdrop-blur">
         <div className="max-w-6xl mx-auto px-5 py-4 flex flex-col gap-4">
-          <div className="flex items-start justify-between gap-4">
+          <div className="flex items-center justify-between gap-4">
             <div>
               {/* <p className="text-xs font-semibold uppercase tracking-wide text-[#949ba4] mb-1">
                 Appearance
               </p> */}
-              <h1 className="text-[30px] sm:text-[15px] font-bold items-start   text-white">
-               Pick a Background
+              <h1 className="text-[30px] sm:text-[15px] font-bold leading-tight text-white">
+                Pick a Background
               </h1>
               {/* <p className="text-sm text-[#b5bac1] mt-1">
                 Pick an image below and it becomes the background across the app.
@@ -154,26 +197,57 @@ export default function BackgroundPicker() {
             </div>
           </div>
 
-          {/* Category tabs */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-1 -mb-1">
-            {categories.map((cat) => {
-              const isActive = cat === activeTab;
-              return (
-                <button
-                  key={cat}
-                  onClick={() => setActiveTab(cat)}
-                  className={
-                    "shrink-0 rounded-[6px] px-3.5 py-1.5 text-sm font-medium transition-colors " +
-                    (isActive
-                      ? "bg-[#5865f2] text-white"
-                      : "bg-[#2b2d31] text-[#b5bac1] hover:bg-[#3a3c42] hover:text-white")
-                  }
+          {/* Category tabs with left / right navigation */}
+          <div className="relative">
+            <div
+              ref={tabsRef}
+              onScroll={updateArrows}
+              className="flex items-center gap-2 overflow-x-auto scroll-smooth pb-1 -mb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            >
+              {categories.map((cat) => {
+                const isActive = cat === activeTab;
+                return (
+                  <button
+                    key={cat}
+                    onClick={() => setActiveTab(cat)}
+                    className={
+                      "shrink-0 inline-flex items-center justify-center h-8 rounded-[6px] px-3.5 text-sm leading-none font-medium transition-colors " +
+                      (isActive
+                        ? "bg-[#5865f2] text-white"
+                        : "bg-[#2b2d31] text-[#b5bac1] hover:bg-[#3a3c42] hover:text-white")
+                    }
+                  >
+                    {cat}
+                  </button>
+                );
+              })}
+            </div>
 
+            {/* Left arrow: hidden at the start */}
+            {canScrollLeft && (
+              <div className="absolute left-0 top-0 bottom-0 flex items-center pr-6 bg-gradient-to-r from-[#313338] via-[#313338]/90 to-transparent">
+                <button
+                  onClick={() => scrollTabs(-1)}
+                  aria-label="Scroll left"
+                  className="h-8 w-8 flex items-center justify-center rounded-full bg-[#1e1f22] text-white shadow-md hover:bg-[#5865f2] transition-colors"
                 >
-                  {cat}
+                  <ChevronLeft size={18} />
                 </button>
-              );
-            })}
+              </div>
+            )}
+
+            {/* Right arrow: hidden at the end */}
+            {canScrollRight && (
+              <div className="absolute right-0 top-0 bottom-0 flex items-center justify-end pl-6 bg-gradient-to-l from-[#313338] via-[#313338]/90 to-transparent">
+                <button
+                  onClick={() => scrollTabs(1)}
+                  aria-label="Scroll right"
+                  className="h-8 w-8 flex items-center justify-center rounded-full bg-[#1e1f22] text-white shadow-md hover:bg-[#5865f2] transition-colors"
+                >
+                  <ChevronRight size={18} />
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </header>
@@ -217,7 +291,7 @@ export default function BackgroundPicker() {
         )}
 
         {status === "ready" && filtered.length > 0 && (
-          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4">
             {filtered.map((bg) => {
               const isSelected = bg._id === selectedId;
               const isCurrentlyActive = bg._id === currentActiveId;
@@ -257,11 +331,18 @@ export default function BackgroundPicker() {
                     {/* gradient for legibility */}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/0 to-black/0" />
 
+                    {/* name — shows only on hover (or keyboard focus) */}
+                    <div className="pointer-events-none absolute inset-x-0 bottom-0 pl-3 pr-11 pb-2.5 translate-y-1 opacity-0 transition-all duration-200 group-hover:translate-y-0 group-hover:opacity-100 group-focus-visible:translate-y-0 group-focus-visible:opacity-100">
+                      <p className="text-sm font-semibold text-white truncate drop-shadow">
+                        {bg.name}
+                      </p>
+                    </div>
+
                     {/* premium badge */}
                     {bg.premium && (
-                      <div className="absolute top-2 left-2 flex items-center gap-1 rounded-full bg-black/60 backdrop-blur px-2 py-0.5">
+                      <div className="absolute top-2 left-2 flex items-center gap-1 rounded-full bg-black/60 backdrop-blur px-2 py-1">
                         <Crown size={12} className="text-[#f0b232]" />
-                        <span className="text-[10px] font-semibold text-[#f0b232] tracking-wide">
+                        <span className="text-[10px] leading-none font-semibold text-[#f0b232] tracking-wide">
                           PREMIUM
                         </span>
                       </div>
@@ -269,8 +350,8 @@ export default function BackgroundPicker() {
 
                     {/* currently applied badge */}
                     {isCurrentlyActive && (
-                      <div className="absolute top-2 right-2 rounded-full bg-black/60 backdrop-blur px-2 py-0.5">
-                        <span className="text-[10px] font-semibold text-[#23a55a] tracking-wide">
+                      <div className="absolute top-2 right-2 flex items-center rounded-full bg-black/60 backdrop-blur px-2 py-1">
+                        <span className="text-[10px] leading-none font-semibold text-[#23a55a] tracking-wide">
                           IN USE
                         </span>
                       </div>
@@ -289,11 +370,6 @@ export default function BackgroundPicker() {
                       <Check size={14} className="text-white" strokeWidth={3} />
                     </div>
                   </div>
-
-                  {/* <div className="p-3">
-                    <p className="text-sm font-semibold text-white truncate">{bg.name}</p>
-                    <p className="text-xs text-[#949ba4] mt-0.5">{bg.category}</p>
-                  </div> */}
                 </button>
               );
             })}

@@ -4,6 +4,7 @@ import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import PublicRoute from "./components/PublicRoute.jsx";
 import Login from "./pages/LoginPage.jsx";
 import Register from "./pages/RegisterPage.jsx";
+import VerifyEmailRoute from "./pages/VerifyEmailPage.jsx";
 import RootLayout from "./components/layout/RootLayout.jsx";
 import ErrorPage from "./components/ErrorPage.jsx";
 import Chat from "./components/chat/Chat.jsx";
@@ -66,6 +67,10 @@ export const router = createBrowserRouter([
             <Register />
           </PublicRoute>
         ),
+      },
+      {
+        path: "/verify-email",
+        element: <VerifyEmailRoute />,
       },
     ],
   },
