@@ -34,7 +34,9 @@ const C = {
   link: "text-[#00a8fc]",
   danger: "text-[#f23f42]",
 };
-const backgroundImage="https://i.pinimg.com/736x/b2/ce/77/b2ce77463fa02f88282b5b59d34db30f.jpg";
+const backgroundImage =
+  "https://i.pinimg.com/1200x/a5/3d/d9/a53dd9dc2ca234eb150596f6f91b9315.jpg";
+
 const primaryBtn =
   "flex h-[44px] w-full items-center justify-center gap-2 rounded-[3px] bg-[#5865f2] text-[16px] font-medium text-white transition-colors hover:bg-[#4752c4] active:bg-[#3c45a5] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-[#5865f2] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#00a8fc]";
 
@@ -86,10 +88,17 @@ export default function VerifyEmailPage() {
     }
   }, [blockedFor, step]);
 
+  // go to "/" after the success screen; hard reload is the fallback
   useEffect(() => {
     if (step !== "success") return;
-    const t = setTimeout(() => navigate("/", { replace: true }), 1800);
-    return () => clearTimeout(t);
+    const t1 = setTimeout(() => navigate("/", { replace: true }), 1500);
+    const t2 = setTimeout(() => {
+      if (window.location.pathname !== "/") window.location.replace("/");
+    }, 3000);
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+    };
   }, [step, navigate]);
 
   // focus first box when the OTP step opens
@@ -98,9 +107,12 @@ export default function VerifyEmailPage() {
   }, [step]);
 
   // ---- route guards (after all hooks) ----
-  if (status === "loading") return <FullScreen><Spinner big /></FullScreen>;
-  if (status === "unauthenticated") return <Navigate to="/login" replace />;
-  if (status === "authenticated" && step !== "success") return <Navigate to="/" replace />;
+  // Skipped on the success screen so the refetch can't interrupt it.
+  if (step !== "success") {
+    if (status === "loading") return <FullScreen><Spinner big /></FullScreen>;
+    if (status === "unauthenticated") return <Navigate to="/login" replace />;
+    if (status === "authenticated") return <Navigate to="/" replace />;
+  }
 
   const fail = (msg) => {
     setError(msg);
@@ -148,22 +160,31 @@ export default function VerifyEmailPage() {
     }
   };
 
-  const submitOtp = async (value = code) => {
-    if (loading) return;
-    if (value.length !== OTP_LENGTH) return fail("Enter the full 6-digit code.");
-    if (expired) return fail("This code has expired. Request a new one.");
-    setError("");
-    try {
-      await verifyOtp.mutateAsync({ email, otp: value });
-      setStep("success");
-    } catch (e) {
-      const { message, retryAfterSeconds, attemptsRemaining, status: s } = parseError(e);
-      if (s === 429) return block(retryAfterSeconds, message);
-      if (typeof attemptsRemaining === "number") setAttemptsLeft(attemptsRemaining);
-      fail(message);
-      clearBoxes();
-    }
-  };
+const submitOtp = async (value = code) => {
+  if (loading) return;
+  if (value.length !== OTP_LENGTH)
+    return fail("Enter the full 6-digit code.");
+  if (expired) return fail("This code has expired. Request a new one.");
+  setError("");
+  try {
+    await verifyOtp.mutateAsync({ email, otp: value });
+    setStep("success");
+    // not tied to the component, so it still runs if the page re-mounts
+    setTimeout(() => window.location.replace("/"), 1200);
+  } catch (e) {
+    const {
+      message,
+      retryAfterSeconds,
+      attemptsRemaining,
+      status: s,
+    } = parseError(e);
+    if (s === 429) return block(retryAfterSeconds, message);
+    if (typeof attemptsRemaining === "number")
+      setAttemptsLeft(attemptsRemaining);
+    fail(message);
+    clearBoxes();
+  }
+};
 
   const handleChange = (i, v) => {
     if (!/^\d?$/.test(v)) return;
@@ -207,7 +228,7 @@ export default function VerifyEmailPage() {
       `}</style>
 
       <div
-        className={`w-full max-w-[480px] rounded-[5px] ${C.card} p-6 shadow-[0_2px_10px_rgba(0,0,0,.2)] sm:p-8 ${
+        className={`w-full max-w-[480px] rounded-[5px] ${C.card} p-6 shadow-[0_2px_10px_rgba(0,0,0,.2)] backdrop-blur-sm sm:p-8 ${
           shake ? "anim-shake" : ""
         }`}
       >
@@ -280,7 +301,7 @@ export default function VerifyEmailPage() {
                       ? "border-[#f23f42]"
                       : d
                       ? "border-[#4e5058]"
-                      : "border-transparent focus:border-[#00a8fc]"
+                      : "border-transparent"
                   } focus:border-[#00a8fc]`}
                 />
               ))}
@@ -377,16 +398,12 @@ export default function VerifyEmailPage() {
 
 /* ---------- small pieces ---------- */
 
-
 function FullScreen({ children, backgroundImage }) {
   const [imageFailed, setImageFailed] = useState(false);
-
   const showImage = Boolean(backgroundImage) && !imageFailed;
 
   return (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#05060D] px-4 py-8 font-['gg_sans','Noto_Sans','Helvetica_Neue',Helvetica,Arial,sans-serif]">
-
-      {/* Background image with fallback */}
       {showImage && (
         <img
           src={backgroundImage}
@@ -397,34 +414,22 @@ function FullScreen({ children, backgroundImage }) {
         />
       )}
 
-      {/* Dark overlay for readability */}
-      {showImage && (
-        <div className="pointer-events-none absolute inset-0 bg-black/60" />
-      )}
+      {showImage && <div className="pointer-events-none absolute inset-0 bg-black/60" />}
 
-      {/* Fallback ambient background */}
       {!showImage && (
         <div className="pointer-events-none absolute inset-0">
           <div className="absolute -top-52 left-1/2 h-[500px] w-[700px] -translate-x-1/2 rounded-full bg-[#3F42BE]/15 blur-[130px]" />
-
           <div className="absolute -bottom-64 -right-40 h-[500px] w-[500px] rounded-full bg-[#3F42BE]/10 blur-[140px]" />
-
           <div className="absolute -bottom-64 -left-40 h-[400px] w-[400px] rounded-full bg-[#252A70]/10 blur-[120px]" />
         </div>
       )}
 
-      {/* Subtle gradient */}
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/30" />
 
-      {/* Content */}
-      <div className="relative z-10 flex w-full justify-center">
-        {children}
-      </div>
-
+      <div className="relative z-10 flex w-full justify-center">{children}</div>
     </div>
   );
 }
-
 
 function IconCircle({ children, red }) {
   return (
