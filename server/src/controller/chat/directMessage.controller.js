@@ -1,10 +1,9 @@
-
 import { directMessage } from "../../model/chat/directMessage.model.js";
 import { mainchat } from "../../Socket.IO/chat/mainsocket.js";
 import { getIO } from "../../Socket.IO/socket.js";
 import mongoose from "mongoose";
 // import { uploadToImageKit } from "..."; // keep your existing import
-
+const MAX_ENCRYPTED_TEXT_LENGTH = 10000;
 
 // ======================================================
 // SEND DIRECT MESSAGE
@@ -53,63 +52,85 @@ export const SenddirectMessage = async (req, res) => {
       });
     }
 
-    // ==================================================
-    // VALIDATE RECEIVER DEVICE COPIES
-    // ==================================================
+  // ==================================================
+// VALIDATE RECEIVER DEVICE COPIES
+// ==================================================
 
-    if (Array.isArray(deviceMessagesreceiver)) {
-      for (const deviceMessage of deviceMessagesreceiver) {
-        if (!deviceMessage.senderDeviceId) {
-          return res.status(400).json({
-            message: "senderDeviceId is required in receiver device copy",
-          });
-        }
-
-        if (!deviceMessage.receiverDeviceId) {
-          return res.status(400).json({
-            message: "receiverDeviceId is required",
-          });
-        }
-
-        if (!deviceMessage.encryptedText) {
-          return res.status(400).json({
-            message: "encryptedText is required",
-          });
-        }
-
-        if (!deviceMessage.iv) {
-          return res.status(400).json({
-            message: "iv is required",
-          });
-        }
-      }
+if (Array.isArray(deviceMessagesreceiver)) {
+  for (const deviceMessage of deviceMessagesreceiver) {
+    if (!deviceMessage.senderDeviceId) {
+      return res.status(400).json({
+        message: "senderDeviceId is required in receiver device copy",
+      });
     }
 
-    // ==================================================
-    // VALIDATE SENDER DEVICE COPIES
-    // ==================================================
-
-    if (Array.isArray(deviceMessagessender)) {
-      for (const deviceMessage of deviceMessagessender) {
-        if (!deviceMessage.senderDeviceId) {
-          return res.status(400).json({
-            message: "senderDeviceId is required in sender device copy",
-          });
-        }
-
-        if (!deviceMessage.encryptedText) {
-          return res.status(400).json({
-            message: "encryptedText is required",
-          });
-        }
-
-        if (!deviceMessage.iv) {
-          return res.status(400).json({
-            message: "iv is required",
-          });
-        }
-      }
+    if (!deviceMessage.receiverDeviceId) {
+      return res.status(400).json({
+        message: "receiverDeviceId is required",
+      });
     }
+
+    if (
+      typeof deviceMessage.encryptedText !== "string" ||
+      deviceMessage.encryptedText.length === 0
+    ) {
+      return res.status(400).json({
+        message: "Valid encryptedText is required",
+      });
+    }
+
+    if (
+      deviceMessage.encryptedText.length > MAX_ENCRYPTED_TEXT_LENGTH
+    ) {
+      return res.status(400).json({
+        message: "Encrypted message exceeds the maximum allowed length",
+      });
+    }
+
+    if (!deviceMessage.iv) {
+      return res.status(400).json({
+        message: "iv is required",
+      });
+    }
+  }
+}
+
+  // ==================================================
+// VALIDATE SENDER DEVICE COPIES
+// ==================================================
+
+if (Array.isArray(deviceMessagessender)) {
+  for (const deviceMessage of deviceMessagessender) {
+    if (!deviceMessage.senderDeviceId) {
+      return res.status(400).json({
+        message: "senderDeviceId is required in sender device copy",
+      });
+    }
+
+    if (
+      typeof deviceMessage.encryptedText !== "string" ||
+      deviceMessage.encryptedText.length === 0
+    ) {
+      return res.status(400).json({
+        message: "Valid encryptedText is required",
+      });
+    }
+
+    if (
+      deviceMessage.encryptedText.length > MAX_ENCRYPTED_TEXT_LENGTH
+    ) {
+      return res.status(400).json({
+        message: "Encrypted message exceeds the maximum allowed length",
+      });
+    }
+
+    if (!deviceMessage.iv) {
+      return res.status(400).json({
+        message: "iv is required",
+      });
+    }
+  }
+}
 
     // ==================================================
     // CHECK MESSAGE EXISTS
@@ -189,10 +210,7 @@ export const SenddirectMessage = async (req, res) => {
     // DEBUG AFTER SAVE
     // ==================================================
 
-    console.log(
-      "✅ Message created:",
-      directMessageinchat._id,
-    );
+    console.log("✅ Message created:", directMessageinchat._id);
 
     console.log(
       "📱 Receiver copies:",
@@ -208,11 +226,7 @@ export const SenddirectMessage = async (req, res) => {
     // SOCKET
     // ==================================================
 
-    mainchat(
-      io,
-      receiver,
-      directMessageinchat,
-    );
+    mainchat(io, receiver, directMessageinchat);
 
     // ==================================================
     // RESPONSE
@@ -224,17 +238,13 @@ export const SenddirectMessage = async (req, res) => {
       data: directMessageinchat,
     });
   } catch (error) {
-    console.error(
-      "❌ Send Message Error:",
-      error,
-    );
+    console.error("❌ Send Message Error:", error);
 
     return res.status(500).json({
       message: "Internal server error",
     });
   }
 };
-
 
 // ======================================================
 // GET DIRECT MESSAGES
@@ -280,13 +290,11 @@ export const getdirectMessage = async (req, res) => {
     // GET MESSAGES
     // ==================================================
 
-    const [
-      directmessageschat,
-      totaldirectmessageschat,
-    ] = await Promise.all([
+    const [directmessageschat, totaldirectmessageschat] = await Promise.all([
       directMessage
         .find(query)
-        .select(`
+        .select(
+          `
           _id
           sender
           receiver
@@ -299,7 +307,8 @@ export const getdirectMessage = async (req, res) => {
           replyTo
           editedAt
           edited
-        `)
+        `,
+        )
         .populate({
           path: "replyTo",
           select: `
@@ -335,18 +344,13 @@ export const getdirectMessage = async (req, res) => {
       total: totaldirectmessageschat,
     });
   } catch (error) {
-    console.error(
-      "❌ Get Messages Error:",
-      error,
-    );
+    console.error("❌ Get Messages Error:", error);
 
     return res.status(500).json({
       message: "Internal server error",
     });
   }
 };
-
-
 
 // ======================================================
 // GET PEOPLE I HAVE TALKED TO
@@ -395,10 +399,7 @@ export const getTalkedUsers = async (req, res) => {
           otherUser: {
             $cond: [
               {
-                $eq: [
-                  "$sender",
-                  new mongoose.Types.ObjectId(loginuserId),
-                ],
+                $eq: ["$sender", new mongoose.Types.ObjectId(loginuserId)],
               },
               "$receiver",
               "$sender",
@@ -462,4 +463,3 @@ export const getTalkedUsers = async (req, res) => {
     });
   }
 };
-

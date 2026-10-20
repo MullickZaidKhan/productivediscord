@@ -6,12 +6,7 @@ import {
   uint8ArrayToBase64,
 } from "../../../../crypto/cryptoUtils.js";
 
-async function encryptCopies(
-  text,
-  keyMap,
-  deviceField,
-  senderDeviceId = null,
-) {
+async function encryptCopies(text, keyMap, deviceField, senderDeviceId = null) {
   const copies = [];
 
   for (const [copyDeviceId, sharedKey] of keyMap.entries()) {
@@ -20,16 +15,9 @@ async function encryptCopies(
       continue;
     }
 
-    console.log(
-      "🔐 Encrypting message for",
-      deviceField,
-      copyDeviceId,
-    );
+    console.log("🔐 Encrypting message for", deviceField, copyDeviceId);
 
-    const { encrypted, iv } = await encryptMessage(
-      text,
-      sharedKey,
-    );
+    const { encrypted, iv } = await encryptMessage(text, sharedKey);
 
     const copy = {
       [deviceField]: copyDeviceId,
@@ -57,11 +45,9 @@ export default function useSendChatMessage({
 }) {
   const queryClient = useQueryClient();
 
-  const {
-    mutateAsync: sendDirectMessage,
-    isPending: isSending,
-  } = useSendDirectMessage();
-
+  const { mutateAsync: sendDirectMessage, isPending: isSending } =
+    useSendDirectMessage();
+  const MAX_MESSAGE_LENGTH = 2000;
   const sendMessage = async (draft) => {
     const text = draft.trim();
 
@@ -78,6 +64,15 @@ export default function useSendChatMessage({
 
     if (!contact?._id) {
       console.error("❌ Receiver user ID is missing");
+      return false;
+    }
+    console.log("Message length:", [...text].length);
+    console.log("Maximum allowed:", MAX_MESSAGE_LENGTH);
+
+    if ([...text].length > MAX_MESSAGE_LENGTH) {
+      console.error(
+        `❌ Message cannot exceed ${MAX_MESSAGE_LENGTH} characters`,
+      );
       return false;
     }
 
@@ -117,13 +112,8 @@ export default function useSendChatMessage({
       // VALIDATION
       // ==================================================
 
-      if (
-        !deviceMessagesreceiver.length ||
-        !deviceMessagessender.length
-      ) {
-        console.error(
-          "❌ Encrypted device copies are incomplete",
-        );
+      if (!deviceMessagesreceiver.length || !deviceMessagessender.length) {
+        console.error("❌ Encrypted device copies are incomplete");
         return false;
       }
 
@@ -156,10 +146,7 @@ export default function useSendChatMessage({
 
       return true;
     } catch (error) {
-      console.error(
-        "❌ Message Encryption Error:",
-        error,
-      );
+      console.error("❌ Message Encryption Error:", error);
 
       return false;
     }
