@@ -341,7 +341,7 @@
 //   );
 // }
 import { Skeleton, SkeletonCircle, SkeletonList } from "./Skeleton.jsx";
-
+import { useState, useEffect } from "react";
 // ---- Space background data (computed once at module load: no state/timers) ----
 const COLORS = { white: "#FFFFFF", silver: "color-mix(in srgb, #FFFFFF 68%, #000000)" };
 const frac = (n) => n - Math.floor(n);
@@ -384,20 +384,20 @@ const STARS = Array.from({ length: 36 }, (_, i) => {
 
 // A few rare shooting stars (each travels only briefly in a long cycle).
 const SHOOTERS = [
-  { "--x": "6%",  "--y": "8%",  "--w": "130px", "--r": "30deg",  "--tx": "46vw",  "--ty": "26.6vw", "--d": "19s", "--dl": "3s" },
-  { "--x": "58%", "--y": "4%",  "--w": "110px", "--r": "28deg",  "--tx": "40vw",  "--ty": "21.3vw", "--d": "26s", "--dl": "10s" },
+  { "--x": "6%", "--y": "8%", "--w": "130px", "--r": "30deg", "--tx": "46vw", "--ty": "26.6vw", "--d": "19s", "--dl": "3s" },
+  { "--x": "58%", "--y": "4%", "--w": "110px", "--r": "28deg", "--tx": "40vw", "--ty": "21.3vw", "--d": "26s", "--dl": "10s" },
   { "--x": "94%", "--y": "16%", "--w": "120px", "--r": "152deg", "--tx": "-44vw", "--ty": "23.4vw", "--d": "31s", "--dl": "16s" },
 ];
 
 // Orbiting particles around centres spread across the scene (none on the logo).
 // --e flattens the circle into an ellipse, --tilt rotates it, --dir sets the spin direction.
 const ORBITS = [
-  { "--cx": "14%", "--cy": "24%", "--r": "22vmin", "--e": 0.45, "--tilt": "-18deg", "--d": "46s", "--dl": "-12s", "--dir": "normal",  "--s": "3px",   "--c": COLORS.silver,   "--o": 0.9,  "--g": "7s",  "--gl": "-2s" },
-  { "--cx": "84%", "--cy": "20%", "--r": "17vmin", "--e": 0.55, "--tilt": "24deg",  "--d": "38s", "--dl": "-20s", "--dir": "reverse", "--s": "2.5px", "--c": COLORS.white, "--o": 0.85, "--g": "9s",  "--gl": "-5s" },
-  { "--cx": "22%", "--cy": "80%", "--r": "26vmin", "--e": 0.4,  "--tilt": "12deg",  "--d": "62s", "--dl": "-30s", "--dir": "reverse", "--s": "3.5px", "--c": COLORS.silver,  "--o": 0.8,  "--g": "11s", "--gl": "-7s" },
-  { "--cx": "80%", "--cy": "74%", "--r": "20vmin", "--e": 0.5,  "--tilt": "-30deg", "--d": "52s", "--dl": "-8s",  "--dir": "normal",  "--s": "2.5px", "--c": COLORS.silver,  "--o": 0.9,  "--g": "8s",  "--gl": "-1s" },
-  { "--cx": "50%", "--cy": "9%",  "--r": "15vmin", "--e": 0.35, "--tilt": "6deg",   "--d": "34s", "--dl": "-15s", "--dir": "reverse", "--s": "2px",   "--c": COLORS.silver,   "--o": 0.8,  "--g": "6s",  "--gl": "-3s" },
-  { "--cx": "92%", "--cy": "52%", "--r": "13vmin", "--e": 0.6,  "--tilt": "70deg",  "--d": "30s", "--dl": "-5s",  "--dir": "normal",  "--s": "2px",   "--c": COLORS.silver,  "--o": 0.75, "--g": "10s", "--gl": "-6s" },
+  { "--cx": "14%", "--cy": "24%", "--r": "22vmin", "--e": 0.45, "--tilt": "-18deg", "--d": "46s", "--dl": "-12s", "--dir": "normal", "--s": "3px", "--c": COLORS.silver, "--o": 0.9, "--g": "7s", "--gl": "-2s" },
+  { "--cx": "84%", "--cy": "20%", "--r": "17vmin", "--e": 0.55, "--tilt": "24deg", "--d": "38s", "--dl": "-20s", "--dir": "reverse", "--s": "2.5px", "--c": COLORS.white, "--o": 0.85, "--g": "9s", "--gl": "-5s" },
+  { "--cx": "22%", "--cy": "80%", "--r": "26vmin", "--e": 0.4, "--tilt": "12deg", "--d": "62s", "--dl": "-30s", "--dir": "reverse", "--s": "3.5px", "--c": COLORS.silver, "--o": 0.8, "--g": "11s", "--gl": "-7s" },
+  { "--cx": "80%", "--cy": "74%", "--r": "20vmin", "--e": 0.5, "--tilt": "-30deg", "--d": "52s", "--dl": "-8s", "--dir": "normal", "--s": "2.5px", "--c": COLORS.silver, "--o": 0.9, "--g": "8s", "--gl": "-1s" },
+  { "--cx": "50%", "--cy": "9%", "--r": "15vmin", "--e": 0.35, "--tilt": "6deg", "--d": "34s", "--dl": "-15s", "--dir": "reverse", "--s": "2px", "--c": COLORS.silver, "--o": 0.8, "--g": "6s", "--gl": "-3s" },
+  { "--cx": "92%", "--cy": "52%", "--r": "13vmin", "--e": 0.6, "--tilt": "70deg", "--d": "30s", "--dl": "-5s", "--dir": "normal", "--s": "2px", "--c": COLORS.silver, "--o": 0.75, "--g": "10s", "--gl": "-6s" },
 ];
 
 // Irregular asteroid silhouettes.
@@ -416,18 +416,18 @@ const rock = (c, size, [x0, y0], [x1, y1], d, dl, r, rd, o) => ({
   "--d": `${d}s`, "--dl": `${dl}s`, "--r": `${r}s`, "--rd": rd, "--o": o,
 });
 const ROCKS = [
-  rock(0, 3.4, ["-8vw", "14vh"],  ["108vw", "26vh"],  120, -35, 46, "normal",  0.9),
-  rock(1, 2.4, ["108vw", "84vh"], ["-8vw", "72vh"],   95,  -60, 33, "reverse", 0.85),
-  rock(2, 2.9, ["-8vw", "79vh"],  ["108vw", "91vh"],  150, -90, 58, "normal",  0.8),
-  rock(3, 1.9, ["108vw", "22vh"], ["-8vw", "9vh"],    85,  -20, 27, "reverse", 0.8),
-  rock(4, 2.2, ["82vw", "-8vh"],  ["96vw", "108vh"],  110, -50, 40, "normal",  0.75),
+  rock(0, 3.4, ["-8vw", "14vh"], ["108vw", "26vh"], 120, -35, 46, "normal", 0.9),
+  rock(1, 2.4, ["108vw", "84vh"], ["-8vw", "72vh"], 95, -60, 33, "reverse", 0.85),
+  rock(2, 2.9, ["-8vw", "79vh"], ["108vw", "91vh"], 150, -90, 58, "normal", 0.8),
+  rock(3, 1.9, ["108vw", "22vh"], ["-8vw", "9vh"], 85, -20, 27, "reverse", 0.8),
+  rock(4, 2.2, ["82vw", "-8vh"], ["96vw", "108vh"], 110, -50, 40, "normal", 0.75),
   // tiny distant rocks
-  rock(1, 0.7, ["-8vw", "30vh"],  ["108vw", "36vh"],  70,  -10, 20, "normal",  0.6),
-  rock(2, 0.5, ["108vw", "60vh"], ["-8vw", "66vh"],   64,  -40, 16, "reverse", 0.55),
-  rock(3, 0.8, ["-8vw", "88vh"],  ["108vw", "80vh"],  105, -70, 24, "normal",  0.6),
-  rock(0, 0.6, ["20vw", "-8vh"],  ["8vw", "108vh"],   90,  -30, 18, "reverse", 0.5),
-  rock(4, 0.9, ["108vw", "12vh"], ["-8vw", "18vh"],   130, -100, 30, "normal", 0.65),
-  rock(1, 0.5, ["38vw", "108vh"], ["22vw", "-8vh"],   75,  -55, 14, "reverse", 0.5),
+  rock(1, 0.7, ["-8vw", "30vh"], ["108vw", "36vh"], 70, -10, 20, "normal", 0.6),
+  rock(2, 0.5, ["108vw", "60vh"], ["-8vw", "66vh"], 64, -40, 16, "reverse", 0.55),
+  rock(3, 0.8, ["-8vw", "88vh"], ["108vw", "80vh"], 105, -70, 24, "normal", 0.6),
+  rock(0, 0.6, ["20vw", "-8vh"], ["8vw", "108vh"], 90, -30, 18, "reverse", 0.5),
+  rock(4, 0.9, ["108vw", "12vh"], ["-8vw", "18vh"], 130, -100, 30, "normal", 0.65),
+  rock(1, 0.5, ["38vw", "108vh"], ["22vw", "-8vh"], 75, -55, 14, "reverse", 0.5),
 ];
 
 // One distant satellite on a slow elliptical path, left of the centre content.
@@ -436,6 +436,15 @@ const SATELLITE = { "--cx": "26%", "--cy": "32%", "--a": "17vw", "--b": "9vh", "
 
 /** Full-app loading skeleton shown while the auth/session check is in flight. */
 export default function AppSkeleton() {
+  const [loadingText, setLoadingText] = useState("Getting things ready");
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoadingText("Almost there");
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, []);
   return (
     <div
       className="relative flex h-screen bg-[#1f1f1f9c] overflow-hidden"
@@ -538,6 +547,7 @@ export default function AppSkeleton() {
             from { opacity: 0; }
             to   { opacity: 1; }
           }
+            
 
           /* black space layer: #000000 dominates. A black vignette lets the edges recede
              and soft white only appears as a whisper of light in two corners. Nothing
@@ -1043,6 +1053,47 @@ export default function AppSkeleton() {
             .wolvo-shoot, .wolvo-rocket { display: none; }
             .wolvo-waves path { opacity: 1; }
           }
+            .wolvo-status {
+  display: inline-block;
+  animation: wolvo-status 2.6s ease-in-out infinite;
+}
+
+@keyframes wolvo-status {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 1; }
+}
+
+.wolvo-loading-dots {
+  display: inline-flex;
+  width: 18px;
+  margin-left: 2px;
+}
+
+.wolvo-loading-dots span {
+  display: inline-block;
+  opacity: 0.2;
+  animation: wolvo-dot-pulse 1.4s ease-in-out infinite;
+}
+
+.wolvo-loading-dots span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.wolvo-loading-dots span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes wolvo-dot-pulse {
+  0%, 60%, 100% {
+    opacity: 0.2;
+    transform: translateY(0);
+  }
+
+  30% {
+    opacity: 1;
+    transform: translateY(-2px);
+  }
+}
         `}</style>
 
         {/* Deep-space atmosphere: decorative, behind everything in the overlay */}
@@ -1111,7 +1162,12 @@ export default function AppSkeleton() {
             Wolvo
           </h1>
           <p className="wolvo-status mt-1 text-sm font-normal text-white/50">
-            Getting things ready...
+            {loadingText}
+            <span className="wolvo-loading-dots" aria-hidden="true">
+              <span>.</span>
+              <span>.</span>
+              <span>.</span>
+            </span>
           </p>
         </div>
       </div>
