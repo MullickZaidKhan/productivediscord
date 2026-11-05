@@ -31,7 +31,7 @@ const isUserOnline = (contactId) => {
       initial="hidden"
       animate="show"
       variants={staggerContainer(0.04)}
-      className="w-[82vw] max-w-[280px] md:w-[23vw] md:max-w-none h-full md:h-screen p-1 bg-[#1e1f22] md:bg-[#03030373] flex flex-col rounded-2x text-[#949ba4] select-none overflow-y-auto"
+      className="w-[82vw] max-w-[280px] md:w-[23vw] md:max-w-none h-full md:h-screen p-1 bg-[#1e1f22] md:bg-[#111214cc] backdrop-blur-md flex flex-col rounded-2xl text-[#949ba4] select-none overflow-y-auto border-r border-[#26282c]"
     >
       {/* Mobile drawer header */}
       {onClose && (

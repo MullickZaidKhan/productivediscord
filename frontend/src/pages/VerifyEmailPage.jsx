@@ -184,7 +184,7 @@ const submitOtp = async (value = code) => {
     fail(message);
     clearBoxes();
   }
-};
+};                    
 
   const handleChange = (i, v) => {
     if (!/^\d?$/.test(v)) return;

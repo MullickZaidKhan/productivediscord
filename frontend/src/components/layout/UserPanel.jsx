@@ -131,17 +131,29 @@ export default function UserPanel(props) {
       {/* Right */}
       <div className="flex items-center gap-0.5 sm:gap-1 shrink-0">
         {/* Mic */}
-        <button className="flex w-7 h-7 sm:w-8 sm:h-8 md:w-9 md:h-9 rounded-lg bg-[#5d2028] hover:bg-[#6b242d] items-center justify-center transition-colors active:scale-95">
+        <button
+          title="Mute"
+          aria-label="Mute microphone"
+          className="flex w-7 h-7 sm:w-8 sm:h-8 md:w-9 md:h-9 rounded-lg bg-[#5d2028] hover:bg-[#6b242d] items-center justify-center transition-colors active:scale-95"
+        >
           <BsMicMuteFill size={14} className="text-[#f23f43] sm:hidden" />
           <BsMicMuteFill size={16} className="text-[#f23f43] hidden sm:block md:hidden" />
           <BsMicMuteFill size={18} className="text-[#f23f43] hidden md:block" />
         </button>
         {/* Arrow */}
-        <button className="flex w-5 h-7 sm:w-6 sm:h-8 md:w-6 md:h-9 rounded-lg hover:bg-[#36373d] items-center justify-center transition-colors active:scale-95">
+        <button
+          title="User settings menu"
+          aria-label="User settings menu"
+          className="flex w-5 h-7 sm:w-6 sm:h-8 md:w-6 md:h-9 rounded-lg hover:bg-[#36373d] items-center justify-center transition-colors active:scale-95"
+        >
           <HiChevronDown size={14} className="text-gray-300" />
         </button>
         {/* Headphone */}
-        <button className="flex w-7 h-7 sm:w-8 sm:h-8 md:w-9 md:h-9 rounded-lg hover:bg-[#36373d] items-center justify-center transition-colors active:scale-95">
+        <button
+          title="Deafen"
+          aria-label="Deafen headphones"
+          className="flex w-7 h-7 sm:w-8 sm:h-8 md:w-9 md:h-9 rounded-lg hover:bg-[#36373d] items-center justify-center transition-colors active:scale-95"
+        >
           <BsHeadphones size={14} className="text-gray-300 sm:hidden" />
           <BsHeadphones size={16} className="text-gray-300 hidden sm:block md:hidden" />
           <BsHeadphones size={18} className="text-gray-300 hidden md:block" />
@@ -149,6 +161,8 @@ export default function UserPanel(props) {
         {/* Settings */}
         <button
           onClick={() => dispatch(openAccountSettings())}
+          title="User Settings"
+          aria-label="User Settings"
           className="flex w-7 h-7 sm:w-8 sm:h-8 md:w-9 md:h-9 rounded-lg hover:bg-[#36373d] items-center justify-center transition-colors active:scale-95"
         >
           <HiCog6Tooth size={16} className="text-gray-300 sm:hidden" />

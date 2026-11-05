@@ -118,7 +118,7 @@
 //               onClick={onCloseChat}
 //               className="rounded-full p-1 hover:bg-white/10 transition-colors"
 //               aria-label="Close chat"
-              
+
 //             >
 //               <ChevronLeft className="text-white" />
 //             </button>
@@ -288,12 +288,8 @@ export default function ChatPage({ onCloseChat }) {
   const contact = useSelector((state) => state.chat.userinfo);
   const currentUser = useSelector((state) => state.authinfoSlice.userinfo);
   const { bgimg } = useChatBackground();
-  const {
-    deviceId,
-    sharedKeysRef,
-    senderSharedKeysRef,
-    isSharedKeyReady,
-  } = useChatCrypto({ currentUser, contact });
+  const { deviceId, sharedKeysRef, senderSharedKeysRef, isSharedKeyReady } =
+    useChatCrypto({ currentUser, contact });
   const socket = useChatSocket({
     contactId: contact?._id,
     currentUserId: currentUser?.id,
@@ -301,19 +297,15 @@ export default function ChatPage({ onCloseChat }) {
     sharedKeysRef,
     senderSharedKeysRef,
   });
-  const {
-    messages,
-    groupedMessages,
-    messagesLoading,
-    messagesError,
-  } = useChatMessages({
-    contactId: contact?._id,
-    currentUserId: currentUser?.id,
-    deviceId,
-    sharedKeysRef,
-    senderSharedKeysRef,
-    isSharedKeyReady,
-  });
+  const { messages, groupedMessages, messagesLoading, messagesError } =
+    useChatMessages({
+      contactId: contact?._id,
+      currentUserId: currentUser?.id,
+      deviceId,
+      sharedKeysRef,
+      senderSharedKeysRef,
+      isSharedKeyReady,
+    });
   const { sendMessage, isSending } = useSendChatMessage({
     contact,
     currentUser,
@@ -321,19 +313,14 @@ export default function ChatPage({ onCloseChat }) {
     sharedKeysRef,
     senderSharedKeysRef,
   });
-  const {
-    draft,
-    isContactTyping,
-    handleTyping,
-    handleKeyDown,
-    handleSend,
-  } = useChatTyping({
-    socket,
-    currentUserId: currentUser?.id,
-    contactId: contact?._id,
-    onSend: sendMessage,
-    isSending,
-  });
+  const { draft, isContactTyping, handleTyping, handleKeyDown, handleSend } =
+    useChatTyping({
+      socket,
+      currentUserId: currentUser?.id,
+      contactId: contact?._id,
+      onSend: sendMessage,
+      isSending,
+    });
   const scrollRef = useChatScroll(messages.length);
   const isContactOnline = useContactOnline(contact?._id);
 
@@ -488,10 +475,18 @@ export default function ChatPage({ onCloseChat }) {
           </div>
 
           <div className="flex items-center gap-4 text-[#b5bac1]">
-            <InputIcon label="Call"><Phone size={20} /></InputIcon>
-            <InputIcon label="Video call"><Video size={20} /></InputIcon>
-            <InputIcon label="Pinned messages"><Pin size={20} /></InputIcon>
-            <InputIcon label="Add friend"><Users size={20} /></InputIcon>
+            <InputIcon label="Call">
+              <Phone size={20} />
+            </InputIcon>
+            <InputIcon label="Video call">
+              <Video size={20} />
+            </InputIcon>
+            <InputIcon label="Pinned messages">
+              <Pin size={20} />
+            </InputIcon>
+            <InputIcon label="Add friend">
+              <Users size={20} />
+            </InputIcon>
           </div>
         </div>
 
@@ -521,14 +516,21 @@ export default function ChatPage({ onCloseChat }) {
               </div>
               <div className="flex flex-col gap-2.5">
                 {group.messages.map((message) => {
-                  const isOwn = String(message.sender) === String(currentUser?.id);
+                  const isOwn =
+                    String(message.sender) === String(currentUser?.id);
                   const author = isOwn
                     ? {
                         name: currentUser?.name + " ( you )" || "You",
                         profileimg: currentUser?.profileimg,
                       }
                     : { name: contact.name, profileimg: contact?.profileimg };
-                  return <MessageRow key={message._id} message={message} author={author} />;
+                  return (
+                    <MessageRow
+                      key={message._id}
+                      message={message}
+                      author={author}
+                    />
+                  );
                 })}
               </div>
             </div>
@@ -564,7 +566,9 @@ export default function ChatPage({ onCloseChat }) {
 
             <div className="flex flex-wrap sm:flex-nowrap items-end gap-x-3 gap-y-1.5 w-full box-border bg-[#383a40] rounded-lg px-3 sm:px-4 py-2.5 focus-within:ring-1 focus-within:ring-[#4a4d55] transition-all duration-200">
               <div className="flex h-[26px] shrink-0 items-center">
-                <InputIcon label="Add attachment"><Plus size={20} /></InputIcon>
+                <InputIcon label="Add attachment">
+                  <Plus size={20} />
+                </InputIcon>
               </div>
 
               <textarea
@@ -580,10 +584,22 @@ export default function ChatPage({ onCloseChat }) {
               />
 
               <div className="ml-auto sm:ml-0 flex h-[26px] shrink-0 items-center gap-3.5">
-                <span className="hidden sm:inline-flex"><InputIcon label="Send a gift"><Gift size={20} /></InputIcon></span>
-                <InputIcon label="Open GIF picker"><ImageIcon size={20} /></InputIcon>
-                <span className="hidden sm:inline-flex"><InputIcon label="Open sticker picker"><Grid3x3 size={20} /></InputIcon></span>
-                <InputIcon label="Open emoji picker"><Smile size={20} /></InputIcon>
+                <span className="hidden sm:inline-flex">
+                  <InputIcon label="Send a gift">
+                    {/* <Gift size={20} /> */}
+                  </InputIcon>
+                </span>
+                <InputIcon label="Open GIF picker">
+                  <ImageIcon size={20} />
+                </InputIcon>
+                <span className="hidden sm:inline-flex">
+                  {/* <InputIcon label="Open sticker picker">
+                    <Grid3x3 size={20} />
+                  </InputIcon> */}
+                </span>
+                <InputIcon label="Open emoji picker">
+                  <Smile size={20} />
+                </InputIcon>
                 {hasText && (
                   <InputIcon
                     label="Send message"
@@ -643,8 +659,8 @@ export default function ChatPage({ onCloseChat }) {
                 role="alert"
                 className="mx-4 mb-2 rounded-md border border-[#ed4245]/50 bg-[#ed4245]/15 px-3 py-2 text-[13px] text-[#ff8587]"
               >
-                Message is too long ({draft.length}/{MAX_MESSAGE_LENGTH}). Remove{" "}
-                {overBy} character{overBy === 1 ? "" : "s"} to send.
+                Message is too long ({draft.length}/{MAX_MESSAGE_LENGTH}).
+                Remove {overBy} character{overBy === 1 ? "" : "s"} to send.
               </div>
             )}
 

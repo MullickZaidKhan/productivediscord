@@ -641,12 +641,12 @@ export default function useChatMessages({
               sharedKey,
             );
 
-            console.log(
-              isSender
-                ? "✅ Sender message decrypted:"
-                : "✅ Receiver message decrypted:",
-              message._id,
-            );
+            // console.log(
+            //   isSender
+            //     ? "✅ Sender message decrypted:"
+            //     : "✅ Receiver message decrypted:",
+            //   message._id,
+            // );
 
             return { ...message, text };
           } catch (error) {

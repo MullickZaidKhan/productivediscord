@@ -2,6 +2,7 @@ import { directMessage } from "../../model/chat/directMessage.model.js";
 import { mainchat } from "../../Socket.IO/chat/mainsocket.js";
 import { getIO } from "../../Socket.IO/socket.js";
 import mongoose from "mongoose";
+import { User } from "../../model/auth.model.js";
 // import { uploadToImageKit } from "..."; // keep your existing import
 const MAX_ENCRYPTED_TEXT_LENGTH = 10000;
 
@@ -250,35 +251,144 @@ if (Array.isArray(deviceMessagessender)) {
 // GET DIRECT MESSAGES
 // ======================================================
 
+// export const getdirectMessage = async (req, res) => {
+//   try {
+//     const { userId } = req.params;
+
+//     const loginuserId = req.user.id;
+
+//     // ==================================================
+//     // VALIDATION
+//     // ==================================================
+
+//     if (!userId) {
+//       return res.status(400).json({
+//         message: "userId is required",
+//       });
+//     }
+
+//     // ==================================================
+//     // QUERY
+//     // ==================================================
+
+//     const query = {
+//       deleted: false,
+
+//       $or: [
+//         {
+//           sender: loginuserId,
+//           receiver: userId,
+//         },
+
+//         {
+//           sender: userId,
+//           receiver: loginuserId,
+//         },
+//       ],
+//     };
+
+//     // ==================================================
+//     // GET MESSAGES
+//     // ==================================================
+
+//     const [directmessageschat, totaldirectmessageschat] = await Promise.all([
+//       directMessage
+//         .find(query)
+//         .select(
+//           `
+//           _id
+//           sender
+//           receiver
+//           senderDeviceId
+//           deviceMessagesreceiver
+//           deviceMessagessender
+//           image
+//           seen
+//           createdAt
+//           replyTo
+//           editedAt
+//           edited
+//         `,
+//         )
+//         .populate({
+//           path: "replyTo",
+//           select: `
+//             _id
+//             sender
+//             receiver
+//             senderDeviceId
+//             deviceMessagesreceiver
+//             deviceMessagessender
+//             image
+//             createdAt
+//           `,
+//         }),
+
+//       directMessage.countDocuments(query),
+//     ]);
+
+//     // ==================================================
+//     // ORDER
+//     // ==================================================
+
+//     const orderedMessages = directmessageschat.reverse();
+
+//     // ==================================================
+//     // RESPONSE
+//     // ==================================================
+
+//     return res.status(200).json({
+//       message: "Messages fetched successfully",
+
+//       data: orderedMessages,
+
+//       total: totaldirectmessageschat,
+//     });
+//   } catch (error) {
+//     console.error("❌ Get Messages Error:", error);
+
+//     return res.status(500).json({
+//       message: "Internal server error",
+//     });
+//   }
+// };
 export const getdirectMessage = async (req, res) => {
   try {
     const { userId } = req.params;
-
     const loginuserId = req.user.id;
 
-    // ==================================================
-    // VALIDATION
-    // ==================================================
-
-    if (!userId) {
+    // Validate userId
+    if (!userId || !mongoose.isValidObjectId(userId)) {
       return res.status(400).json({
-        message: "userId is required",
+        message: "Invalid userId",
       });
     }
 
-    // ==================================================
-    // QUERY
-    // ==================================================
+    // Prevent querying your own conversation as another user
+    if (userId === loginuserId.toString()) {
+      return res.status(400).json({
+        message: "Invalid conversation user",
+      });
+    }
 
+    // Verify that the requested user exists
+    const requestedUser = await User.findById(userId).select("_id");
+
+    if (!requestedUser) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    // Fetch only messages between the logged-in user
+    // and the requested user
     const query = {
       deleted: false,
-
       $or: [
         {
           sender: loginuserId,
           receiver: userId,
         },
-
         {
           sender: userId,
           receiver: loginuserId,
@@ -286,32 +396,11 @@ export const getdirectMessage = async (req, res) => {
       ],
     };
 
-    // ==================================================
-    // GET MESSAGES
-    // ==================================================
-
-    const [directmessageschat, totaldirectmessageschat] = await Promise.all([
-      directMessage
-        .find(query)
-        .select(
-          `
-          _id
-          sender
-          receiver
-          senderDeviceId
-          deviceMessagesreceiver
-          deviceMessagessender
-          image
-          seen
-          createdAt
-          replyTo
-          editedAt
-          edited
-        `,
-        )
-        .populate({
-          path: "replyTo",
-          select: `
+    const [directmessageschat, totaldirectmessageschat] =
+      await Promise.all([
+        directMessage
+          .find(query)
+          .select(`
             _id
             sender
             receiver
@@ -319,39 +408,46 @@ export const getdirectMessage = async (req, res) => {
             deviceMessagesreceiver
             deviceMessagessender
             image
+            seen
             createdAt
-          `,
-        }),
+            replyTo
+            editedAt
+            edited
+          `)
+          .populate({
+            path: "replyTo",
+            select: `
+              _id
+              sender
+              receiver
+              senderDeviceId
+              deviceMessagesreceiver
+              deviceMessagessender
+              image
+              createdAt
+            `,
+          })
+          .sort({ createdAt: -1 }),
 
-      directMessage.countDocuments(query),
-    ]);
+        directMessage.countDocuments(query),
+      ]);
 
-    // ==================================================
-    // ORDER
-    // ==================================================
-
-    const orderedMessages = directmessageschat.reverse();
-
-    // ==================================================
-    // RESPONSE
-    // ==================================================
+    // Return messages in chronological order
+    directmessageschat.reverse();
 
     return res.status(200).json({
       message: "Messages fetched successfully",
-
-      data: orderedMessages,
-
+      data: directmessageschat,
       total: totaldirectmessageschat,
     });
   } catch (error) {
-    console.error("❌ Get Messages Error:", error);
+    console.error("Get Messages Error:", error);
 
     return res.status(500).json({
       message: "Internal server error",
     });
   }
 };
-
 // ======================================================
 // GET PEOPLE I HAVE TALKED TO
 // ======================================================

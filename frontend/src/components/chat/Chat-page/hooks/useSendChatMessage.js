@@ -15,7 +15,7 @@ async function encryptCopies(text, keyMap, deviceField, senderDeviceId = null) {
       continue;
     }
 
-    console.log("🔐 Encrypting message for", deviceField, copyDeviceId);
+    // console.log("🔐 Encrypting message for", deviceField, copyDeviceId);
 
     const { encrypted, iv } = await encryptMessage(text, sharedKey);
 
