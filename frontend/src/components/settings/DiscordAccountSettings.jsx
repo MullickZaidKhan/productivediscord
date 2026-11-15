@@ -385,7 +385,7 @@ const onLogout = () => {
 
           {/* Scrollable content area only — header and close icon live outside this */}
           <div className="flex-1 overflow-y-auto dc-scroll min-h-0">
-            <div className="w-full max-w-[95%] mx-auto pt-6 sm:pt-[60px] pb-20 px-5 sm:px-10 min-w-0">
+            <div className="w-full max-w-[95%] mx-auto pt-6 sm:pt-[60px] pb-2 px-5 sm:px-10 min-w-0">
               {activeKey === "account" && (
                 <>
                   <h1 className="hidden sm:block text-white text-xl font-semibold mb-10">

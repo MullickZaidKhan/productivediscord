@@ -95,6 +95,36 @@ const userSchema = new mongoose.Schema(
       default: null,
     },
 
+    resetOtpHash: {
+      type: String,
+      select: false,
+    },
+    resetOtpExpiresAt: {
+      type: Date,
+      select: false,
+    },
+    resetOtpLastSentAt: {
+      type: Date,
+      select: false,
+    },
+    resetOtpAttempts: {
+      type: Number,
+      default: 0,
+      select: false,
+    },
+    resetOtpLockedUntil: {
+      type: Date,
+      select: false,
+    },
+    resetTokenHash: {
+      type: String,
+      select: false,
+    },
+    resetTokenExpiresAt: {
+      type: Date,
+      select: false,
+    },
+
     // Friends List
     friends: [
       {

@@ -5,6 +5,7 @@ import friendRoute from "./router/Friend.route.js";
 import backgroundRoute from "./router/background.route.js";
 import directMessage from "./router/chat/directMessage.route.js"
 import userSettingRoute from "./router/usersetting/usersetting.router.js";
+import passwordRoutes from "./router/password/password.routes.js";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 
@@ -48,6 +49,7 @@ app.use("/api/v1/friends", friendRoute);
 app.use("/api/v1/background", backgroundRoute);
 app.use("/api/v1/chat/directMessage", directMessage);
 app.use("/api/v1/usersetting", userSettingRoute);
+app.use("/api/v1/auth", passwordRoutes);
 app.get("/", (req, res) => {
   res.send("Hello, World!");
 });

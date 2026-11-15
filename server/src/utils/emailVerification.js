@@ -140,3 +140,24 @@ export const sendVerificationEmail = async (email, otp) => {
     throw err;
   }
 };
+
+export const sendPasswordResetEmail = async (email, otp) => {
+  try {
+    await transporter.sendMail({
+      from: `"Wolvo" <${config.EMAIL_USER}>`,
+      to: email,
+      subject: "Wolvo Password Reset OTP",
+      text: `Your Wolvo password reset code is ${otp}. It expires in 1 minute.`,
+      html: `
+        <h2>Wolvo Password Reset</h2>
+        <p>Your password reset OTP is:</p>
+        <h1>${otp}</h1>
+        <p>This OTP expires in 1 minute.</p>
+        <p>If you did not request this, ignore this email.</p>
+      `,
+    });
+  } catch (err) {
+    console.error("[MAIL] Failed to send password reset email:", err.message);
+    throw err;
+  }
+};
